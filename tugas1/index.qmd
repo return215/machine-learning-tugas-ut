@@ -1,0 +1,123 @@
+---
+title: "Quarto Basics"
+format:
+  html:
+    code-fold: true
+  ipynb: 
+    output-file: tugas1-052747132.ipynb
+  pdf:
+    code-fold: false
+jupyter: python3
+execute: 
+  enabled: true
+---
+
+# Tugas 1 Machine Learning
+
+```yaml
+Nama: Muhammad Hidayat
+NIM: 052747132
+```
+
+Tujuan dari tugas ini adalah untuk mempersiapkan dataset yang akan digunakan dalam proses pemodelan machine learning. Dataset yang digunakan memiliki beberapa permasalahan umum, seperti data yang hilang dan inkonsistensi format data, sehingga memerlukan langkah-langkah preprocessing untuk memastikan kualitas data sebelum digunakan dalam model.
+
+## Library yang digunakan
+
+```{python}
+import numpy as np
+import pandas as pd
+```
+
+## Dataset
+
+Dataset yang digunakan, [dataset_tugas1_preprocessing.csv](./dataset_tugas1_preprocessing.csv), berisi informasi mahasiswa dari berbagai program studi. Dataset ini sengaja dirancang dengan beberapa permasalahan umum dalam dunia nyata, seperti data yang hilang (missing values), inkonsistensi format data, serta tipe data kategorikal yang belum siap diproses oleh model machine learning.
+
+Langkah pertama dalam eksplorasi data adalah memuat dataset ke dalam DataFrame menggunakan pandas. 
+
+```{python}
+#| label: tbl-data-head
+
+# Memuat dataset
+data = pd.read_csv('dataset_tugas1_preprocessing.csv')
+
+# Menampilkan beberapa baris pertama dari dataset
+data.head()
+```
+
+## Eksplorasi Data
+
+Sebelum melakukan pemodelan, penting untuk memahami struktur dan kualitas data yang kita miliki. Salah satu langkah awal adalah mengetahui struktur dataset, termasuk jumlah baris dan kolom, serta tipe data dari setiap kolom.
+
+Dari @tbl-data-head, terdapat 99 baris data, tiapa baris mewakili satu mahasiswa, dan terdapat 8 kolom yang memberikan informasi tentang mahasiswa tersebut. Berikut adalah penjelasan singkat mengenai setiap kolom:
+
+- **ID**: Merupakan identifier unik untuk setiap mahasiswa. Ini biasanya digunakan oleh Nomor Induk Mahasiswa (NIM). Dalam hal ini, ID berupa format `MHXXX` dimana `XXX` adalah angka yang menunjukkan urutan mahasiswa.
+- **Nama**: Merupakan nama lengkap mahasiswa. Ini digunakan sebagai pelengkap dalam identifikasi mahasiswa.
+- **Jenis_Kelamin**: Merupakan jenis kelamin mahasiswa, yang dapat berupa 'Laki-laki' atau 'Perempuan'.
+- **Prodi**: Merupakan program studi yang diikuti oleh mahasiswa, seperti 'Informatika', 'Teknik Komputer', 'Data Science', dll.
+- **Status**: Merupakan status mahasiswa, yang dapat berupa 'Aktif', 'Cuti', 'Lulus', atau 'DO' atau "_dropout_".
+- **Nilai_Akhir**: Merupakan nilai akhir mahasiswa dalam bentuk mutu huruf, seperti 'A', 'B', 'C', 'D', atau 'E'. Nilai ini menunjukkan performa akademik mahasiswa, dengan 'A' sebagai performa terbaik dan 'E' sebagai performa terburuk.
+- **Tanggal_Ujian**: Merupakan tanggal ujian yang diikuti oleh mahasiswa. Terdapat dua format, yaittu 'YYYY/MM/DD' dan 'DD-MM-YYYY'. Dalam pemodelan, kita perlu memastikan bahwa format tanggal konsisten agar dapat diproses dengan benar.
+- **Umur**: Merupakan umur mahasiswa dalam tahun.
+
+```{python}
+# Menampilkan informasi tentang dataset
+data.info()
+```
+
+Menggunakan `data.info()`, kita dapat melihat bahwa sebagian besar kolom masih berupa tipe `str` atau teks, termasuk 'Tanggal_Ujian'. Data ini akan diolah menjadi tipe data yang sesuai untuk pemodelan.
+
+Selain itu, Dari lima kolom pertama yang ditampilkan, terdapat beberapa nilai yang hilang (NaN) pada kolom 'Nilai_Akhir' dan 'Umur'. Untuk mengetahui jumlah nilai yang hilang pada setiap kolom, kita dapat menggunakan fungsi `isnull()` dan `sum()`.
+
+```{python}
+# Menghitung jumlah nilai yang hilang pada setiap kolom
+missing_values = data.isnull().sum()
+print(missing_values)
+```
+
+Di sini terdapat 29 nilai kosong pada 'Nilai_Akhir' dan 9 nilai kosong pada 'Umur'. Hal ini menunjukkan bahwa kita perlu melakukan penanganan terhadap data yang hilang sebelum melanjutkan ke tahap pemodelan.
+
+
+```{python}
+# Analisis statistik deskriptif untuk kolom numerik
+numeric_summary = data.describe()
+print(numeric_summary)
+print()
+
+# Hitung jumlah entri string unik per kolom
+unique_entries = data.apply(lambda col: col.nunique())
+
+# Cetak hasilnya
+print(unique_entries)
+print()
+```
+
+```{python}
+# Tampilkan entri string unik untuk setiap kolom
+for column in data.columns:
+    unique_entries = data[column].unique()
+    if len(unique_entries) <= 10:  # Hanya tampilkan jika jumlah entri unik tidak terlalu banyak
+        print(f"Unique string entries for column '{column}':")
+        print(unique_entries)
+        print()
+```
+
+Terdapat 2 jenis kelamin, 4 program studi, 4 status mahasiswa, dan 5 nilai akhir yang berbeda. Hal ini menunjukkan perlu dilakukan encoding pada kolom-kolom tersebut agar dapat digunakan dalam model machine learning. Untuk nama, meskipun hanya terdapat 10 entri unik, ini hanya tanda identifikasi mahasiswa, sehingga tidak akan digunakan dalam pemodelan dan tidak perlu diencoding.
+
+## Preprocessing Data
+
+### Penanganan Data yang Hilang
+
+### Standaridasi Format Tanggal
+
+### Encoding Data Kategorikal
+
+## Pemodelan Machine Learning
+
+## Visualisasi Hasil
+
+## Diagnostik Python {.appendix}
+
+```{python}
+import IPython as ipy
+print(ipy.sys_info())
+```
