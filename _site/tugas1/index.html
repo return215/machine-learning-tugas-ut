@@ -1,0 +1,2464 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Muhammad Hidayat">
+
+<title>Tugas 1 Machine Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="index_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="index_files/libs/bootstrap/bootstrap-67270d1595a62d14f123c043d4fb2f18.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Daftar Isi</h2>
+   
+  <ul>
+  <li><a href="#sec-intro" id="toc-sec-intro" class="nav-link active" data-scroll-target="#sec-intro"><span class="header-section-number">1</span> Pendahuluan</a></li>
+  <li><a href="#persiapan-lingkungan" id="toc-persiapan-lingkungan" class="nav-link" data-scroll-target="#persiapan-lingkungan"><span class="header-section-number">2</span> Persiapan Lingkungan</a>
+  <ul class="collapse">
+  <li><a href="#sec-library" id="toc-sec-library" class="nav-link" data-scroll-target="#sec-library"><span class="header-section-number">2.1</span> Library yang digunakan</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset"><span class="header-section-number">2.2</span> Dataset</a></li>
+  </ul></li>
+  <li><a href="#sec-eda" id="toc-sec-eda" class="nav-link" data-scroll-target="#sec-eda"><span class="header-section-number">3</span> Eksplorasi Data</a></li>
+  <li><a href="#sec-preprocessing" id="toc-sec-preprocessing" class="nav-link" data-scroll-target="#sec-preprocessing"><span class="header-section-number">4</span> Preprocessing Data</a>
+  <ul class="collapse">
+  <li><a href="#penanganan-data-yang-hilang" id="toc-penanganan-data-yang-hilang" class="nav-link" data-scroll-target="#penanganan-data-yang-hilang"><span class="header-section-number">4.1</span> Penanganan Data yang Hilang</a></li>
+  <li><a href="#standarisasi-format-tanggal" id="toc-standarisasi-format-tanggal" class="nav-link" data-scroll-target="#standarisasi-format-tanggal"><span class="header-section-number">4.2</span> Standarisasi Format Tanggal</a></li>
+  <li><a href="#encoding-data-kategorikal" id="toc-encoding-data-kategorikal" class="nav-link" data-scroll-target="#encoding-data-kategorikal"><span class="header-section-number">4.3</span> Encoding Data Kategorikal</a></li>
+  </ul></li>
+  <li><a href="#pemodelan-machine-learning" id="toc-pemodelan-machine-learning" class="nav-link" data-scroll-target="#pemodelan-machine-learning"><span class="header-section-number">5</span> Pemodelan Machine Learning</a></li>
+  <li><a href="#evaluasi-model" id="toc-evaluasi-model" class="nav-link" data-scroll-target="#evaluasi-model"><span class="header-section-number">6</span> Evaluasi Model</a></li>
+  <li><a href="#visualisasi-hasil" id="toc-visualisasi-hasil" class="nav-link" data-scroll-target="#visualisasi-hasil"><span class="header-section-number">7</span> Visualisasi Hasil</a>
+  <ul class="collapse">
+  <li><a href="#distribusi-umur-histogram" id="toc-distribusi-umur-histogram" class="nav-link" data-scroll-target="#distribusi-umur-histogram"><span class="header-section-number">7.1</span> Distribusi Umur (histogram)</a></li>
+  <li><a href="#jumlah-mahasiswa-per-program-studi-column-chart" id="toc-jumlah-mahasiswa-per-program-studi-column-chart" class="nav-link" data-scroll-target="#jumlah-mahasiswa-per-program-studi-column-chart"><span class="header-section-number">7.2</span> Jumlah Mahasiswa per Program Studi (column chart)</a></li>
+  </ul></li>
+  <li><a href="#kesimpulan" id="toc-kesimpulan" class="nav-link" data-scroll-target="#kesimpulan"><span class="header-section-number">8</span> Kesimpulan</a></li>
+  <li><a href="#sec-appendix" id="toc-sec-appendix" class="nav-link" data-scroll-target="#sec-appendix"><span class="header-section-number">9</span> Lampiran</a>
+  <ul class="collapse">
+  
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Format Lain</h2><ul><li><a href="index.ipynb" download="index.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li><li><a href="index.md"><i class="bi bi-file-code"></i>Github (GFM)</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tugas 1 Machine Learning</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Penulis</div>
+    <div class="quarto-title-meta-contents">
+             <p>Muhammad Hidayat </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="sec-intro" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Pendahuluan</h1>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Nama</span><span class="kw">:</span><span class="at"> Muhammad Hidayat</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">NIM</span><span class="kw">:</span><span class="at"> </span><span class="dv">052747132</span></span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Tujuan dari tugas ini adalah untuk mempersiapkan dataset yang akan digunakan dalam proses pemodelan machine learning. Dataset yang digunakan memiliki beberapa permasalahan umum, seperti data yang hilang dan inkonsistensi format data, sehingga memerlukan langkah-langkah preprocessing untuk memastikan kualitas data sebelum digunakan dalam model.</p>
+</section>
+<section id="persiapan-lingkungan" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Persiapan Lingkungan</h1>
+<section id="sec-library" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="sec-library"><span class="header-section-number">2.1</span> Library yang digunakan</h2>
+<div id="9a9a26ec" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.impute <span class="im">import</span> SimpleImputer</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder, StandardScaler</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Penjelasan mengenai library yang digunakan:</p>
+<ul>
+<li><code>numpy</code>: digunakan untuk operasi matematika dan manipulasi array</li>
+<li><code>pandas</code>: digunakan untuk manipulasi dan analisis data, fondasi untuk DataFrame</li>
+<li><code>matplotlib.pyplot</code>: digunakan untuk membuat visualisasi data</li>
+<li><code>sklearn.impute.SimpleImputer</code>: digunakan untuk mengisi data yang hilang</li>
+<li><code>sklearn.compose.ColumnTransformer</code>: digunakan untuk menggabungkan transformasi kolom</li>
+<li><code>sklearn.preprocessing.OneHotEncoder</code>: digunakan untuk mengonversi data kategorikal menjadi numerik</li>
+<li><code>sklearn.preprocessing.StandardScaler</code>: digunakan untuk melakukan normalisasi data</li>
+<li><code>sklearn.model_selection.train_test_split</code>: digunakan untuk membagi data menjadi data latih dan data uji</li>
+<li><code>sklearn.linear_model.LinearRegression</code>: digunakan untuk pemodelan regresi linear</li>
+</ul>
+</section>
+<section id="dataset" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="dataset"><span class="header-section-number">2.2</span> Dataset</h2>
+<p>Dataset yang digunakan, <a href="./dataset_tugas1_preprocessing.csv">dataset_tugas1_preprocessing.csv</a>, berisi informasi mahasiswa dari berbagai program studi. Dataset ini sengaja dirancang dengan beberapa permasalahan umum dalam dunia nyata, seperti data yang hilang (missing values), inkonsistensi format data, serta tipe data kategorikal yang belum siap diproses oleh model machine learning.</p>
+<p>Langkah pertama dalam eksplorasi data adalah memuat dataset ke dalam DataFrame menggunakan pandas.</p>
+<div class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Memuat dataset</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_csv(<span class="st">'dataset_tugas1_preprocessing.csv'</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan beberapa baris pertama dari dataset</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>display(data.head())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-data-head" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="2">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-data-head-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabel&nbsp;1
+</figcaption>
+<div aria-describedby="tbl-data-head-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">Nama</th>
+<th data-quarto-table-cell-role="th">Jenis_Kelamin</th>
+<th data-quarto-table-cell-role="th">Prodi</th>
+<th data-quarto-table-cell-role="th">Status</th>
+<th data-quarto-table-cell-role="th">Nilai_Akhir</th>
+<th data-quarto-table-cell-role="th">Tanggal_Ujian</th>
+<th data-quarto-table-cell-role="th">Umur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>MH001</td>
+<td>Iwan</td>
+<td>Laki-laki</td>
+<td>Teknik Komputer</td>
+<td>Aktif</td>
+<td>NaN</td>
+<td>13-04-2020</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>MH002</td>
+<td>Eka</td>
+<td>Perempuan</td>
+<td>Teknik Komputer</td>
+<td>Lulus</td>
+<td>E</td>
+<td>2020/12/11</td>
+<td>28.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>MH003</td>
+<td>Iwan</td>
+<td>Laki-laki</td>
+<td>Teknik Komputer</td>
+<td>Aktif</td>
+<td>NaN</td>
+<td>2021/11/21</td>
+<td>23.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>MH004</td>
+<td>Eka</td>
+<td>Perempuan</td>
+<td>Teknik Komputer</td>
+<td>Aktif</td>
+<td>D</td>
+<td>2021/08/19</td>
+<td>18.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>MH005</td>
+<td>Joko</td>
+<td>Perempuan</td>
+<td>Data Science</td>
+<td>Aktif</td>
+<td>C</td>
+<td>2020/01/05</td>
+<td>26.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<p>Beberapa baris pertama dari dataset</p>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-eda" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Eksplorasi Data</h1>
+<p>Sebelum melakukan pemodelan, penting untuk memahami struktur dan kualitas data yang kita miliki. Salah satu langkah awal adalah mengetahui struktur dataset, termasuk jumlah baris dan kolom, serta tipe data dari setiap kolom.</p>
+<p>Dari <a href="#tbl-data-head" class="quarto-xref">Tabel&nbsp;1</a>, terdapat 99 baris data, tiapa baris mewakili satu mahasiswa, dan terdapat 8 kolom yang memberikan informasi tentang mahasiswa tersebut. Berikut adalah penjelasan singkat mengenai setiap kolom:</p>
+<ul>
+<li><strong>ID</strong>: Merupakan identifier unik untuk setiap mahasiswa. Ini biasanya digunakan oleh Nomor Induk Mahasiswa (NIM). Dalam hal ini, ID berupa format <code>MHXXX</code> dimana <code>XXX</code> adalah angka yang menunjukkan urutan mahasiswa.</li>
+<li><strong>Nama</strong>: Merupakan nama lengkap mahasiswa. Ini digunakan sebagai pelengkap dalam identifikasi mahasiswa.</li>
+<li><strong>Jenis_Kelamin</strong>: Merupakan jenis kelamin mahasiswa, yang dapat berupa ‘Laki-laki’ atau ‘Perempuan’.</li>
+<li><strong>Prodi</strong>: Merupakan program studi yang diikuti oleh mahasiswa, seperti ‘Informatika’, ‘Teknik Komputer’, ‘Data Science’, dll.</li>
+<li><strong>Status</strong>: Merupakan status mahasiswa, yang dapat berupa ‘Aktif’, ‘Cuti’, ‘Lulus’, atau ‘DO’ atau “<em>dropout</em>”.</li>
+<li><strong>Nilai_Akhir</strong>: Merupakan nilai akhir mahasiswa dalam bentuk mutu huruf, seperti ‘A’, ‘B’, ‘C’, ‘D’, atau ‘E’. Nilai ini menunjukkan performa akademik mahasiswa, dengan ‘A’ sebagai performa terbaik dan ‘E’ sebagai performa terburuk.</li>
+<li><strong>Tanggal_Ujian</strong>: Merupakan tanggal ujian yang diikuti oleh mahasiswa. Terdapat dua format, yaittu ‘YYYY/MM/DD’ dan ‘DD-MM-YYYY’. Dalam pemodelan, kita perlu memastikan bahwa format tanggal konsisten agar dapat diproses dengan benar.</li>
+<li><strong>Umur</strong>: Merupakan umur mahasiswa dalam tahun.</li>
+</ul>
+<div id="cc0ca691" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan informasi tentang dataset</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>display(data.info())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.DataFrame'&gt;
+RangeIndex: 99 entries, 0 to 98
+Data columns (total 8 columns):
+ #   Column         Non-Null Count  Dtype  
+---  ------         --------------  -----  
+ 0   ID             99 non-null     str    
+ 1   Nama           99 non-null     str    
+ 2   Jenis_Kelamin  99 non-null     str    
+ 3   Prodi          99 non-null     str    
+ 4   Status         99 non-null     str    
+ 5   Nilai_Akhir    70 non-null     str    
+ 6   Tanggal_Ujian  99 non-null     str    
+ 7   Umur           90 non-null     float64
+dtypes: float64(1), str(7)
+memory usage: 6.3 KB</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>None</code></pre>
+</div>
+</div>
+<p>Menggunakan <code>data.info()</code>, kita dapat melihat bahwa sebagian besar kolom masih berupa tipe <code>str</code> atau teks, termasuk ‘Tanggal_Ujian’. Data ini akan diolah menjadi tipe data yang sesuai untuk pemodelan.</p>
+<div id="737cfd73" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Analisis statistik deskriptif untuk kolom numerik</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>numeric_summary <span class="op">=</span> data.describe()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>display(numeric_summary)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Hitung jumlah entri string unik per kolom</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>unique_entries <span class="op">=</span> data.<span class="bu">apply</span>(<span class="kw">lambda</span> col: col.nunique())</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Cetak hasilnya</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Jumlah entri string unik per kolom:"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>display(unique_entries)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Umur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>90.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>23.366667</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>3.763963</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>18.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>20.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>23.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>26.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>30.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Jumlah entri string unik per kolom:</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>ID               99
+Nama             10
+Jenis_Kelamin     2
+Prodi             4
+Status            4
+Nilai_Akhir       5
+Tanggal_Ujian    97
+Umur             13
+dtype: int64</code></pre>
+</div>
+</div>
+<div id="09b128ce" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tampilkan entri string unik untuk setiap kolom</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> column <span class="kw">in</span> data.columns:</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    unique_entries <span class="op">=</span> data[column].unique()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(unique_entries) <span class="op">&lt;=</span> <span class="dv">10</span>:  <span class="co"># Hanya tampilkan jika jumlah entri unik tidak terlalu banyak</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Unique string entries for column '</span><span class="sc">{</span>column<span class="sc">}</span><span class="ss">':</span><span class="ch">\n</span><span class="sc">{</span>unique_entries<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Unique string entries for column 'Nama':
+&lt;StringArray&gt;
+['Iwan', 'Eka', 'Joko', 'Gita', 'Adi', 'Hana', 'Dina', 'Budi', 'Citra',
+ 'Farhan']
+Length: 10, dtype: str
+
+Unique string entries for column 'Jenis_Kelamin':
+&lt;StringArray&gt;
+['Laki-laki', 'Perempuan']
+Length: 2, dtype: str
+
+Unique string entries for column 'Prodi':
+&lt;StringArray&gt;
+['Teknik Komputer', 'Data Science', 'Informatika', 'Sistem Informasi']
+Length: 4, dtype: str
+
+Unique string entries for column 'Status':
+&lt;StringArray&gt;
+['Aktif', 'Lulus', 'DO', 'Cuti']
+Length: 4, dtype: str
+
+Unique string entries for column 'Nilai_Akhir':
+&lt;StringArray&gt;
+[nan, 'E', 'D', 'C', 'B', 'A']
+Length: 6, dtype: str
+</code></pre>
+</div>
+</div>
+<p>Terdapat 2 jenis kelamin, 4 program studi, 4 status mahasiswa, dan 5 nilai akhir yang berbeda. Hal ini menunjukkan perlu dilakukan encoding pada kolom-kolom tersebut agar dapat digunakan dalam model machine learning. Untuk nama, meskipun hanya terdapat 10 entri unik, ini hanya tanda identifikasi mahasiswa, sehingga tidak akan digunakan dalam pemodelan dan tidak perlu diencoding.</p>
+<p>Berikut banyak baris per entri unik untuk jenis kelamin, prodi, status, dan nilai akhir.</p>
+<div id="3b189607" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hitung banyak baris per entri unik</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Hanya untuk jenis kelamin, prodi, status, dan nilai akhir</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>columns <span class="op">=</span> [<span class="st">'Jenis_Kelamin'</span>, <span class="st">'Prodi'</span>, <span class="st">'Status'</span>, <span class="st">'Nilai_Akhir'</span>]</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> column <span class="kw">in</span> columns:</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    unique_counts <span class="op">=</span> data[column].value_counts()</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Unique counts for column '</span><span class="sc">{</span>column<span class="sc">}</span><span class="ss">':</span><span class="ch">\n</span><span class="sc">{</span>unique_counts<span class="sc">}</span><span class="ch">\n</span><span class="ss">Total: </span><span class="sc">{</span>unique_counts<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Unique counts for column 'Jenis_Kelamin':
+Jenis_Kelamin
+Laki-laki    50
+Perempuan    49
+Name: count, dtype: int64
+Total: 99
+
+Unique counts for column 'Prodi':
+Prodi
+Teknik Komputer     28
+Informatika         28
+Sistem Informasi    23
+Data Science        20
+Name: count, dtype: int64
+Total: 99
+
+Unique counts for column 'Status':
+Status
+Cuti     29
+DO       26
+Aktif    25
+Lulus    19
+Name: count, dtype: int64
+Total: 99
+
+Unique counts for column 'Nilai_Akhir':
+Nilai_Akhir
+C    17
+D    16
+A    16
+B    12
+E     9
+Name: count, dtype: int64
+Total: 70
+</code></pre>
+</div>
+</div>
+<p>Selain itu, dari lima kolom pertama yang ditampilkan, terdapat beberapa nilai yang hilang (NaN) pada kolom ‘Nilai_Akhir’ dan ‘Umur’. Untuk mengetahui jumlah nilai yang hilang pada setiap kolom, kita dapat menggunakan fungsi <code>isnull()</code> dan <code>sum()</code>. Dan untuk melihat baris mana saja yang memiliki nilai yang hilang, kita dapat menggunakan fungsi <code>isnull()</code> dengan <code>any(axis=1)</code> untuk memfilter baris yang memiliki setidaknya satu nilai yang hilang.</p>
+<div id="9a8e22ec" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter baris dengan nilai NA</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>na_rows <span class="op">=</span> data[data.isnull().<span class="bu">any</span>(axis<span class="op">=</span><span class="dv">1</span>)]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Hitung jumlah total nilai NA</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>total_cols_na <span class="op">=</span> data.isnull().<span class="bu">sum</span>()</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Hitung baris dengan nilai NA</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>total_rows_na <span class="op">=</span> na_rows.shape[<span class="dv">0</span>]</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>total_na <span class="op">=</span> data.isnull().<span class="bu">sum</span>().<span class="bu">sum</span>()</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Cetak jumlah nilai NA per kolom</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Count of NA values per column:"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(total_cols_na[total_cols_na <span class="op">&gt;</span> <span class="dv">0</span>])</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Cetak baris dengan nilai NA</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Rows with NA values:"</span>)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>display(na_rows.tail())</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Cetak jumlah total baris dengan nilai NA</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total count of rows with NA values: </span><span class="sc">{</span>total_rows_na<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Cetak jumlah total nilai NA</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total count of NA values: </span><span class="sc">{</span>total_na<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Count of NA values per column:
+Nilai_Akhir    29
+Umur            9
+dtype: int64
+Rows with NA values:</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">Nama</th>
+<th data-quarto-table-cell-role="th">Jenis_Kelamin</th>
+<th data-quarto-table-cell-role="th">Prodi</th>
+<th data-quarto-table-cell-role="th">Status</th>
+<th data-quarto-table-cell-role="th">Nilai_Akhir</th>
+<th data-quarto-table-cell-role="th">Tanggal_Ujian</th>
+<th data-quarto-table-cell-role="th">Umur</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">84</th>
+<td>MH085</td>
+<td>Gita</td>
+<td>Laki-laki</td>
+<td>Sistem Informasi</td>
+<td>Cuti</td>
+<td>NaN</td>
+<td>2021/03/20</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">86</th>
+<td>MH087</td>
+<td>Eka</td>
+<td>Laki-laki</td>
+<td>Teknik Komputer</td>
+<td>DO</td>
+<td>NaN</td>
+<td>2022/02/06</td>
+<td>20.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">91</th>
+<td>MH092</td>
+<td>Eka</td>
+<td>Laki-laki</td>
+<td>Sistem Informasi</td>
+<td>Cuti</td>
+<td>NaN</td>
+<td>2021/11/12</td>
+<td>24.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">96</th>
+<td>MH097</td>
+<td>Iwan</td>
+<td>Laki-laki</td>
+<td>Data Science</td>
+<td>Lulus</td>
+<td>D</td>
+<td>2020/01/11</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">98</th>
+<td>MH099</td>
+<td>Hana</td>
+<td>Perempuan</td>
+<td>Teknik Komputer</td>
+<td>DO</td>
+<td>NaN</td>
+<td>2021/10/18</td>
+<td>19.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total count of rows with NA values: 35
+Total count of NA values: 38</code></pre>
+</div>
+</div>
+<p>Di sini terdapat 29 nilai kosong pada ‘Nilai_Akhir’ dan 9 nilai kosong pada ‘Umur’. Hal ini menunjukkan bahwa kita perlu melakukan penanganan terhadap data yang hilang sebelum melanjutkan ke tahap pemodelan.</p>
+</section>
+<section id="sec-preprocessing" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Preprocessing Data</h1>
+<p>Di sini, kita akan melakukan beberapa langkah preprocessing untuk menangani permasalahan yang ada dalam dataset, seperti data yang hilang, inkonsistensi format tanggal, dan encoding data kategorikal. Data yang diproses ini akan ditaruh dalam variabel <code>data_preprocessed</code> untuk digunakan dalam tahap pemodelan selanjutnya.</p>
+<p>Pertama, kita akan membuat dataframe baru dan menyalin semua data dari data aslinya. Kolom ‘ID’ dipertahankan, karena kolom ini bertindak sebagai identifikasi dan tidak akan digunakan dalam pemodelan. Kolom-kolom lainnya akan diproses seperlunya. Dan untuk kolom ‘Nama’, ini akan dihapus karena kolom ini hanya sebagai pelengkap dan tidak akan digunakan dalam pemodelan.</p>
+<div id="90505979" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Membuat dataframe baru untuk data yang sudah diproses</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>data_preprocessed <span class="op">=</span> data.copy()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Menghapus kolom 'Nama' karena tidak akan digunakan dalam pemodelan</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>data_preprocessed.drop(columns<span class="op">=</span>[<span class="st">'Nama'</span>], inplace<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="penanganan-data-yang-hilang" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="penanganan-data-yang-hilang"><span class="header-section-number">4.1</span> Penanganan Data yang Hilang</h2>
+<p>Sebelumnya dalam <a href="#sec-eda" class="quarto-xref">Bagian&nbsp;3</a>, kita sudah mengetahui bahwa terdapat nilai yang hilang pada kolom ‘Nilai_Akhir’ dan ‘Umur’. Untuk menangani data yang hilang, metode berikut akan digunakan:</p>
+<ul>
+<li>‘Nilai_Akhir’: Nilai adalah data yang kritis. Melakukan pengisian nilai akan mengganggu integritas data, sehingga 29 baris dengan nilai yang hilang pada kolom ini akan dihapus.</li>
+<li>‘Umur’: Data umur tidak terlalu kritis dan bisa diperkirakan berdasarkan data yang ada. Nilai yang hilang pada kolom ini akan diisi dengan nilai rata-rata umur dari data yang tersedia. Metode yang digunakan adalah <code>SimpleImputer</code> dari library <code>sklearn</code>, dengan strategi ‘mean’ untuk mengisi nilai yang hilang dengan rata-rata.</li>
+</ul>
+<div id="9e5b151c" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Untuk kolom 'Nilai_Akhir', nilai yang hilang akan dihapus</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>data_preprocessed <span class="op">=</span> data_preprocessed.dropna(subset<span class="op">=</span>[<span class="st">'Nilai_Akhir'</span>])</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Untuk kolom 'Umur', nilai yang hilang akan diisi dengan nilai rata-rata umur</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>imputer <span class="op">=</span> SimpleImputer(strategy<span class="op">=</span><span class="st">'mean'</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>data_preprocessed[<span class="st">'Umur'</span>] <span class="op">=</span> imputer.fit_transform(data_preprocessed[[<span class="st">'Umur'</span>]])</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="standarisasi-format-tanggal" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="standarisasi-format-tanggal"><span class="header-section-number">4.2</span> Standarisasi Format Tanggal</h2>
+<p>Kolom ‘Tanggal_Ujian’ memiliki dua format tanggal yang berbeda, yaitu ‘YYYY/MM/DD’ dan ‘DD-MM-YYYY’. Untuk memastikan konsistensi dalam pemrosesan data, kita akan mengubah semua format tanggal menjadi format yang sama sekaligus membuat kolom menjadi tipe data datetime.</p>
+<p>Kita akan menggunakan fungsi <code>pd.to_datetime()</code> dari pandas untuk melakukan konversi ini. Dikarenakan terdapat dua format tanggal yang berbeda, kita akan menggunakan parameter <code>format='mixed'</code> untuk memungkinkan pandas mengenali kedua format tersebut. Selain itu, kita juga akan menggunakan parameter <code>yearfirst=True</code> dan <code>dayfirst=True</code> untuk memastikan bahwa pandas dapat mengidentifikasi bagian tahun dan hari dengan benar.</p>
+<div id="c6a51bad" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mengubah format tanggal menjadi format yang sama dan mengonversi ke tipe datetime</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>data_preprocessed[<span class="st">'Tanggal_Ujian'</span>] <span class="op">=</span> pd.to_datetime(data_preprocessed[<span class="st">'Tanggal_Ujian'</span>], errors<span class="op">=</span><span class="st">'raise'</span>, <span class="bu">format</span><span class="op">=</span><span class="st">'mixed'</span>, yearfirst<span class="op">=</span><span class="va">True</span>, dayfirst<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="encoding-data-kategorikal" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="encoding-data-kategorikal"><span class="header-section-number">4.3</span> Encoding Data Kategorikal</h2>
+<p>Encoding data kategorikal diperlukan agar data tersebut dapat digunakan dalam model machine learning, yang umumnya hanya dapat memproses data numerik. Berikut adalah beberapa asumsi terkait kolom-kolom kategorikal dalam dataset ini beserta metode encoding yang akan digunakan:</p>
+<ul>
+<li><strong>Jenis_Kelamin</strong>: Terdapat dua kategori, yaitu ‘Laki-laki’ dan ‘Perempuan’. Kita akan menggunakan encoding manual dengan memberikan nilai 0 untuk ‘Laki-laki’ dan 1 untuk ‘Perempuan’.</li>
+<li><strong>Nilai_Akhir</strong>: Terdapat lima kategori, yaitu ‘A’, ‘B’, ‘C’, ‘D’, dan ‘E’. Data ini bersifat ordinal dan memiliki urutan mutu, sehingga kita akan menggunakan encoding manual berbobot dengan memberikan nilai 4 untuk ‘A’, 3 untuk ‘B’, 2 untuk ‘C’, 1 untuk ‘D’, dan 0 untuk ‘E’.</li>
+<li><strong>Status</strong>: Terdapat empat kategori, yaitu ‘Aktif’, ‘Cuti’, ‘Lulus’, dan ‘DO’. Untuk mempermudah proses encoding, kita akan menggunakan <em>one-hot encoding</em>, yang akan menghasilkan empat kolom baru, masing-masing untuk setiap kategori status, dengan nilai 1 jika mahasiswa memiliki status tersebut dan 0 jika tidak.</li>
+<li><strong>Prodi</strong>: Terdapat empat kategori, yaitu ‘Informatika’, ‘Teknik Komputer’, ‘Data Science’, dan ‘Sistem Informasi’. Sama seperti ‘Status’, kita akan menggunakan <em>one-hot encoding</em> untuk kolom ini.</li>
+</ul>
+<div id="44108ae3" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Kategori untuk jenis kelamin (manual)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>gender_categories <span class="op">=</span> {<span class="st">'Laki-laki'</span>: <span class="dv">0</span>, <span class="st">'Perempuan'</span>: <span class="dv">1</span>}</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Kategori untuk nilai akhir (manual, berbobot)</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>grade_categories <span class="op">=</span> {<span class="st">'A'</span>: <span class="dv">4</span>, <span class="st">'B'</span>: <span class="dv">3</span>, <span class="st">'C'</span>: <span class="dv">2</span>, <span class="st">'D'</span>: <span class="dv">1</span>, <span class="st">'E'</span>: <span class="dv">0</span>}</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Untuk encoding manual, operasi <code>map</code> sederhana akan digunakan. Sedangkan untuk melakukan <em>one-hot encoding</em>, kita akan menggunakan fungsi <code>get_dummies</code> dari pandas. Alternatif lain untuk melakukan <em>one-hot encoding</em> adalah dengan menggunakan <code>ColumnTransformer</code> dan <code>OneHotEncoder</code> dari library <code>sklearn</code>, namun prosesnya lebih kompleks, sehingga tidak akan digunakan di sini.</p>
+<div id="4953c795" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># menggunakan pd.get_dummies() untuk melakukan one-hot encoding pada kolom 'Status' dan 'Prodi'</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fungsi ini juga membuat salinan data baru, sehingga kita bisa melakukan encoding manual pada kolom 'Jenis_Kelamin' dan 'Nilai_Akhir' tanpa mempengaruhi data asli</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>data_preprocessed_3 <span class="op">=</span> pd.get_dummies(data_preprocessed, columns<span class="op">=</span>[<span class="st">'Status'</span>, <span class="st">'Prodi'</span>], prefix<span class="op">=</span>[<span class="st">'Status'</span>, <span class="st">'Prodi'</span>], drop_first<span class="op">=</span><span class="va">False</span>, dtype<span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Melakukan encoding manual untuk kolom 'Jenis_Kelamin' dan 'Nilai_Akhir'</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>data_preprocessed_3[<span class="st">'Jenis_Kelamin'</span>] <span class="op">=</span> data_preprocessed[<span class="st">'Jenis_Kelamin'</span>].<span class="bu">map</span>(gender_categories)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>data_preprocessed_3[<span class="st">'Nilai_Akhir'</span>] <span class="op">=</span> data_preprocessed[<span class="st">'Nilai_Akhir'</span>].<span class="bu">map</span>(grade_categories)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>display(data_preprocessed_3[[<span class="st">'ID'</span>, <span class="st">'Jenis_Kelamin'</span>, <span class="st">'Nilai_Akhir'</span>, <span class="st">'Tanggal_Ujian'</span>, <span class="st">'Umur'</span>, <span class="st">'Status_Aktif'</span>, <span class="st">'Prodi_Teknik Komputer'</span>]].head())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">Jenis_Kelamin</th>
+<th data-quarto-table-cell-role="th">Nilai_Akhir</th>
+<th data-quarto-table-cell-role="th">Tanggal_Ujian</th>
+<th data-quarto-table-cell-role="th">Umur</th>
+<th data-quarto-table-cell-role="th">Status_Aktif</th>
+<th data-quarto-table-cell-role="th">Prodi_Teknik Komputer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">1</th>
+<td>MH002</td>
+<td>1</td>
+<td>0</td>
+<td>2020-11-12</td>
+<td>28.0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>MH004</td>
+<td>1</td>
+<td>1</td>
+<td>2021-08-19</td>
+<td>18.0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>MH005</td>
+<td>1</td>
+<td>2</td>
+<td>2020-05-01</td>
+<td>26.0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5</th>
+<td>MH006</td>
+<td>1</td>
+<td>2</td>
+<td>2021-10-15</td>
+<td>20.0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>MH007</td>
+<td>0</td>
+<td>2</td>
+<td>2020-01-15</td>
+<td>21.0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="d2b804c3" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>display(data_preprocessed_3.info())</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>display(data_preprocessed_3.describe())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.DataFrame'&gt;
+Index: 70 entries, 1 to 97
+Data columns (total 13 columns):
+ #   Column                  Non-Null Count  Dtype         
+---  ------                  --------------  -----         
+ 0   ID                      70 non-null     str           
+ 1   Jenis_Kelamin           70 non-null     int64         
+ 2   Nilai_Akhir             70 non-null     int64         
+ 3   Tanggal_Ujian           70 non-null     datetime64[us]
+ 4   Umur                    70 non-null     float64       
+ 5   Status_Aktif            70 non-null     int64         
+ 6   Status_Cuti             70 non-null     int64         
+ 7   Status_DO               70 non-null     int64         
+ 8   Status_Lulus            70 non-null     int64         
+ 9   Prodi_Data Science      70 non-null     int64         
+ 10  Prodi_Informatika       70 non-null     int64         
+ 11  Prodi_Sistem Informasi  70 non-null     int64         
+ 12  Prodi_Teknik Komputer   70 non-null     int64         
+dtypes: datetime64[us](1), float64(1), int64(10), str(1)
+memory usage: 7.7 KB</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>None</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Jenis_Kelamin</th>
+<th data-quarto-table-cell-role="th">Nilai_Akhir</th>
+<th data-quarto-table-cell-role="th">Tanggal_Ujian</th>
+<th data-quarto-table-cell-role="th">Umur</th>
+<th data-quarto-table-cell-role="th">Status_Aktif</th>
+<th data-quarto-table-cell-role="th">Status_Cuti</th>
+<th data-quarto-table-cell-role="th">Status_DO</th>
+<th data-quarto-table-cell-role="th">Status_Lulus</th>
+<th data-quarto-table-cell-role="th">Prodi_Data Science</th>
+<th data-quarto-table-cell-role="th">Prodi_Informatika</th>
+<th data-quarto-table-cell-role="th">Prodi_Sistem Informasi</th>
+<th data-quarto-table-cell-role="th">Prodi_Teknik Komputer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>70.000000</td>
+<td>70.000000</td>
+<td>70</td>
+<td>70.00000</td>
+<td>70.000000</td>
+<td>70.000000</td>
+<td>70.000000</td>
+<td>70.000000</td>
+<td>70.000000</td>
+<td>70.000000</td>
+<td>70.000000</td>
+<td>70.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>0.514286</td>
+<td>2.142857</td>
+<td>2021-05-27 20:34:17.142857</td>
+<td>23.15625</td>
+<td>0.285714</td>
+<td>0.271429</td>
+<td>0.214286</td>
+<td>0.228571</td>
+<td>0.228571</td>
+<td>0.285714</td>
+<td>0.214286</td>
+<td>0.271429</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">min</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>2020-01-15 00:00:00</td>
+<td>18.00000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>0.000000</td>
+<td>1.000000</td>
+<td>2020-08-12 06:00:00</td>
+<td>20.00000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>1.000000</td>
+<td>2.000000</td>
+<td>2021-03-17 12:00:00</td>
+<td>23.15625</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>1.000000</td>
+<td>3.000000</td>
+<td>2022-03-08 06:00:00</td>
+<td>26.00000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">max</th>
+<td>1.000000</td>
+<td>4.000000</td>
+<td>2022-12-31 00:00:00</td>
+<td>30.00000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">std</th>
+<td>0.503405</td>
+<td>1.354389</td>
+<td>NaN</td>
+<td>3.44404</td>
+<td>0.455016</td>
+<td>0.447907</td>
+<td>0.413289</td>
+<td>0.422944</td>
+<td>0.422944</td>
+<td>0.455016</td>
+<td>0.413289</td>
+<td>0.447907</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="pemodelan-machine-learning" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Pemodelan Machine Learning</h1>
+<p>Selanjutnya, kita akan melakukan pemodelan machine learning. Untuk pemodelan ini, kita akan menggunakan regresi linear untuk melakukan prediksi nilai akhir mahasiswa.</p>
+<p>Sebelum melakukan pemodelan, data perlu dinormalisasi. Karena akan menggunakan regresi linear, maka metode normalisasi yang digunakan adalah <em>standarisasi</em> berdasarkan mean dan standar deviasi.</p>
+<p>Karena “Tanggal_Ujian” masih dalam bentuk datetime, perlu diubah menjadi bentuk numerik terlebih dahulu.</p>
+<p>Untuk melakukan normalisasi, kita akan menggunakan fungsi <code>StandardScaler</code> dari library <code>sklearn</code>:</p>
+<div id="c1fda715" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Membuat objek StandardScaler</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Membuat salinan tabel data</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>data_premodel <span class="op">=</span> data_preprocessed_3.copy().drop(<span class="st">'ID'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Mengubah 'Tanggal_Ujian' menjadi bentuk numerik</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>data_premodel[<span class="st">'Tanggal_Ujian'</span>] <span class="op">=</span> pd.to_numeric(data_premodel[<span class="st">'Tanggal_Ujian'</span>])</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Melakukan standarisasi pada data</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>data_premodel_scaled <span class="op">=</span> scaler.fit_transform(data_premodel)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>data_premodel_scaled_df <span class="op">=</span> pd.DataFrame(data_premodel_scaled, columns<span class="op">=</span>data_premodel.columns)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="040a0152" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>display(data_premodel_scaled_df.head())</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>display(data_premodel_scaled_df.info())</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>display(data_premodel_scaled_df.describe())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Jenis_Kelamin</th>
+<th data-quarto-table-cell-role="th">Nilai_Akhir</th>
+<th data-quarto-table-cell-role="th">Tanggal_Ujian</th>
+<th data-quarto-table-cell-role="th">Umur</th>
+<th data-quarto-table-cell-role="th">Status_Aktif</th>
+<th data-quarto-table-cell-role="th">Status_Cuti</th>
+<th data-quarto-table-cell-role="th">Status_DO</th>
+<th data-quarto-table-cell-role="th">Status_Lulus</th>
+<th data-quarto-table-cell-role="th">Prodi_Data Science</th>
+<th data-quarto-table-cell-role="th">Prodi_Informatika</th>
+<th data-quarto-table-cell-role="th">Prodi_Sistem Informasi</th>
+<th data-quarto-table-cell-role="th">Prodi_Teknik Komputer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>0.971825</td>
+<td>-1.593582</td>
+<td>-0.595187</td>
+<td>1.416570</td>
+<td>-0.632456</td>
+<td>-0.610368</td>
+<td>-0.522233</td>
+<td>1.837117</td>
+<td>-0.544331</td>
+<td>-0.632456</td>
+<td>-0.522233</td>
+<td>1.638356</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>0.971825</td>
+<td>-0.849910</td>
+<td>0.251378</td>
+<td>-1.507961</td>
+<td>1.581139</td>
+<td>-0.610368</td>
+<td>-0.522233</td>
+<td>-0.544331</td>
+<td>-0.544331</td>
+<td>-0.632456</td>
+<td>-0.522233</td>
+<td>1.638356</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>0.971825</td>
+<td>-0.106239</td>
+<td>-1.184760</td>
+<td>0.831664</td>
+<td>1.581139</td>
+<td>-0.610368</td>
+<td>-0.522233</td>
+<td>-0.544331</td>
+<td>1.837117</td>
+<td>-0.632456</td>
+<td>-0.522233</td>
+<td>-0.610368</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>0.971825</td>
+<td>-0.106239</td>
+<td>0.423715</td>
+<td>-0.923055</td>
+<td>1.581139</td>
+<td>-0.610368</td>
+<td>-0.522233</td>
+<td>-0.544331</td>
+<td>-0.544331</td>
+<td>-0.632456</td>
+<td>-0.522233</td>
+<td>1.638356</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>-1.028992</td>
+<td>-0.106239</td>
+<td>-1.508269</td>
+<td>-0.630602</td>
+<td>-0.632456</td>
+<td>-0.610368</td>
+<td>1.914854</td>
+<td>-0.544331</td>
+<td>1.837117</td>
+<td>-0.632456</td>
+<td>-0.522233</td>
+<td>-0.610368</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.DataFrame'&gt;
+RangeIndex: 70 entries, 0 to 69
+Data columns (total 12 columns):
+ #   Column                  Non-Null Count  Dtype  
+---  ------                  --------------  -----  
+ 0   Jenis_Kelamin           70 non-null     float64
+ 1   Nilai_Akhir             70 non-null     float64
+ 2   Tanggal_Ujian           70 non-null     float64
+ 3   Umur                    70 non-null     float64
+ 4   Status_Aktif            70 non-null     float64
+ 5   Status_Cuti             70 non-null     float64
+ 6   Status_DO               70 non-null     float64
+ 7   Status_Lulus            70 non-null     float64
+ 8   Prodi_Data Science      70 non-null     float64
+ 9   Prodi_Informatika       70 non-null     float64
+ 10  Prodi_Sistem Informasi  70 non-null     float64
+ 11  Prodi_Teknik Komputer   70 non-null     float64
+dtypes: float64(12)
+memory usage: 6.7 KB</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>None</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Jenis_Kelamin</th>
+<th data-quarto-table-cell-role="th">Nilai_Akhir</th>
+<th data-quarto-table-cell-role="th">Tanggal_Ujian</th>
+<th data-quarto-table-cell-role="th">Umur</th>
+<th data-quarto-table-cell-role="th">Status_Aktif</th>
+<th data-quarto-table-cell-role="th">Status_Cuti</th>
+<th data-quarto-table-cell-role="th">Status_DO</th>
+<th data-quarto-table-cell-role="th">Status_Lulus</th>
+<th data-quarto-table-cell-role="th">Prodi_Data Science</th>
+<th data-quarto-table-cell-role="th">Prodi_Informatika</th>
+<th data-quarto-table-cell-role="th">Prodi_Sistem Informasi</th>
+<th data-quarto-table-cell-role="th">Prodi_Teknik Komputer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>7.000000e+01</td>
+<td>7.000000e+01</td>
+<td>7.000000e+01</td>
+<td>7.000000e+01</td>
+<td>70.000000</td>
+<td>7.000000e+01</td>
+<td>7.000000e+01</td>
+<td>7.000000e+01</td>
+<td>7.000000e+01</td>
+<td>70.000000</td>
+<td>7.000000e+01</td>
+<td>7.000000e+01</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>1.332268e-16</td>
+<td>3.489272e-17</td>
+<td>-3.747796e-15</td>
+<td>-1.665335e-17</td>
+<td>0.000000</td>
+<td>1.490871e-16</td>
+<td>-2.220446e-17</td>
+<td>2.696256e-17</td>
+<td>3.806479e-17</td>
+<td>0.000000</td>
+<td>-2.854859e-17</td>
+<td>1.490871e-16</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>1.007220e+00</td>
+<td>1.007220e+00</td>
+<td>1.007220e+00</td>
+<td>1.007220e+00</td>
+<td>1.007220</td>
+<td>1.007220e+00</td>
+<td>1.007220e+00</td>
+<td>1.007220e+00</td>
+<td>1.007220e+00</td>
+<td>1.007220</td>
+<td>1.007220e+00</td>
+<td>1.007220e+00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>-1.028992e+00</td>
+<td>-1.593582e+00</td>
+<td>-1.508269e+00</td>
+<td>-1.507961e+00</td>
+<td>-0.632456</td>
+<td>-6.103679e-01</td>
+<td>-5.222330e-01</td>
+<td>-5.443311e-01</td>
+<td>-5.443311e-01</td>
+<td>-0.632456</td>
+<td>-5.222330e-01</td>
+<td>-6.103679e-01</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>-1.028992e+00</td>
+<td>-8.499104e-01</td>
+<td>-8.725889e-01</td>
+<td>-9.230552e-01</td>
+<td>-0.632456</td>
+<td>-6.103679e-01</td>
+<td>-5.222330e-01</td>
+<td>-5.443311e-01</td>
+<td>-5.443311e-01</td>
+<td>-0.632456</td>
+<td>-5.222330e-01</td>
+<td>-6.103679e-01</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>9.718253e-01</td>
+<td>-1.062388e-01</td>
+<td>-2.157447e-01</td>
+<td>0.000000e+00</td>
+<td>-0.632456</td>
+<td>-6.103679e-01</td>
+<td>-5.222330e-01</td>
+<td>-5.443311e-01</td>
+<td>-5.443311e-01</td>
+<td>-0.632456</td>
+<td>-5.222330e-01</td>
+<td>-6.103679e-01</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>9.718253e-01</td>
+<td>6.374328e-01</td>
+<td>8.598472e-01</td>
+<td>8.316636e-01</td>
+<td>1.581139</td>
+<td>1.638356e+00</td>
+<td>-5.222330e-01</td>
+<td>-5.443311e-01</td>
+<td>-5.443311e-01</td>
+<td>1.581139</td>
+<td>-5.222330e-01</td>
+<td>1.638356e+00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>9.718253e-01</td>
+<td>1.381104e+00</td>
+<td>1.760079e+00</td>
+<td>2.001476e+00</td>
+<td>1.581139</td>
+<td>1.638356e+00</td>
+<td>1.914854e+00</td>
+<td>1.837117e+00</td>
+<td>1.837117e+00</td>
+<td>1.581139</td>
+<td>1.914854e+00</td>
+<td>1.638356e+00</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Langkah selanjutnya adalah membagi data menjadi data latih dan data uji. Data latih digunakan untuk melatih model, sedangkan data uji digunakan untuk menguji performa model yang telah dibuat. Dari soal, diminta untuk membagi data menjadi 80% untuk data latih dan 20% untuk data uji. Untuk membagi data, kita akan menggunakan fungsi <code>train_test_split</code> dari library <code>sklearn</code>. Untuk nilai y, kita akan menggunakan kolom ‘Nilai_Akhir’ sebagai target. Sedangkan untuk nilai X, kita akan menggunakan semua kolom selain ‘Nilai_Akhir’ sebagai fitur.</p>
+<div id="e0cae4b2" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> data_premodel_scaled_df.drop(<span class="st">'Nilai_Akhir'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> data_premodel_scaled_df[<span class="st">'Nilai_Akhir'</span>]</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Membagi data menjadi data latih dan data uji</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan jumlah data latih dan data uji</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Jumlah data latih:"</span>, <span class="bu">len</span>(X_train))</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Jumlah data uji:"</span>, <span class="bu">len</span>(X_test))</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Jumlah data latih: 56
+Jumlah data uji: 14</code></pre>
+</div>
+</div>
+<p>Setelah melakukan normalisasi dan membagi data menjadi data latih dan data uji, kita akan melakukan pemodelan menggunakan regresi linear dengan fungsi <code>LinearRegression</code> dari library <code>sklearn</code>.</p>
+<div id="0bcf735b" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Membuat objek regresi linear</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>regressor <span class="op">=</span> LinearRegression()</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Melatih model menggunakan data latih</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>regressor.fit(X_train, y_train)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<style>#sk-container-id-1 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: #000;
+  --sklearn-color-text-muted: #666;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+}
+
+#sk-container-id-1.light {
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: black;
+  --sklearn-color-background: white;
+  --sklearn-color-border-box: black;
+  --sklearn-color-icon: #696969;
+}
+
+#sk-container-id-1.dark {
+  --sklearn-color-text-on-default-background: white;
+  --sklearn-color-background: #111;
+  --sklearn-color-border-box: white;
+  --sklearn-color-icon: #878787;
+}
+
+#sk-container-id-1 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-1 pre {
+  padding: 0;
+}
+
+#sk-container-id-1 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-1 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-1 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-1 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-1 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-1 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-1 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-1 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-1 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-1 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-1 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-1 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-1 label.sk-toggleable__label {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+#sk-container-id-1 label.sk-toggleable__label .caption {
+  font-size: 0.6rem;
+  font-weight: lighter;
+  color: var(--sklearn-color-text-muted);
+}
+
+#sk-container-id-1 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-1 div.sk-toggleable__content {
+  display: none;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-1 div.sk-label label.sk-toggleable__label,
+#sk-container-id-1 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-1 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  line-height: 1.2em;
+}
+
+#sk-container-id-1 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-1 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-1 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 0.5em;
+  text-align: center;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-3) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3) 1pt solid;
+  color: var(--sklearn-color-fitted-level-3);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  border: var(--sklearn-color-fitted-level-0) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-0);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  border: var(--sklearn-color-fitted-level-0) 1pt solid;
+  color: var(--sklearn-color-fitted-level-0);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-1 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-unfitted-level-0);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-1 a.estimator_doc_link.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-1 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-1 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+
+.estimator-table {
+    font-family: monospace;
+}
+
+.estimator-table summary {
+    padding: .5rem;
+    cursor: pointer;
+}
+
+.estimator-table summary::marker {
+    font-size: 0.7rem;
+}
+
+.estimator-table details[open] {
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+    padding-bottom: 0.3rem;
+}
+
+.estimator-table .parameters-table {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 0;
+}
+
+.estimator-table .parameters-table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.estimator-table .parameters-table tr:nth-child(even) {
+    background-color: #f6f6f6;
+}
+
+.estimator-table .parameters-table tr:hover {
+    background-color: #e0e0e0;
+}
+
+.estimator-table table td {
+    border: 1px solid rgba(106, 105, 104, 0.232);
+}
+
+/*
+    `table td`is set in notebook with right text-align.
+    We need to overwrite it.
+*/
+.estimator-table table td.param {
+    text-align: left;
+    position: relative;
+    padding: 0;
+}
+
+.user-set td {
+    color:rgb(255, 94, 0);
+    text-align: left !important;
+}
+
+.user-set td.value {
+    color:rgb(255, 94, 0);
+    background-color: transparent;
+}
+
+.default td {
+    color: black;
+    text-align: left !important;
+}
+
+.user-set td i,
+.default td i {
+    color: black;
+}
+
+/*
+    Styles for parameter documentation links
+    We need styling for visited so jupyter doesn't overwrite it
+*/
+a.param-doc-link,
+a.param-doc-link:link,
+a.param-doc-link:visited {
+    text-decoration: underline dashed;
+    text-underline-offset: .3em;
+    color: inherit;
+    display: block;
+    padding: .5em;
+}
+
+/* "hack" to make the entire area of the cell containing the link clickable */
+a.param-doc-link::before {
+    position: absolute;
+    content: "";
+    inset: 0;
+}
+
+.param-doc-description {
+    display: none;
+    position: absolute;
+    z-index: 9999;
+    left: 0;
+    padding: .5ex;
+    margin-left: 1.5em;
+    color: var(--sklearn-color-text);
+    box-shadow: .3em .3em .4em #999;
+    width: max-content;
+    text-align: left;
+    max-height: 10em;
+    overflow-y: auto;
+
+    /* unfitted */
+    background: var(--sklearn-color-unfitted-level-0);
+    border: thin solid var(--sklearn-color-unfitted-level-3);
+}
+
+/* Fitted state for parameter tooltips */
+.fitted .param-doc-description {
+    /* fitted */
+    background: var(--sklearn-color-fitted-level-0);
+    border: thin solid var(--sklearn-color-fitted-level-3);
+}
+
+.param-doc-link:hover .param-doc-description {
+    display: block;
+}
+
+.copy-paste-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    background-position: 0;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LinearRegression()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked=""><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LinearRegression</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.linear_model.LinearRegression.html">?<span>Documentation for LinearRegression</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                
+<table class="parameters-table caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<tbody>
+<tr class="default odd">
+<td><em></em></td>
+<td class="param"><a href="https://scikit-learn.org/1.8/modules/generated/sklearn.linear_model.LinearRegression.html#:~:text=fit_intercept,-bool%2C%20default%3DTrue" class="param-doc-link" rel="noreferrer" target="_blank">fit_intercept <span class="param-doc-description">fit_intercept: bool, default=True<br>
+<br>
+Whether to calculate the intercept for this model. If set<br>
+to False, no intercept will be used in calculations<br>
+(i.e. data is expected to be centered).</span></a></td>
+<td class="value">True</td>
+</tr>
+<tr class="default even">
+<td><em></em></td>
+<td class="param"><a href="https://scikit-learn.org/1.8/modules/generated/sklearn.linear_model.LinearRegression.html#:~:text=copy_X,-bool%2C%20default%3DTrue" class="param-doc-link" rel="noreferrer" target="_blank">copy_X <span class="param-doc-description">copy_X: bool, default=True<br>
+<br>
+If True, X will be copied; else, it may be overwritten.</span></a></td>
+<td class="value">True</td>
+</tr>
+<tr class="default odd">
+<td><em></em></td>
+<td class="param"><a href="https://scikit-learn.org/1.8/modules/generated/sklearn.linear_model.LinearRegression.html#:~:text=tol,-float%2C%20default%3D1e-6" class="param-doc-link" rel="noreferrer" target="_blank">tol <span class="param-doc-description">tol: float, default=1e-6<br>
+<br>
+The precision of the solution (`coef_`) is determined by `tol` which<br>
+specifies a different convergence criterion for the `lsqr` solver.<br>
+`tol` is set as `atol` and `btol` of :func:`scipy.sparse.linalg.lsqr` when<br>
+fitting on sparse training data. This parameter has no effect when fitting<br>
+on dense data.<br>
+<br>
+.. versionadded:: 1.7</span></a></td>
+<td class="value">1e-06</td>
+</tr>
+<tr class="default even">
+<td><em></em></td>
+<td class="param"><a href="https://scikit-learn.org/1.8/modules/generated/sklearn.linear_model.LinearRegression.html#:~:text=n_jobs,-int%2C%20default%3DNone" class="param-doc-link" rel="noreferrer" target="_blank">n_jobs <span class="param-doc-description">n_jobs: int, default=None<br>
+<br>
+The number of jobs to use for the computation. This will only provide<br>
+speedup in case of sufficiently large problems, that is if firstly<br>
+`n_targets &gt; 1` and secondly `X` is sparse or if `positive` is set<br>
+to `True`. ``None`` means 1 unless in a<br>
+:obj:`joblib.parallel_backend` context. ``-1`` means using all<br>
+processors. See :term:`Glossary <n_jobs>` for more details.</n_jobs></span></a></td>
+<td class="value">None</td>
+</tr>
+<tr class="default odd">
+<td><em></em></td>
+<td class="param"><a href="https://scikit-learn.org/1.8/modules/generated/sklearn.linear_model.LinearRegression.html#:~:text=positive,-bool%2C%20default%3DFalse" class="param-doc-link" rel="noreferrer" target="_blank">positive <span class="param-doc-description">positive: bool, default=False<br>
+<br>
+When set to ``True``, forces the coefficients to be positive. This<br>
+option is only supported for dense arrays.<br>
+<br>
+For a comparison between a linear regression model with positive constraints<br>
+on the regression coefficients and a linear regression without such constraints,<br>
+see :ref:`sphx_glr_auto_examples_linear_model_plot_nnls.py`.<br>
+<br>
+.. versionadded:: 0.24</span></a></td>
+<td class="value">False</td>
+</tr>
+</tbody>
+</table>
+
+            </details>
+        </div>
+    </div></div></div></div></div><script>function copyToClipboard(text, element) {
+    // Get the parameter prefix from the closest toggleable content
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+    const originalStyle = element.style;
+    const computedStyle = window.getComputedStyle(element);
+    const originalWidth = computedStyle.width;
+    const originalHTML = element.innerHTML.replace('Copied!', '');
+
+    navigator.clipboard.writeText(fullParamName)
+        .then(() => {
+            element.style.width = originalWidth;
+            element.style.color = 'green';
+            element.innerHTML = "Copied!";
+
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            element.style.color = 'red';
+            element.innerHTML = "Failed!";
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        });
+    return false;
+}
+
+document.querySelectorAll('.copy-paste-icon').forEach(function(element) {
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const paramName = element.parentElement.nextElementSibling
+        .textContent.trim().split(' ')[0];
+    const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+    element.setAttribute('title', fullParamName);
+});
+
+
+/**
+ * Adapted from Skrub
+ * https://github.com/skrub-data/skrub/blob/403466d1d5d4dc76a7ef569b3f8228db59a31dc3/skrub/_reporting/_data/templates/report.js#L789
+ * @returns "light" or "dark"
+ */
+function detectTheme(element) {
+    const body = document.querySelector('body');
+
+    // Check VSCode theme
+    const themeKindAttr = body.getAttribute('data-vscode-theme-kind');
+    const themeNameAttr = body.getAttribute('data-vscode-theme-name');
+
+    if (themeKindAttr && themeNameAttr) {
+        const themeKind = themeKindAttr.toLowerCase();
+        const themeName = themeNameAttr.toLowerCase();
+
+        if (themeKind.includes("dark") || themeName.includes("dark")) {
+            return "dark";
+        }
+        if (themeKind.includes("light") || themeName.includes("light")) {
+            return "light";
+        }
+    }
+
+    // Check Jupyter theme
+    if (body.getAttribute('data-jp-theme-light') === 'false') {
+        return 'dark';
+    } else if (body.getAttribute('data-jp-theme-light') === 'true') {
+        return 'light';
+    }
+
+    // Guess based on a parent element's color
+    const color = window.getComputedStyle(element.parentNode, null).getPropertyValue('color');
+    const match = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/i);
+    if (match) {
+        const [r, g, b] = [
+            parseFloat(match[1]),
+            parseFloat(match[2]),
+            parseFloat(match[3])
+        ];
+
+        // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
+        const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        if (luma > 180) {
+            // If the text is very bright we have a dark theme
+            return 'dark';
+        }
+        if (luma < 75) {
+            // If the text is very dark we have a light theme
+            return 'light';
+        }
+        // Otherwise fall back to the next heuristic.
+    }
+
+    // Fallback to system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+
+function forceTheme(elementId) {
+    const estimatorElement = document.querySelector(`#${elementId}`);
+    if (estimatorElement === null) {
+        console.error(`Element with id ${elementId} not found.`);
+    } else {
+        const theme = detectTheme(estimatorElement);
+        estimatorElement.classList.add(theme);
+    }
+}
+
+forceTheme('sk-container-id-1');</script>
+</div>
+</div>
+</section>
+<section id="evaluasi-model" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Evaluasi Model</h1>
+<p>Evaluasi model tidak dicakup dalam soal, sehingga tidak dikerjakan.</p>
+</section>
+<section id="visualisasi-hasil" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Visualisasi Hasil</h1>
+<p>Kita akan melakukan visualisasi hasil pemodelan. Untuk visualisasi, kita akan menggunakan library <code>matplotlib</code>.</p>
+<section id="distribusi-umur-histogram" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="distribusi-umur-histogram"><span class="header-section-number">7.1</span> Distribusi Umur (histogram)</h2>
+<div id="391852c3" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># bins adalah (max-min) dari umur</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>bins <span class="op">=</span> <span class="bu">int</span>(<span class="bu">max</span>(data_preprocessed[<span class="st">'Umur'</span>]) <span class="op">-</span> <span class="bu">min</span>(data_preprocessed[<span class="st">'Umur'</span>])<span class="op">+</span><span class="dv">1</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Membuat histogram</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>plt.hist(data_preprocessed[<span class="st">'Umur'</span>], bins<span class="op">=</span>bins, edgecolor<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Umur'</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Jumlah'</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Distribusi Umur'</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-20-output-1.png" width="585" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="jumlah-mahasiswa-per-program-studi-column-chart" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="jumlah-mahasiswa-per-program-studi-column-chart"><span class="header-section-number">7.2</span> Jumlah Mahasiswa per Program Studi (column chart)</h2>
+<div id="5a501e79" class="cell" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Membuat column chart</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>plt.bar(data_preprocessed[<span class="st">'Prodi'</span>].unique(), data_preprocessed[<span class="st">'Prodi'</span>].value_counts())</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Program Studi'</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Jumlah'</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Jumlah Mahasiswa per Program Studi'</span>)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># tambah label angka di atas bar</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, v <span class="kw">in</span> <span class="bu">enumerate</span>(data_preprocessed[<span class="st">'Prodi'</span>].value_counts()):</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    plt.text(i, v, <span class="bu">str</span>(v), ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'bottom'</span>)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-21-output-1.png" width="597" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="kesimpulan" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Kesimpulan</h1>
+</section>
+<section id="sec-appendix" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Lampiran</h1>
+
+</section>
+
+<div id="quarto-appendix"><section id="diagnostik-python" class="level2 appendix" data-number="9.1"><h2 class="anchored quarto-appendix-heading"><span class="header-section-number">9.1</span> Diagnostik Python</h2><div class="quarto-appendix-contents">
+
+<div id="08a94fae" class="cell" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> IPython <span class="im">as</span> ipy</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ipy.sys_info())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'commit_hash': 'f5e51b8',
+ 'commit_source': 'installation',
+ 'default_encoding': 'utf-8',
+ 'ipython_path': '/var/home/nord/ContainerHomes/ubuntu-bigdata/miniconda3/envs/machine-learning-tugas/lib/python3.14/site-packages/IPython',
+ 'ipython_version': '9.11.0',
+ 'os_name': 'posix',
+ 'platform': 'Linux-6.17.7-ba25.fc43.x86_64-x86_64-with-glibc2.39',
+ 'sys_executable': '/var/home/nord/ContainerHomes/ubuntu-bigdata/miniconda3/envs/machine-learning-tugas/bin/python',
+ 'sys_platform': 'linux',
+ 'sys_version': '3.14.4 | packaged by Anaconda, Inc. | (main, Apr 14 2026, '
+                '17:07:44) [GCC 14.3.0]'}</code></pre>
+</div>
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Disalin!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Disalin!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
