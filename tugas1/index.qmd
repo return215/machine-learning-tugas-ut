@@ -1,16 +1,17 @@
 ---
 title: "Tugas 1 Machine Learning"
 format:
-  html:
-    code-fold: true
-  ipynb: 
-    output-file: tugas1-052747132.ipynb
+  html: default
+  ipynb: default
   pdf:
-    code-fold: false
+    toc: true
+  gfm: default
 jupyter: python3
 number-sections: true
 execute: 
   enabled: true
+  echo: true
+  warning: false
 appendix-style: plain
 ---
 
@@ -30,7 +31,26 @@ Tujuan dari tugas ini adalah untuk mempersiapkan dataset yang akan digunakan dal
 ```{python}
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 ```
+
+Penjelasan mengenai library yang digunakan:
+
+- `numpy`: digunakan untuk operasi matematika dan manipulasi array
+- `pandas`: digunakan untuk manipulasi dan analisis data, fondasi untuk DataFrame
+- `matplotlib.pyplot`: digunakan untuk membuat visualisasi data
+- `sklearn.impute.SimpleImputer`: digunakan untuk mengisi data yang hilang
+- `sklearn.compose.ColumnTransformer`: digunakan untuk menggabungkan transformasi kolom
+- `sklearn.preprocessing.OneHotEncoder`: digunakan untuk mengonversi data kategorikal menjadi numerik
+- `sklearn.preprocessing.StandardScaler`: digunakan untuk melakukan normalisasi data
+- `sklearn.model_selection.train_test_split`: digunakan untuk membagi data menjadi data latih dan data uji
+- `sklearn.linear_model.LinearRegression`: digunakan untuk pemodelan regresi linear
 
 ## Dataset
 
@@ -158,6 +178,7 @@ Sebelumnya dalam @sec-eda, kita sudah mengetahui bahwa terdapat nilai yang hilan
 - 'Umur': Data umur tidak terlalu kritis dan bisa diperkirakan berdasarkan data yang ada. Nilai yang hilang pada kolom ini akan diisi dengan nilai rata-rata umur dari data yang tersedia. Metode yang digunakan adalah `SimpleImputer` dari library `sklearn`, dengan strategi 'mean' untuk mengisi nilai yang hilang dengan rata-rata.
 
 ```{python}
+
 # Untuk kolom 'Nilai_Akhir', nilai yang hilang akan dihapus
 data_preprocessed = data_preprocessed.dropna(subset=['Nilai_Akhir'])
 
@@ -214,8 +235,6 @@ display(data_preprocessed_3[['ID', 'Jenis_Kelamin', 'Nilai_Akhir', 'Tanggal_Ujia
 
 # Selamat, anda menemukan Deleted Scenes! Berikut adalah contoh alternatif untuk melakukan one-hot encoding menggunakan ColumnTransformer dan OneHotEncoder dari sklearn. 
 
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
 
 # Kolom yang akan diencoding dengan one-hot encoding
 one_hot_columns = ['Status', 'Prodi']
@@ -252,7 +271,6 @@ Karena "Tanggal_Ujian" masih dalam bentuk datetime, perlu diubah menjadi bentuk 
 Untuk melakukan normalisasi, kita akan menggunakan fungsi `StandardScaler` dari library `sklearn`:
 
 ```{python}
-from sklearn.preprocessing import StandardScaler
 
 # Membuat objek StandardScaler
 scaler = StandardScaler()
@@ -264,16 +282,22 @@ data_premodel = data_preprocessed_3.copy().drop('ID', axis=1)
 data_premodel['Tanggal_Ujian'] = pd.to_numeric(data_premodel['Tanggal_Ujian'])
 
 # Melakukan standarisasi pada data
-data_premodel = scaler.fit_transform(data_premodel)
+data_premodel_scaled = scaler.fit_transform(data_premodel)
+data_premodel_scaled_df = pd.DataFrame(data_premodel_scaled, columns=data_premodel.columns)
+```
+
+```{python}
+display(data_premodel_scaled_df.head())
+display(data_premodel_scaled_df.info())
+display(data_premodel_scaled_df.describe())
 ```
 
 Langkah selanjutnya adalah membagi data menjadi data latih dan data uji. Data latih digunakan untuk melatih model, sedangkan data uji digunakan untuk menguji performa model yang telah dibuat. Dari soal, diminta untuk membagi data menjadi 80% untuk data latih dan 20% untuk data uji. Untuk membagi data, kita akan menggunakan fungsi `train_test_split` dari library `sklearn`. Untuk nilai y, kita akan menggunakan kolom 'Nilai_Akhir' sebagai target. Sedangkan untuk nilai X, kita akan menggunakan semua kolom selain 'Nilai_Akhir' sebagai fitur.
 
 ```{python}
-from sklearn.model_selection import train_test_split
 
-X = data_preprocessed_3.drop('Nilai_Akhir', axis=1)
-y = data_preprocessed_3['Nilai_Akhir']
+X = data_premodel_scaled_df.drop('Nilai_Akhir', axis=1)
+y = data_premodel_scaled_df['Nilai_Akhir']
 
 # Membagi data menjadi data latih dan data uji
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -286,7 +310,6 @@ print("Jumlah data uji:", len(X_test))
 Setelah melakukan normalisasi dan membagi data menjadi data latih dan data uji, kita akan melakukan pemodelan menggunakan regresi linear dengan fungsi `LinearRegression` dari library `sklearn`.
 
 ```{python}
-from sklearn.linear_model import LinearRegression
 
 # Membuat objek regresi linear
 regressor = LinearRegression()
@@ -297,7 +320,43 @@ regressor.fit(X_train, y_train)
 
 # Evaluasi Model
 
+Evaluasi model tidak dicakup dalam soal, sehingga tidak dikerjakan.
+
 # Visualisasi Hasil
+
+Kita akan melakukan visualisasi hasil pemodelan. Untuk visualisasi, kita akan menggunakan library `matplotlib`.
+
+## Distribusi Umur (histogram)
+
+```{python}
+
+# bins adalah (max-min) dari umur
+bins = int(max(data_preprocessed['Umur']) - min(data_preprocessed['Umur'])+1)
+
+# Membuat histogram
+plt.hist(data_preprocessed['Umur'], bins=bins, edgecolor='black')
+plt.xlabel('Umur')
+plt.ylabel('Jumlah')
+plt.title('Distribusi Umur')
+plt.show()
+```
+
+## Jumlah Mahasiswa per Program Studi (column chart)
+
+```{python}
+
+# Membuat column chart
+plt.bar(data_preprocessed['Prodi'].unique(), data_preprocessed['Prodi'].value_counts())
+plt.xlabel('Program Studi')
+plt.ylabel('Jumlah')
+plt.title('Jumlah Mahasiswa per Program Studi')
+
+# tambah label angka di atas bar
+for i, v in enumerate(data_preprocessed['Prodi'].value_counts()):
+    plt.text(i, v, str(v), ha='center', va='bottom')
+
+plt.show()
+```
 
 # Kesimpulan
 
