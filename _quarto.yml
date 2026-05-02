@@ -1,5 +1,18 @@
 project:
   title: "Tugas Machine Learning Universitas Terbuka"
-
-
-
+  output-dir: _site
+author: "Muhammad Hidayat"
+lang: "id"
+website:
+  navbar:
+    left:
+      - text: "Beranda"
+        href: index.qmd
+      - text: "Tugas 1"
+        href: tugas1/index.qmd
+format: 
+  html:
+    theme: cosmo
+    toc: true
+execute: 
+  freeze: auto

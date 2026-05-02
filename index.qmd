@@ -1,0 +1,43 @@
+---
+title: "Tugas Machine Learning Universitas Terbuka"
+format:
+    html: default
+    gfm: 
+        output-file: readme.md
+---
+
+# Tugas Machine Learning Universitas Terbuka
+
+```yaml
+Nama: Muhammad Hidayat
+NIM: 052747132
+```
+
+## Daftar Tugas
+
+- [Tugas 1](tugas1/index.qmd)
+
+Masing-masing file tugas dapat dijalankan secara terpisah dan dapat diexport ke format notebook (ipynb), Markdown, HTML, dan PDF.
+
+## Persiapan Environment
+
+Project ini menggunakan [Quarto](https://quarto.org/) dan [Anaconda](https://www.anaconda.com). Ikuti panduan dari [Quarto](https://quarto.org/docs/get-started/) dan [Anaconda](https://www.anaconda.com/docs/getting-started/main) untuk menginstal Quarto dan Conda.
+
+Buat dan aktifkan lingkungan Conda:
+
+```bash
+conda env create -f environment.yml
+conda activate quarto-python-project
+```
+
+Jalankan rendering:
+
+```bash
+quarto render
+```
+
+Jalankan rendering spesifik (misal untuk tugas 1 sebagai notebook):
+
+```bash
+quarto render -t ipynb tugas1/index.qmd
+```
