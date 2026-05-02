@@ -316,6 +316,8 @@ regressor = LinearRegression()
 
 # Melatih model menggunakan data latih
 regressor.fit(X_train, y_train)
+
+print()
 ```
 
 # Evaluasi Model
