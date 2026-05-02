@@ -1,6 +1,6 @@
 project:
   title: "Tugas Machine Learning Universitas Terbuka"
-  output-dir: _site
+  output-dir: docs
 author: "Muhammad Hidayat"
 lang: "id"
 website:
