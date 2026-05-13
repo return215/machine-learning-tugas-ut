@@ -1,0 +1,372 @@
+---
+title: "Tugas 2 Machine Learning: Klasifikasi"
+format:
+  html: default
+  ipynb: default
+  pdf:
+    toc: true
+  gfm: default
+jupyter: python3
+number-sections: true
+execute: 
+  enabled: true
+  echo: true
+  warning: false
+appendix-style: plain
+---
+
+> Nama: Muhammad Hidayat  
+> NIM: 052747132
+
+# Pendahuluan {#sec-intro}
+
+<p>
+Universitas Terbuka adalah sebuah perguruan tinggi terbuka yang memberikan kesempatan bagi putra putri bangsa untuk menimba ilmu dan pengetahuan. UT memiliki mahasiswa dengan latar belakang yang beragam. Mahasiswanya tidak terbatas pada lulusan baru dari sma/smu/smk sederajat. Beberapa diantaranya bahkan telah/sedang bekerja. Kondisi tersebut memberikan kesulitan bagi pihak kampus dalam menerapkan strategi untuk membantu mahasiswa berhasil melewati masa kuliah dan lulus tepat waktu.
+</p>
+
+<p>
+Sebagai seorang Machine Learning engineer, kamu diminta untuk membuat model yang mampu mendeteksi secara dini tigkat resiko kegagalan seorang mahasiswa. Dengan harapan jika sistem mampu memberikan informasi yang valid, maka bagian wali akademik dapat memberikan konseling yang tepat. Untuk melaksanakan tugasmu ini, kamu diberikan data yang bersumber dari dua periode penerimaan.
+</p>
+
+# Environment Setup {#sec-env-setup}
+
+## Task 0: Import Library {#sec-import}
+
+Sebelum memulai, import library yang diperlukan untuk melakukan proses data cleaning, data visualization, dan machine learning.
+
+```{python}
+# 1) Import library yang diperlukan
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+```
+
+Berikut penjelasan singkat mengenai library yang diimport:
+- `numpy`: Library untuk melakukan operasi matematika dan manipulasi array.
+- `pandas`: Library untuk manipulasi data dan analisis data, terutama dengan struktur DataFrame.
+- `matplotlib.pyplot`: Library untuk membuat visualisasi data, seperti grafik dan plot.
+
+## Task 1: Data Loading {#sec-data-loading}
+
+Mulailah memuat semua data yang ada ke sistem.
+
+```{python}
+# 1) Muat data dari kedua sumber
+data_period1 = pd.read_csv('Data Siswa Periode 1.csv')
+data_period2 = pd.read_csv('Data Siswa Periode 2.csv')
+```
+
+```{python}
+# 2) Lihat atribut apa saja yang ada dari kedua data tersebut
+print("Atribut Data Periode 1:")
+for col in data_period1.columns.tolist():
+    print(f"- {col}")
+print("\nAtribut Data Periode 2:")
+for col in data_period2.columns.tolist():
+    print(f"- {col}")
+```
+
+Berikut kolom yang muncul pada kedua data. Sebagian kolom terlihat sama, tetapi ada beberapa yang berbeda nama, padahal maknanya sama. Kita akan melakukan penamaan ulang pada bagian selanjutnya, @sec-feature-rename.
+
+Selanjutnya kita juga perlu melihat beberapa baris data untuk memastikan bahwa data sudah benar-benar termuat dengan baik.
+
+```{python}
+#| layout-nrow: 2
+#| label: tbl-data-preview
+#| tbl-cap: "Data Preview"
+#| tbl-subcap: 
+#|   - "Data Periode 1"
+#|   - "Data Periode 2"
+
+# 3) Lihat beberapa baris data untuk memastikan data sudah benar-benar termuat dengan baik
+display(data_period1.head())
+display(data_period2.head())
+```
+
+Kemudian kita juga perlu melihat informasi statistik serta tipe data dari setiap kolom untuk memastikan bahwa data sudah benar-benar termuat dengan baik dan mampu memberikan informasi yang cukup untuk melakukan proses analisis data selanjutnya.
+
+```{python}
+# 4) Lihat informasi statistik dan tipe data dari setiap kolom
+print("Informasi Statistik Data Periode 1:")
+display(data_period1.info())
+display(data_period1.describe())
+print("\nInformasi Statistik Data Periode 2:")
+display(data_period2.info())
+display(data_period2.describe())
+```
+
+Kolom seperti ID, nilai, usia/umur, dan IP memiliki tipe data numerik. Kolom yang lain semuanya memiliki tipe data string dan terlihat seperti data kategorikal. Detail lebih lanjut akan dibahas di bagian yang relevan.
+
+# Data Integration {#sec-data-integration-top}
+
+## Task 2: Null Value Handling {#sec-null-handling}
+
+Dari deskripsi statistik di atas, terlihat bahwa terdapat beberapa kolom pada data periode 1 yang memiliki nilai null/missing value, sementara pada data periode 2 tidak terdapat nilai null/missing value. Kita perlu melakukan penanganan untuk mengatasi masalah ini agar nantinya tidak terjadi masalah saat melakukan proses integrasi data.
+
+Terlebih dahulu kita hitung dan identifikasi jumlah nilai null/missing value untuk setiap kolom pada data periode 1.
+
+```{python}
+# Filter baris dengan nilai NA
+na_rows_d1 = data_period1[data_period1.isnull().any(axis=1)]
+
+# Hitung jumlah total nilai NA
+total_cols_na = data_period1.isnull().sum()
+# Hitung baris dengan nilai NA
+total_rows_na = na_rows_d1.shape[0]
+
+total_na = data_period1.isnull().sum().sum()
+
+# Cetak jumlah nilai NA per kolom
+print("Count of NA values per column:")
+print(total_cols_na[total_cols_na > 0])
+
+# Cetak baris dengan nilai NA
+print("Rows with NA values:")
+display(na_rows_d1)
+
+# Cetak jumlah total baris dengan nilai NA
+print(f"Total count of rows with NA values: {total_rows_na}")
+
+# Cetak jumlah total nilai NA
+print(f"Total count of NA values: {total_na}")
+```
+
+Secara spesifik, terdapat 3 entri null pada "Kelas Reguler/Malam" dan 3 entri null pada "Daerah Asal". Kemudian, terdapat 6 baris yang memiliki nilai null dan total 6 nilai null, berarti terdapat tepat satu nilai null pada kolom yang berbeda.
+
+Dan karena banyaknya nilai null yang relatif sedikit, kita bisa melakukan penanganan dengan menghapus baris yang memiliki nilai null tersebut agar nantinya tidak terjadi masalah saat melakukan proses integrasi data.
+
+```{python}
+# Hapus baris dengan nilai NA
+data_period1_clean = data_period1.dropna()
+# Verifikasi bahwa nilai NA sudah dihapus
+print("Jumlah nilai NA setelah pembersihan:")
+print(data_period1_clean.isnull().sum())
+```
+
+## Task 2: Feature Identification and Renaming {#sec-feature-rename}
+
+Sebelum melakukan analisis lebih lanjut, kita perlu memastikan bahwa data yang kita miliki sudah bersih dan siap untuk digunakan. Salah satu langkah penting dalam proses ini adalah mengidentifikasi fitur yang serupa dan melakukan penamaan ulang agar kedua dataset memiliki atribut yang seragam.
+
+```{python}
+# 1) Identifikasi fitur serupa, lakukan penamaan ulang fitur serupa
+
+# Bandingkan kedua data untuk melihat apakah ada perbedaan atribut
+
+# Gunakan operasi set untuk mencari perbedaan atribut
+_cols_in_period12 = set(data_period1_clean.columns.tolist()) & set(data_period2.columns.tolist())
+_cols_in_period1 = set(data_period1_clean.columns.tolist()) - set(data_period2.columns.tolist())
+_cols_in_period2 = set(data_period2.columns.tolist()) - set(data_period1_clean.columns.tolist())
+
+# Tampilkan hasil perbandingan atribut
+print("\nPerbedaan Atribut:")
+print("Atribut yang ada di kedua data:")
+for col in _cols_in_period12:
+    print(f"- {col}")
+print("\nAtribut yang hanya ada di data periode 1:")
+for col in _cols_in_period1:
+    print(f"- {col}")
+print("\nAtribut yang hanya ada di data periode 2:")
+for col in _cols_in_period2:
+    print(f"- {col}")
+```
+
+Terdapat dua atribut yang berbeda nama namun memiliki makna yang sama, yaitu "Kelas Reguler/Malam" dengan "Kelas Siang/Malam", serta "Usia saat mendaftar" dengan "Umur saat mendaftar". Kita perlu melakukan penamaan ulang agar kedua data tersebut memiliki atribut yang seragam. Untuk kali ini kita akan melakukan penamaan ulang pada data periode 2 agar sesuai dengan data periode 1, sehingga nantinya kita bisa melakukan proses integrasi data dengan lebih mudah.
+
+```{python}
+# 2) Lakukan penamaan ulang pada atribut yang berbeda nama namun memiliki makna yang sama
+data_period2_ren = data_period2.rename(columns={
+    'Kelas Siang/Malam': 'Kelas Reguler/Malam',
+    'Umur saat mendaftar': 'Usia saat mendaftar'
+})
+```
+
+Untuk memastikan bahwa penamaan ulang sudah benar, kita bisa melihat kembali atribut yang ada pada data periode 2 setelah dilakukan penamaan ulang.
+
+```{python}
+# 1) Identifikasi fitur serupa, lakukan penamaan ulang fitur serupa
+
+# Bandingkan kedua data untuk melihat apakah ada perbedaan atribut
+
+# Gunakan operasi set untuk mencari perbedaan atribut
+_cols_in_period12ren = set(data_period1_clean.columns.tolist()) & set(data_period2_ren.columns.tolist())
+_cols_in_period1ren = set(data_period1_clean.columns.tolist()) - set(data_period2_ren.columns.tolist())
+_cols_in_period2ren = set(data_period2_ren.columns.tolist()) - set(data_period1_clean.columns.tolist())
+
+# Tampilkan hasil perbandingan atribut
+print("\nPerbedaan Atribut:")
+print("Atribut yang ada di kedua data:")
+for col in _cols_in_period12ren:
+    print(f"- {col}")
+print("\nAtribut yang hanya ada di data periode 1:")
+for col in _cols_in_period1ren:
+    print(f"- {col}")
+print("\nAtribut yang hanya ada di data periode 2:")
+for col in _cols_in_period2ren:
+    print(f"- {col}")
+```
+
+Terlihat tidak ada lagi perbedaan atribut antara kedua data setelah dilakukan penamaan ulang, sehingga kita bisa melanjutkan ke proses selanjutnya, yaitu penyamaan kodefikasi atribut fitur yang berbeda pada kedua data tersebut.
+
+
+## Task 3: Codification Unification {#sec-codification-unification}
+
+Menurut KBBI, kodefikasi adalah "pengalihan suatu data, keterangan, atau informasi menjadi kode atau simbol yang dapat dipahami."^[KBBI VI Daring. "kodefikasi". https://kbbi.kemendikdasmen.go.id/entri/kodefikasi]
+
+Jika sebelumnya kita melakukan penamaan ulang pada atribut yang berbeda nama namun memiliki makna yang sama, kali ini kita akan menyamakan kodefikasi atribut fitur yang berbeda. Misalnya untuk atribut "Kelas Reguler/Malam" pada data periode 1 menggunakan kodefikasi "Reguler" dan "Malam", sedangkan pada data periode 2 menggunakan kodefikasi "Siang" dan "Malam". Kita perlu menyamakan kodefikasi tersebut agar nantinya kita bisa melakukan proses integrasi data dengan lebih mudah.
+
+Dari @sec-data-loading, kita tahu kolom yang merupakan tipe angka adalah "ID", "Nilai SMA", "Nilai Ujian Masuk", "Umur saat mendaftar", "IP Semester 1", dan "IP Semester 2". Kolom ini tidak akan kita proses untuk kodifikasi. Sedangkan untuk kolom yang lain semuanya memiliki tipe data string, sehingga kita perlu melakukan proses kodefikasi untuk kolom-kolom tersebut agar nantinya kita bisa melakukan proses integrasi data dengan lebih mudah.
+
+```{python}
+# Identifikasi kodefikasi atribut yang berbeda untuk semua kolom
+
+
+# Hitung jumlah entri string unik per kolom
+unique_entries_d1 = data_period1_clean.apply(lambda col: col.nunique())
+unique_entries_d2 = data_period2_ren.apply(lambda col: col.nunique())
+
+# Cetak hasilnya
+print("Jumlah entri string unik per kolom:")
+print("Data Periode 1:")
+display(unique_entries_d1)
+print("Data Periode 2:")
+display(unique_entries_d2)
+```
+
+Di atas menunjukkan banyaknya kodefikasi untuk setiap kolom, baik yang memiliki tipe data numerik maupun string. 
+
+Untuk ID, terdapat kejanggalan. Terdapat 1827 entri dalam data periode 1, namun hanya terdapat 1816 ID unik. Sementara itu untuk data periode 2 terdapat 1730 entri dan 1719 ID unik. Hal ini menunjukkan bahwa terdapat beberapa ID yang duplikat pada kedua data tersebut, sehingga kita perlu melakukan penanganan untuk mengatasi masalah ini agar nantinya tidak terjadi masalah saat melakukan proses integrasi data.
+
+Selanjutnya kita akan melihat apa saja entri unik untuk setiap kolom, khususnya yang bertipe string, untuk melihat apakah ada perbedaan kodefikasi yang perlu disamakan.
+
+```{python}
+# Filter kolom yang memiliki tipe data string
+string_cols = data_period1_clean.select_dtypes(include=['str']).columns.tolist()
+# Tidak perlu dua kali karena sudah dipastikan sama setelah penamaan ulang
+#string_cols_d2 = data_period2_ren.select_dtypes(include=['str']).columns.tolist()
+
+# Filter entri string unik untuk setiap kolom pada kedua data
+str_entries_d1 = data_period1_clean[string_cols].apply(lambda col: col.unique())
+str_entries_d2 = data_period2_ren[string_cols].apply(lambda col: col.unique())
+
+# Gunakan operasi set untuk mencari perbedaan atribut
+_entries_differ = []
+for col in string_cols:
+    if set(str_entries_d1[col]) != set(str_entries_d2[col]):
+        _entries_differ.append(col)
+
+# Tampilkan hasil perbandingan entri string unik
+print("\nPerbedaan Entri String Unik:")
+print("Kolom yang memiliki entri berbeda unik di kedua data:")
+for col in _entries_differ:
+    print(f"- {col}")
+    print(f"  Data Periode 1: {str_entries_d1[col].tolist()}")
+    print(f"  Data Periode 2: {str_entries_d2[col].tolist()}")
+```
+
+Didapat perbedaan berikut:
+
+| Kolom | Data Periode 1 | Data Periode 2 |
+| --- | --- | --- |
+| Kelas Reguler/Malam | ['Reguler', 'Malam'] | ['Siang', 'Malam'] |
+| Jenis Kelamin | ['Pria', 'Wanita'] | ['Laki-laki', 'Perempuan'] |
+
+Sama seperti sebelumnya, kita akan menyamakan kodefikasi pada data periode 2 agar sesuai dengan data periode 1.
+
+Setelah itu kita bisa melakukan penyatuan data dari kedua periode tersebut.
+
+<!-- Butuh penyatuan data, tapi ternyata ada kodefikasi atribut fitur yang berbeda, harus di samakan -->
+
+```{python}
+# 1) Lakukan penyamaan kodefikasi atribut
+# ...
+```
+
+```{python}
+# 2) Lakukan penyatuan data
+# ...
+```
+
+## Task 4: Data Analysis
+
+Sekarang kita lakukan analisis atribut untuk setiap fitur nya, mulai dengan penanganan missing/null value
+
+```{python}
+# 1)	Identifikasi dan tangani missing/null value
+# ...
+```
+
+## Task 5: Data Visualization
+
+Untuk bisa melihat bentuk dari data, kita perlu menghitung histogram dari setiap fitur. Dari situ kemudian kita bisa lanjutkan dengan penanganan outlier.
+
+```{python}
+# 1)	Hitung histogram setiap fitur, tampilkan dalam bentuk grafik batang
+# ...
+
+# 2)	Identifikasi outlier dengan boxplot
+# ...
+
+# 3)	Hapus outlier dari data
+# ...
+```
+
+## Task 6: Feature Analysis
+
+Agar nantinya kita bisa mendapatkan fitur yang relevan, sebaiknya kita melihat hubungan setiap fitur dengan kelas target.
+
+```{python}
+# 1)	Lakukan analisis bivariate
+# ...
+
+# 2)	Plot kedalam grafik sebaran (scatter)
+# ...
+```
+
+## Task 7: Handling Class Imbalance
+
+Oke, sepertinya sudah siap, tapi kok jumlah data per-kelas nya tidak seimbang ya, ada beberapa algoritma yang akan terpengaruh dengan kondisi ini, kita akan gunakan algoritma **$\color{orange}{\text{(Nama Algoritma)}}$** untuk menyelesaikan masalah ini, jadi kita **$\color{orange}{\text{(akan/tidak akan)}}$** melakukan proses augmentasi data karena **$\color{orange}{\text{(Alasan melakukan augmentasi/tidak)}}$**
+
+```{python}
+# 1)	Augmentasi data untuk balancing kelas (Optional)
+# ...
+```
+
+Selanjutnya datanya perlu kita bagi dengan ratio **$\color{orange}{\text{(.?.)}}$** : **$\color{orange}{\text{(.?.)}}$**
+Dimana **$\color{orange}{\text{(.?.)}}$** adalah data training
+Dan **$\color{orange}{\text{(.?.)}}$** adalah data testing
+
+```{python}
+# 1)	Lakukan pembagian data training dan testing
+# ...
+```
+
+## Task 8: Model Training
+
+Sekarang kita mulai training nya
+
+```{python}
+# 1)	Lakukan proses training dengan algoritma yang telah dipilih
+# ...
+
+# 2)	Lakukan evaluasi model dengan K-fold
+# ...
+```
+
+## Task 9: Model Evaluation
+
+Training sudah selesai dan model sudah diketahui, kita uji hasilnya dengan data testing untuk melihat kemungkinan overfitting dan underfitting, sekaligus menghitung kualitas model dengan matrik pengukuran
+
+```{python}
+# 1)	Evaluasi dengan data testing
+# ...
+
+# 2)	Hitung dengan matrik pengukuran
+# ...
+```
+
+## Task 10: Conclusion
+
+Berdasarkan hasil evaluasi, kita bisa menyimpulkan bahwa
+
+**$\color{orange}{\text{(Lakukan analisis hasil )}}$**
+
