@@ -95,7 +95,7 @@ display(data_period2.info())
 display(data_period2.describe())
 ```
 
-Kolom seperti ID, nilai, usia/umur, dan IP memiliki tipe data numerik. Kolom yang lain semuanya memiliki tipe data string dan terlihat seperti data kategorikal. Detail lebih lanjut akan dibahas di bagian yang relevan.
+Terdapat 1827 entri pada data periode 1 dan 1730 entri pada data periode 2. Kolom-kolom yang muncul pada kedua data tersebut sebagian besar memiliki tipe data string, namun terdapat beberapa kolom yang memiliki tipe data numerik. Kolom seperti ID, nilai, usia/umur, dan IP memiliki tipe data numerik. Kolom yang lain semuanya memiliki tipe data string dan terlihat seperti data kategorikal. Detail lebih lanjut akan dibahas di bagian yang relevan.
 
 # Data Integration {#sec-data-integration-top}
 
@@ -141,7 +141,12 @@ data_period1_clean = data_period1.dropna()
 # Verifikasi bahwa nilai NA sudah dihapus
 print("Jumlah nilai NA setelah pembersihan:")
 print(data_period1_clean.isnull().sum())
+
+# Banyak baris setelah pembersihan
+print(f"Banyak baris setelah pembersihan: {data_period1_clean.shape[0]}")
 ```
+
+Setelah pembersihan, jumlah nilai null sudah tidak ada lagi pada data periode 1, dan banyak baris setelah pembersihan menjadi 1821 entri. Kita bisa melanjutkan ke proses selanjutnya, yaitu identifikasi fitur yang serupa dan penamaan ulang agar kedua dataset memiliki atribut yang seragam.
 
 ## Task 2: Feature Identification and Renaming {#sec-feature-rename}
 
@@ -210,7 +215,8 @@ Terlihat tidak ada lagi perbedaan atribut antara kedua data setelah dilakukan pe
 
 ## Task 3: Codification Unification {#sec-codification-unification}
 
-Menurut KBBI, kodefikasi adalah "pengalihan suatu data, keterangan, atau informasi menjadi kode atau simbol yang dapat dipahami."^[KBBI VI Daring. "kodefikasi". https://kbbi.kemendikdasmen.go.id/entri/kodefikasi]
+kodefikasi
+: pengalihan suatu data, keterangan, atau informasi menjadi kode atau simbol yang dapat dipahami.^[KBBI VI Daring. "kodefikasi". <https://kbbi.kemendikdasmen.go.id/entri/kodefikasi>]
 
 Jika sebelumnya kita melakukan penamaan ulang pada atribut yang berbeda nama namun memiliki makna yang sama, kali ini kita akan menyamakan kodefikasi atribut fitur yang berbeda. Misalnya untuk atribut "Kelas Reguler/Malam" pada data periode 1 menggunakan kodefikasi "Reguler" dan "Malam", sedangkan pada data periode 2 menggunakan kodefikasi "Siang" dan "Malam". Kita perlu menyamakan kodefikasi tersebut agar nantinya kita bisa melakukan proses integrasi data dengan lebih mudah.
 
@@ -218,7 +224,6 @@ Dari @sec-data-loading, kita tahu kolom yang merupakan tipe angka adalah "ID", "
 
 ```{python}
 # Identifikasi kodefikasi atribut yang berbeda untuk semua kolom
-
 
 # Hitung jumlah entri string unik per kolom
 unique_entries_d1 = data_period1_clean.apply(lambda col: col.nunique())
@@ -234,7 +239,7 @@ display(unique_entries_d2)
 
 Di atas menunjukkan banyaknya kodefikasi untuk setiap kolom, baik yang memiliki tipe data numerik maupun string. 
 
-Untuk ID, terdapat kejanggalan. Terdapat 1827 entri dalam data periode 1, namun hanya terdapat 1816 ID unik. Sementara itu untuk data periode 2 terdapat 1730 entri dan 1719 ID unik. Hal ini menunjukkan bahwa terdapat beberapa ID yang duplikat pada kedua data tersebut, sehingga kita perlu melakukan penanganan untuk mengatasi masalah ini agar nantinya tidak terjadi masalah saat melakukan proses integrasi data.
+Untuk ID, terdapat kejanggalan. Terdapat 1821 entri dalam data periode 1, namun hanya terdapat 1816 ID unik. Sementara itu untuk data periode 2 terdapat 1730 entri dan 1719 ID unik. Hal ini menunjukkan bahwa terdapat beberapa ID yang duplikat pada kedua data tersebut, sehingga kita perlu melakukan penanganan untuk mengatasi masalah ini agar nantinya tidak terjadi masalah saat melakukan proses integrasi data.
 
 Selanjutnya kita akan melihat apa saja entri unik untuk setiap kolom, khususnya yang bertipe string, untuk melihat apakah ada perbedaan kodefikasi yang perlu disamakan.
 
