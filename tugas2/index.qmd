@@ -277,7 +277,37 @@ Didapat perbedaan berikut:
 
 Sama seperti sebelumnya, kita akan menyamakan kodefikasi pada data periode 2 agar sesuai dengan data periode 1.
 
-Setelah itu kita bisa melakukan penyatuan data dari kedua periode tersebut.
+```{python}
+# Lakukan penyamaan kodefikasi atribut
+data_period2_clean = data_period2_ren.replace({
+  'Kelas Reguler/Malam': {'Siang': 'Reguler'},
+  'Jenis Kelamin': {'Laki-laki': 'Pria', 'Perempuan': 'Wanita'}
+})
+```
+
+Kita konfirmasi kembali untuk memastikan bahwa penyamaan kodefikasi sudah benar.
+
+```{python}
+# Filter entri string unik untuk setiap kolom pada kedua data
+str_entries_d1c = data_period1_clean[string_cols].apply(lambda col: col.unique())
+str_entries_d2c = data_period2_clean[string_cols].apply(lambda col: col.unique())
+
+# Gunakan operasi set untuk mencari perbedaan atribut
+_entries_differ = []
+for col in string_cols:
+    if set(str_entries_d1c[col]) != set(str_entries_d2c[col]):
+        _entries_differ.append(col)
+
+# Tampilkan hasil perbandingan entri string unik
+print("\nPerbedaan Entri String Unik:")
+print("Kolom yang memiliki entri berbeda unik di kedua data:")
+for col in _entries_differ:
+    print(f"- {col}")
+    print(f"  Data Periode 1: {str_entries_d1c[col].tolist()}")
+    print(f"  Data Periode 2: {str_entries_d2c[col].tolist()}")
+```
+
+Tidak lagi tampak ada perbedaan entri string unik pada kedua data setelah dilakukan penyamaan kodefikasi, sehingga kita bisa melanjutkan ke proses selanjutnya, yaitu penyatuan data.
 
 <!-- Butuh penyatuan data, tapi ternyata ada kodefikasi atribut fitur yang berbeda, harus di samakan -->
 
@@ -286,10 +316,14 @@ Setelah itu kita bisa melakukan penyatuan data dari kedua periode tersebut.
 # ...
 ```
 
+## Task 3: Data Unification {#sec-data-unification}
+
 ```{python}
 # 2) Lakukan penyatuan data
 # ...
 ```
+
+# Data Analysis and Visualization {#sec-data-analysis-visualization}
 
 ## Task 4: Data Analysis
 
