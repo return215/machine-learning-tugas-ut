@@ -239,7 +239,7 @@ display(unique_entries_d2)
 
 Di atas menunjukkan banyaknya kodefikasi untuk setiap kolom, baik yang memiliki tipe data numerik maupun string. 
 
-Untuk ID, terdapat kejanggalan. Terdapat 1821 entri dalam data periode 1, namun hanya terdapat 1816 ID unik. Sementara itu untuk data periode 2 terdapat 1730 entri dan 1719 ID unik. Hal ini menunjukkan bahwa terdapat beberapa ID yang duplikat pada kedua data tersebut, sehingga kita perlu melakukan penanganan untuk mengatasi masalah ini agar nantinya tidak terjadi masalah saat melakukan proses integrasi data.
+Untuk ID, terdapat kejanggalan. Terdapat 1821 entri dalam data periode 1, namun hanya terdapat 1816 ID unik. Sementara itu untuk data periode 2 terdapat 1730 entri dan 1719 ID unik. Hal ini menunjukkan bahwa terdapat beberapa ID yang duplikat pada kedua data tersebut, dan akan ditangani dalam @sec-handle-duplicates.
 
 Selanjutnya kita akan melihat apa saja entri unik untuk setiap kolom, khususnya yang bertipe string, untuk melihat apakah ada perbedaan kodefikasi yang perlu disamakan.
 
@@ -309,30 +309,64 @@ for col in _entries_differ:
 
 Tidak lagi tampak ada perbedaan entri string unik pada kedua data setelah dilakukan penyamaan kodefikasi, sehingga kita bisa melanjutkan ke proses selanjutnya, yaitu penyatuan data.
 
-<!-- Butuh penyatuan data, tapi ternyata ada kodefikasi atribut fitur yang berbeda, harus di samakan -->
-
-```{python}
-# 1) Lakukan penyamaan kodefikasi atribut
-# ...
-```
-
 ## Task 3: Data Unification {#sec-data-unification}
+
+Setelah melakukan proses penamaan ulang dan penyamaan kodefikasi, kita bisa melanjutkan ke proses penyatuan data. Kita akan menggunakan fungsi `concat` dari library `pandas` untuk menyatukan kedua data tersebut menjadi satu data yang utuh.
 
 ```{python}
 # 2) Lakukan penyatuan data
-# ...
+data_unified = pd.concat([data_period1_clean, data_period2_clean], ignore_index=True)
+
+# 3) Verifikasi bahwa data sudah berhasil disatukan dengan melihat beberapa baris data
+display(data_unified.head())
+display(data_unified.tail())
+```
+
+## Task 3: Handle Duplicates {#sec-handle-duplicates}
+
+```{python}
+#| echo: false
+
+# Get unique counts for each column in the unified data
+for column in data_unified.columns:
+    unique_counts = data_unified[column].value_counts()
+    print(f"Unique counts for column '{column}':\n{unique_counts}\nTotal: {unique_counts.sum()}\n")
+```
+
+```{python}
+# Get duplicate rows
+duplicate_rows = data_unified[data_unified.duplicated()]
+print(f"Jumlah baris duplikat: {len(duplicate_rows)}")
+```
+
+Di sini kita tahu secara pasti terdapat baris duplikat pada data yang sudah disatukan, yaitu sebanyak 22 baris. Pertama-tama kita akan melihat beberapa baris duplikat tersebut untuk memastikan bahwa memang benar-benar duplikat, kemudian kita akan menghapus baris duplikat tersebut agar nantinya tidak terjadi masalah saat melakukan proses analisis data selanjutnya.
+
+```{python}
+# Tampilkan beberapa baris duplikat untuk verifikasi
+display(duplicate_rows.sort_values(by='ID'))
+```
+
+Selanjutnya kita akan menghapus baris duplikat.
+
+```{python}
+# Hapus baris duplikat
+data_unified_dedup = data_unified.drop_duplicates()
+```
+
+Konfirmasi bahwa baris duplikat sudah dihapus dengan melihat jumlah baris sebelum dan sesudah penghapusan duplikat.
+
+```{python}
+#| echo: false
+
+# Get unique counts for each column in the unified data
+for column in data_unified_dedup.columns:
+    unique_counts = data_unified_dedup[column].value_counts()
+    print(f"Unique counts for column '{column}':\n{unique_counts}\nTotal: {unique_counts.sum()}\n")
 ```
 
 # Data Analysis and Visualization {#sec-data-analysis-visualization}
 
 ## Task 4: Data Analysis
-
-Sekarang kita lakukan analisis atribut untuk setiap fitur nya, mulai dengan penanganan missing/null value
-
-```{python}
-# 1)	Identifikasi dan tangani missing/null value
-# ...
-```
 
 ## Task 5: Data Visualization
 
