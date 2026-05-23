@@ -1,5 +1,5 @@
 ---
-title: "Tugas 2 Machine Learning: Klasifikasi"
+title: "TUGAS 2 : KLASIFIKASI"
 format:
   html: default
   ipynb: default
@@ -24,23 +24,23 @@ NIM: 052747132
 
 Universitas Terbuka adalah sebuah perguruan tinggi terbuka yang memberikan kesempatan bagi putra putri bangsa untuk menimba ilmu dan pengetahuan. UT memiliki mahasiswa dengan latar belakang yang beragam. Mahasiswanya tidak terbatas pada lulusan baru dari sma/smu/smk sederajat. Beberapa diantaranya bahkan telah/sedang bekerja. Kondisi tersebut memberikan kesulitan bagi pihak kampus dalam menerapkan strategi untuk membantu mahasiswa berhasil melewati masa kuliah dan lulus tepat waktu.
 
-Sebagai seorang Machine Learning engineer, kamu diminta untuk membuat model yang mampu mendeteksi secara dini tigkat resiko kegagalan seorang mahasiswa. Dengan harapan jika sistem mampu memberikan informasi yang valid, maka bagian wali akademik dapat memberikan konseling yang tepat. Untuk melaksanakan tugasmu ini, kamu diberikan data yang bersumber dari dua periode penerimaan.
+Sebagai seorang Machine Learning engineer, kamu diminta untuk membuat model yang mampu mendeteksi secara dini tingkat risiko kegagalan seorang mahasiswa. Dengan harapan jika sistem mampu memberikan informasi yang valid, maka bagian wali akademik dapat memberikan konseling yang tepat. Untuk melaksanakan tugasmu ini, kamu diberikan data yang bersumber dari dua periode penerimaan.
 
 Tugas ini dibagi ke beberapa poin tugas:
 
 1. Memuat semua data yang ada ke dalam sistem.
 2. Memetakan perbedaan data yang ada, lalu menanganinya.
-3. Menyatukan data dan menangani masalah kodefikasi atribut fitur yang berbeda.
+3. Menyatukan data dan menangani masalah kodifikasi atribut fitur yang berbeda.
 4. Melakukan analisis atribut untuk setiap fiturnya, seperti:
-   - menangani missing value
+   - menangani *missing value*
    - menangani data duplikat
    - menangani data yang tidak valid
    - dll.
-5. Melakukan visualisasi distribusi untuk setiap fitur, dilanjutkan dengan menangani outlier.
+5. Melakukan visualisasi distribusi untuk setiap fitur, dilanjutkan dengan menangani *outlier*.
 6. Melihat hubungan setiap fitur dengan kelas target, untuk mendapatkan fitur yang relevan.
-7. Mengidentifikasi ketidakimbangan data, menentukan algoritma, dan menangani imbalance jika diperlukan, kemudian membagi data training dan testing.
-8. Melakukan training model dan evaluasi model.
-9. Melakukan prediksi dan evaluasi model terhadap data testing.
+7. Mengidentifikasi ketidakimbangan data, menentukan algoritma, dan menangani *imbalance* jika diperlukan, kemudian membagi data *training* dan *testing*.
+8. Melakukan *training* model dan evaluasi model.
+9. Melakukan prediksi dan evaluasi model terhadap data *testing*.
 10. Memberikan kesimpulan berdasarkan hasil evaluasi.
 
 # Persiapan Lingkungan {#sec-env-setup}
@@ -71,7 +71,7 @@ Berikut adalah definisi fungsi `info_like` yang digunakan untuk merangkum kolom 
 
 ```{python}
 #| label: fn-info_like
-#| echo: false
+#| output: false
 
 def info_like(df: pd.DataFrame):
     # 1) Build the summary DataFrame
@@ -90,7 +90,7 @@ def info_like(df: pd.DataFrame):
     return summary, dtype_md
 ```
 
-## Pemuatan Data {#sec-data-loading}
+## Pemuatan Data (Tugas 1) {#sec-data-loading}
 
 Mulailah memuat semua data yang ada ke sistem.
 
@@ -122,7 +122,7 @@ Di atas merupakan daftar kolom yang muncul pada kedua data. Berikut penjelasan k
 - IP Semester 1/2: IP mahasiswa pada semester 1 dan 2. Dataset ini hanya memberikan dua semester pertama, dan diminta untuk menentukan target berdasarkan dua semester tersebut dan parameter lainnya.
 - Target: target evaluasi model, menentukan apakah siswa akan "Lulus Tepat Waktu", "Lulus Tidak Tepat Waktu", atau "Gagal" (Tidak Lulus).
 
-Sebagian kolom terlihat sama, tetapi ada beberapa yang berbeda nama, padahal maknanya sama. Kita akan melakukan penamaan ulang pada bagian selanjutnya, @sec-feature-rename.
+Sebagian kolom terlihat sama, tetapi ada beberapa yang berbeda nama, padahal maknanya sama. Kita akan melakukan penamaan ulang pada @sec-feature-rename.
 
 Selanjutnya kita juga perlu melihat beberapa baris data untuk memastikan bahwa data sudah benar-benar termuat dengan baik. Karena data memiliki banyak kolom, kita akan memilih beberapa kolom untuk ditampilkan agar tidak terlalu lebar, dan kita akan menampilkan data periode 1 dan data periode 2 secara terpisah agar lebih mudah untuk dibandingkan.
 
@@ -146,10 +146,10 @@ display(data_period2[cols_to_display_2].head())
 
 Kemudian kita juga perlu melihat informasi statistik serta tipe data dari setiap kolom untuk memastikan bahwa data sudah benar-benar termuat dengan baik dan mampu memberikan informasi yang cukup untuk melakukan proses analisis data selanjutnya.
 
-Berikut informasi statistik dan tipe data dari setiap kolom pada kedua data tersebut. Di sini menggunakan fungsi `info_like` agar `info()` tampil lebih rapi. Lihat kode sumber untuk detail implementasi fungsi tersebut.
+Berikut informasi statistik dan tipe data dari setiap kolom pada kedua data tersebut. Di sini menggunakan fungsi `info_like` (@fn:info_like) agar `info()` tampil lebih rapi.
 
 ```{python}
-#| label: code-data-info-1a
+#| label: tbl-data-info-1a
 #| tbl-cap: "Informasi Kolom Data Periode 1"
 
 info_period1_summary, info_period1_dtype_md = info_like(data_period1)
@@ -160,28 +160,29 @@ display(info_period1_summary)
 ```
 
 ```{python}
-#| label: code-data-info-1b
+#| label: tbl-data-describe-1b
 #| tbl-cap: "Informasi Statistik Data Periode 1"
 
 display(data_period1.describe())
 ```
 
 ```{python}
-#| label: code-data-info-2
+#| label: tbl-data-info-2a
 #| tbl-cap: "Informasi Kolom Data Periode 2"
 
 display(info_period2_summary)
 ```
 
 ```{python}
-#| label: code-data-info-2b
+#| label: tbl-data-describe-2b
 #| tbl-cap: "Informasi Statistik Data Periode 2"
 
 display(data_period2.describe())
 ```
 
 ```{python}
-#| label: code-data-info-3
+#| label: tbl-data-info-dtype-counts
+#| tbl-cap: "Jumlah Tipe Data"
 #| output: asis
 
 print("Tipe data pada Data Periode 1:\n")
@@ -201,7 +202,7 @@ Dari deskripsi statistik di atas, terlihat bahwa terdapat beberapa kolom pada da
 Terlebih dahulu kita hitung dan identifikasi jumlah nilai null/missing value untuk setiap kolom pada data periode 1.
 
 ```{python}
-#| label: code-null-handling
+#| label: tbl-null-handling
 
 # Filter baris dengan nilai NA
 na_rows_d1 = data_period1[data_period1.isnull().any(axis=1)]
@@ -217,15 +218,15 @@ total_na = data_period1.isnull().sum().sum()
 print("Count of NA values per column:")
 print(total_cols_na[total_cols_na > 0])
 
-# Cetak baris dengan nilai NA
-print("Rows with NA values:")
-display(na_rows_d1)
-
 # Cetak jumlah total baris dengan nilai NA
 print(f"Total count of rows with NA values: {total_rows_na}")
 
 # Cetak jumlah total nilai NA
 print(f"Total count of NA values: {total_na}")
+
+# Cetak baris dengan nilai NA
+print("Rows with NA values:")
+display(na_rows_d1[cols_to_display])
 ```
 
 Secara spesifik, terdapat 3 entri null pada "Kelas Reguler/Malam" dan 3 entri null pada "Daerah Asal". Kemudian, terdapat 6 baris yang memiliki nilai null dan total 6 nilai null, berarti terdapat tepat satu nilai null pada kolom yang berbeda.
@@ -321,16 +322,17 @@ Terlihat tidak ada lagi perbedaan atribut antara kedua data setelah dilakukan pe
 ## Penyelarasan Kodefikasi (Task 3a) {#sec-codification-unification}
 
 kodefikasi
-: pengalihan suatu data, keterangan, atau informasi menjadi kode atau simbol yang dapat dipahami.^[KBBI VI Daring. "kodefikasi". <https://kbbi.kemendikdasmen.go.id/entri/kodefikasi>]
+: pengalihan suatu data, keterangan, atau informasi menjadi kode atau simbol yang dapat dipahami.^[Badan Pengembangan dan Pembinaan Bahasa. (t.t.). _Kodefikasi_. Dalam _Kamus Besar Bahasa Indonesia Daring_. Diakses 13 Mei, 2026, dari <https://kbbi.kemendikdasmen.go.id/entri/kodefikasi>.]
 
-Jika sebelumnya kita melakukan penamaan ulang pada atribut yang berbeda nama namun memiliki makna yang sama, kali ini kita akan menyamakan kodefikasi atribut fitur yang berbeda. Misalnya untuk atribut "Kelas Reguler/Malam" pada data periode 1 menggunakan kodefikasi "Reguler" dan "Malam", sedangkan pada data periode 2 menggunakan kodefikasi "Siang" dan "Malam". Kita perlu menyamakan kodefikasi tersebut agar nantinya kita bisa melakukan proses integrasi data dengan lebih mudah.
+Jika sebelumnya kita melakukan penamaan ulang pada atribut yang berbeda nama namun memiliki makna yang sama, kali ini kita akan menyamakan kodifikasi atribut fitur yang berbeda. Misalnya untuk atribut "Kelas Reguler/Malam" pada data periode 1 menggunakan kodifikasi "Reguler" dan "Malam", sedangkan pada data periode 2 menggunakan kodifikasi "Siang" dan "Malam". Kita perlu menyamakan kodifikasi tersebut agar nantinya kita bisa melakukan proses integrasi data dengan lebih mudah.
 
-Dari @sec-data-loading, kita tahu kolom yang merupakan tipe angka adalah "ID", "Nilai SMA", "Nilai Ujian Masuk", "Umur saat mendaftar", "IP Semester 1", dan "IP Semester 2". Kolom ini tidak akan kita proses untuk kodifikasi. Sedangkan untuk kolom yang lain semuanya memiliki tipe data string, sehingga kita perlu melakukan proses kodefikasi untuk kolom-kolom tersebut agar nantinya kita bisa melakukan proses integrasi data dengan lebih mudah.
+Dari @sec-data-loading, kita tahu kolom yang merupakan tipe angka adalah "ID", "Nilai SMA", "Nilai Ujian Masuk", "Umur saat mendaftar", "IP Semester 1", dan "IP Semester 2". Kolom ini tidak akan kita proses untuk kodifikasi. Sedangkan untuk kolom yang lain semuanya memiliki tipe data string, sehingga kita perlu melakukan proses kodifikasi untuk kolom-kolom tersebut agar nantinya kita bisa melakukan proses integrasi data dengan lebih mudah.
 
 ```{python}
-#| label: code-codification-unification-identify
+#| label: tbl-kodifikasi-unik-identify
+#| tbl-cap: "Jumlah Entri Unik Sebelum Kodifikasi"
 
-# Identifikasi kodefikasi atribut yang berbeda untuk semua kolom
+# Identifikasi kodifikasi atribut yang berbeda untuk semua kolom
 
 # Hitung jumlah entri string unik per kolom
 unique_entries_d1 = data_period1_clean.apply(lambda col: col.nunique())
@@ -344,14 +346,15 @@ print("Data Periode 2:")
 display(unique_entries_d2)
 ```
 
-Di atas menunjukkan banyaknya kodefikasi untuk setiap kolom, baik yang memiliki tipe data numerik maupun string. 
+Di atas menunjukkan banyaknya kodifikasi untuk setiap kolom, baik yang memiliki tipe data numerik maupun string. 
 
 Untuk ID, terdapat kejanggalan. Terdapat 1821 entri dalam data periode 1, namun hanya terdapat 1816 ID unik. Sementara itu untuk data periode 2 terdapat 1730 entri dan 1719 ID unik. Hal ini menunjukkan bahwa terdapat beberapa ID yang duplikat pada kedua data tersebut, dan akan ditangani dalam @sec-handle-duplicates.
 
-Selanjutnya kita akan melihat apa saja entri unik untuk setiap kolom, khususnya yang bertipe string, untuk melihat apakah ada perbedaan kodefikasi yang perlu disamakan.
+Selanjutnya kita akan melihat apa saja entri unik untuk setiap kolom, khususnya yang bertipe string, untuk melihat apakah ada perbedaan kodifikasi yang perlu disamakan.
 
 ```{python}
-#| label: code-codification-unification-compare
+#| label: tbl-kodifikasi-compare
+#| tbl-cap: "Perbedaan Entri Unik Sebelum Penyelarasan"
 #| output: asis
 
 # Filter kolom yang memiliki tipe data string
@@ -379,22 +382,23 @@ if len(_entries_differ) > 0:
         print(f"{col} | {str_entries_d1[col].tolist()} | {str_entries_d2[col].tolist()}")
 ```
 
-Sama seperti sebelumnya, kita akan menyamakan kodefikasi pada data periode 2 agar sesuai dengan data periode 1.
+Sama seperti sebelumnya, kita akan menyamakan kodifikasi pada data periode 2 agar sesuai dengan data periode 1.
 
 ```{python}
-#| label: code-codification-unification-clean
+#| label: code-kodifikasi-clean
 
-# Lakukan penyamaan kodefikasi atribut
+# Lakukan penyamaan kodifikasi atribut
 data_period2_clean = data_period2_ren.replace({
   'Kelas Reguler/Malam': {'Siang': 'Reguler'},
   'Jenis Kelamin': {'Laki-laki': 'Pria', 'Perempuan': 'Wanita'}
 })
 ```
 
-Kita konfirmasi kembali untuk memastikan bahwa penyamaan kodefikasi sudah benar.
+Kita konfirmasi kembali untuk memastikan bahwa penyamaan kodifikasi sudah benar.
 
 ```{python}
-#| label: code-codification-unification-verify
+#| label: tbl-kodifikasi-verify
+#| tbl-cap: "Verifikasi Perbedaan Entri Unik Setelah Penyelarasan"
 #| output: asis
 
 # Filter entri string unik untuk setiap kolom pada kedua data
@@ -417,14 +421,14 @@ if len(_entries_differ) > 0:
         print(f"{col} | {str_entries_d1[col].tolist()} | {str_entries_d2[col].tolist()}")
 ```
 
-Tidak lagi tampak ada perbedaan entri string unik pada kedua data setelah dilakukan penyamaan kodefikasi, sehingga kita bisa melanjutkan ke proses selanjutnya, yaitu penyatuan data.
+Tidak lagi tampak ada perbedaan entri string unik pada kedua data setelah dilakukan penyamaan kodifikasi, sehingga kita bisa melanjutkan ke proses selanjutnya, yaitu penyatuan data.
 
 ## Penggabungan Dataset (Task 3b) {#sec-data-unification}
 
-Setelah melakukan proses penamaan ulang dan penyamaan kodefikasi, kita bisa melanjutkan ke proses penyatuan data. Kita akan menggunakan fungsi `concat` dari library `pandas` untuk menyatukan kedua data tersebut menjadi satu data yang utuh.
+Setelah melakukan proses penamaan ulang dan penyamaan kodifikasi, kita bisa melanjutkan ke proses penyatuan data. Kita akan menggunakan fungsi `concat` dari library `pandas` untuk menyatukan kedua data tersebut menjadi satu data yang utuh.
 
 ```{python}
-#| label: code-data-unification
+#| label: tbl-data-unification
 #| tbl-cap: "Data Unification"
 #| tbl-subcap: 
 #|   - "Data (5 baris pertama)"
@@ -440,15 +444,9 @@ display(data_unified[cols_to_display].tail())
 
 ## Penanganan Data Duplikat (Task 3c) {#sec-handle-duplicates}
 
-```{python}
-#| label: code-handle-duplicates-get-counts
-#| output: false
+Sebagaimana yang sudah disebutkan sebelumnya, terdapat beberapa ID yang duplikat pada kedua data tersebut. Kita perlu melakukan penanganan agar nantinya tidak terjadi masalah saat melakukan proses analisis data selanjutnya.
 
-# Get unique counts for each column in the unified data
-for column in data_unified.columns:
-    unique_counts = data_unified[column].value_counts()
-    print(f"Unique counts for column '{column}':\n{unique_counts}\nTotal: {unique_counts.sum()}\n")
-```
+Langkah pertama adalah mendapatkan baris duplikat dan menghitungnya.
 
 ```{python}
 #| label: code-handle-duplicates-get-duplicates
@@ -458,14 +456,14 @@ duplicate_rows = data_unified[data_unified.duplicated()]
 print(f"Jumlah baris duplikat: {len(duplicate_rows)}")
 ```
 
-Di sini kita tahu secara pasti terdapat baris duplikat pada data yang sudah disatukan, yaitu sebanyak 22 baris. Pertama-tama kita akan melihat beberapa baris duplikat tersebut untuk memastikan bahwa memang benar-benar duplikat, kemudian kita akan menghapus baris duplikat tersebut agar nantinya tidak terjadi masalah saat melakukan proses analisis data selanjutnya.
+Terdapat 22 baris duplikat dalam data yang telah diintegrasikan. Pertama-tama kita akan melihat beberapa baris duplikat tersebut, kemudian kita akan menghapus baris duplikat tersebut agar nantinya tidak terjadi masalah saat melakukan proses analisis data selanjutnya.
 
 ```{python}
-#| label: code-handle-duplicates-show-duplicates
+#| label: tbl-handle-duplicates-show-duplicates
 #| tbl-cap: "Duplicate Rows"
 
 # Tampilkan beberapa baris duplikat untuk verifikasi
-display(duplicate_rows[cols_to_display].sort_values(by='ID'))
+display(duplicate_rows[cols_to_display].sort_values(by='ID').head(10))
 ```
 
 Selanjutnya kita akan menghapus baris duplikat.
@@ -491,12 +489,13 @@ for column in data_unified_dedup.columns:
 
 # Eksplorasi Data (EDA) {#sec-data-analysis-visualization}
 
-## Analisis Statistik (Task 4)
+## Analisis Statistik (Task 4) {#sec-statistical-analysis}
 
 Setelah membuang data duplikat, kita bisa melakukan analisis data untuk melihat informasi dari data, dan menentukan apakah masih perlu penanganan data lebih lanjut.
 
 ```{python}
-#| label: code-data-analysis-info-info
+#| label: tbl-info-dedup
+#| tbl-cap: "Ringkasan Kolom Data Gabungan"
 
 info_dedup_summary, info_dedup_dtype_md = info_like(data_unified_dedup)
 
@@ -504,7 +503,8 @@ display(info_dedup_summary)
 ```
 
 ```{python}
-#| label: code-data-analysis-info-dtypes
+#| label: tbl-dtypes-dedup
+#| tbl-cap: "Rincian Tipe Data Gabungan"
 #| output: asis
 
 print("Tipe data pada Data Unifikasi tanpa duplikat:\n")
@@ -512,26 +512,17 @@ print(info_dedup_dtype_md)
 ```
 
 ```{python}
-#| label: code-data-analysis-info-describe
+#| label: tbl-describe-dedup
+#| tbl-cap: "Statistik Deskriptif Data Gabungan"
 
 display(data_unified_dedup.describe())
 ```
 
-```{python}
-#| label: code-data-analysis-unique-counts
-#| echo: false
-#| output: false
-
-# Get unique counts for each column in the unified data
-for column in string_cols:
-    unique_counts = data_unified_dedup[column].value_counts()
-    print(f"Unique counts for column '{column}':\n{unique_counts}\nTotal: {unique_counts.sum()}\n")
-```
-
-Dari ringkasan statistik, terlihat bahwa terdapat beberapa nilai yang tidak masuk akal pada kolom "Usia saat mendaftar", dimana usia mencapai nilai negatif seperti -39. Meskipun terdapat usia yang tinggi seperti 70, namun masih mungkin terjadi (plausible), meskipun sangat jarang. Untuk kali ini, kita hanya akan menghapus data yang memiliki nilai usia negatif.
+Dari ringkasan statistik, terlihat bahwa terdapat beberapa nilai yang tidak masuk akal pada kolom "Usia saat mendaftar", di mana usia mencapai nilai negatif seperti -39. Meskipun terdapat usia yang tinggi seperti 70, namun masih mungkin terjadi (*plausible*), meskipun sangat jarang. Untuk kali ini, kita hanya akan menghapus data yang memiliki nilai usia negatif.
 
 ```{python}
-#| label: code-data-analysis-clean-age
+#| label: tbl-describe-age-clean
+#| tbl-cap: "Statistik Deskriptif Usia Setelah Pembersihan"
 
 # hapus baris dengan usia di bawah 0
 data_unified_clean_age = data_unified_dedup[data_unified_dedup['Usia saat mendaftar'] >= 0]
@@ -540,12 +531,12 @@ data_unified_clean_age = data_unified_dedup[data_unified_dedup['Usia saat mendaf
 display(data_unified_clean_age['Usia saat mendaftar'].describe())
 ```
 
-## Visualisasi Distribusi (Task 5)
+## Visualisasi Distribusi (Task 5) {#sec-data-visualization}
 
-Untuk bisa melihat bentuk dari data, kita perlu menghitung histogram dari setiap fitur. Dari situ kemudian kita bisa lanjutkan dengan penanganan outlier.
+Untuk bisa melihat bentuk dari data, kita perlu menghitung histogram dari setiap fitur. Dari situ kemudian kita bisa lanjutkan dengan penanganan *outlier*.
 
 ```{python}
-#| label: code-data-visualization-histogram-categorical-program-studi
+#| label: fig-histogram-program-studi
 #| fig-cap: "Histogram Fitur Kategorikal: Program Studi"
 
 # 1)	Hitung histogram setiap fitur, tampilkan dalam bentuk grafik batang
@@ -562,7 +553,7 @@ plt.show()
 Dari grafik di atas, terlihat bahwa program studi Perbankan mendominasi jumlah mahasiswa, hingga hampir dua kali lipat program studi lainnya. Setelah itu, perlahan menurun hingga Teknik Industri dengan jumlah di bawah 100.
 
 ```{python}
-#| label: code-data-visualization-histogram-categorical-others
+#| label: fig-histogram-categorical-others
 #| layout-nrow: 4
 #| layout-ncol: 4
 #| column: page
@@ -602,7 +593,15 @@ for col in string_cols_for_chart:
 ```
 
 ```{python}
-#| label: code-data-visualization-histogram-numeric
+#| label: fig-histogram-numeric
+#| fig-cap: "Histogram Fitur Numerik"
+#| fig-subcap: 
+#|   - "ID"
+#|   - "Nilai SMA"
+#|   - "Nilai Ujian Masuk"
+#|   - "Usia saat mendaftar"
+#|   - "IP Semester 1"
+#|   - "IP Semester 2"
 #| column: page
 #| layout-ncol: 2
 #| layout-nrow: 3
@@ -620,18 +619,18 @@ for col in numeric_cols:
 
 Histogram menunjukkan hal-hal berikut:
 
-- ID tersebar rata, tidak ada yang mendominasi. Distribusi uniform.
-- Nilai SMA dan Nilai Ujian Masuk memiliki distribusi yang mirip, yaitu skew ke kanan. Untuk Nilai SMA dominan di daerah 58-65 dengan puncak di 60, sedangkan Nilai Ujian Masuk di daerah 65-70 dengan puncak di 67.
-- Usia saat mendaftar terlihat hampir seperti eksponensial, namun lebih tepat dikatakan bahwa ini adalah distribusi normal dengan skew ke kanan drastis. Mayoritas usia saat mendaftar berada di bawah 25, dengan puncak di sekitar 18-19 tahun. Namun terdapat ekor panjang hingga usia 70.
-- IP Semester 1 dan IP Semester 2 memiliki nilai "cutoff" dimana nilai hanya 0 atau 2.0 ke atas, dengan sedikit nilai di antara 0 dan 2.0. Mayoritas IP berada di atas 2.0, dengan puncak di sekitar 2.5, terlihat seperti distribusi normal dengan skew ke kanan.
+- ID tersebar rata, tidak ada yang mendominasi. Distribusi *uniform*.
+- Nilai SMA dan Nilai Ujian Masuk memiliki distribusi yang mirip, yaitu *skew* ke kanan. Untuk Nilai SMA dominan di daerah 58-65 dengan puncak di 60, sedangkan Nilai Ujian Masuk di daerah 65-70 dengan puncak di 67.
+- Usia saat mendaftar terlihat hampir seperti eksponensial, namun lebih tepat dikatakan bahwa ini adalah distribusi normal dengan *skew* ke kanan drastis. Mayoritas usia saat mendaftar berada di bawah 25, dengan puncak di sekitar 18-19 tahun. Namun terdapat ekor panjang hingga usia 70.
+- IP Semester 1 dan IP Semester 2 memiliki nilai *cutoff* di mana nilai hanya 0 atau 2.0 ke atas, dengan sedikit nilai di antara 0 dan 2.0. Mayoritas IP berada di atas 2.0, dengan puncak di sekitar 2.5, terlihat seperti distribusi normal dengan *skew* ke kanan.
 
 
-## Analisis Hubungan Fitur (Task 6)
+## Analisis Hubungan Fitur (Task 6) {#sec-feature-analysis}
 
 Agar nantinya kita bisa mendapatkan fitur yang relevan, sebaiknya kita melihat hubungan setiap fitur dengan kelas target.
 
 ```{python}
-#| label: code-feature-analysis-crosstab
+#| label: tbl-crosstab-categorical-target
 #| layout-ncol: 2
 #| tbl-cap: "Crosstab Fitur Kategorikal dengan Target"
 #| tbl-subcap:
@@ -658,7 +657,14 @@ for col in [c for c in string_cols if c != 'Target']:
 ```
 
 ```{python}
-#| label: code-feature-analysis-scatter
+#| label: fig-scatter-numeric-target
+#| fig-cap: "Scatter Plot Fitur Numerik vs Target"
+#| fig-subcap:
+#|   - "Nilai SMA"
+#|   - "Nilai Ujian Masuk"
+#|   - "Usia saat mendaftar"
+#|   - "IP Semester 1"
+#|   - "IP Semester 2"
 #| layout-ncol: 2
 
 # 2)	Plot kedalam grafik sebaran (scatter)
@@ -673,12 +679,13 @@ for col in [c for c in numeric_cols if c != 'ID' and c != 'Target']:
     plt.show()
 ```
 
-Scatterplot menunjukkan IP semester 1 dan 2 memiliki "cutoff" dimana nilai hanya $0$ atau $2.0$ ke atas.
+*Scatter plot* menunjukkan IP semester 1 dan 2 memiliki *cutoff* di mana nilai hanya $0$ atau $2.0$ ke atas.
 
-Untuk analisis skew, kita bisa menggunakan metode statistik seperti skewness untuk mengukur tingkat skew pada distribusi data. Khususnya untuk IP Semester 1 dan IP Semester 2, data dengan IP 0 perlu dibuang agar mendapatkan distribusi yang lebih normal, karena IP 0 kemungkinan besar merupakan data yang tidak valid atau outlier yang ekstrem. Data dengan IP 0 tetap akan dipertahankan untuk analisis lainnya serta untuk proses training dan testing, karena ini bisa jadi merupakan data yang valid untuk kelas target "Gagal" (Tidak Lulus).
+Untuk analisis *skew*, kita bisa menggunakan metode statistik seperti *skewness* untuk mengukur tingkat *skew* pada distribusi data. Khususnya untuk IP Semester 1 dan IP Semester 2, data dengan IP 0 perlu dibuang agar mendapatkan distribusi yang lebih normal, karena IP 0 kemungkinan besar merupakan data yang tidak valid atau *outlier* yang ekstrem. Data dengan IP 0 tetap akan dipertahankan untuk analisis lainnya serta untuk proses *training* dan *testing*, karena ini bisa jadi merupakan data yang valid untuk kelas target "Gagal" (Tidak Lulus).
 
 ```{python}
-#| label: code-data-analysis-skew
+#| label: tbl-skewness-numeric
+#| tbl-cap: "Skor Skewness untuk Fitur Numerik"
 
 # drop values from IP Semester 1 dan IP Semester 2 if they're 0
 data_skew_analysis = data_unified_clean_age[(data_unified_clean_age['IP Semester 1'] > 0) & (data_unified_clean_age['IP Semester 2'] > 0)]
@@ -689,7 +696,14 @@ display(skew_results)
 ```
 
 ```{python}
-#| label: code-data-visualization-histogram-numeric-2
+#| label: fig-histogram-numeric-no-outliers
+#| fig-cap: "Histogram Fitur Numerik Tanpa Outlier IP 0"
+#| fig-subcap: 
+#|   - "Nilai SMA"
+#|   - "Nilai Ujian Masuk"
+#|   - "Usia saat mendaftar"
+#|   - "IP Semester 1"
+#|   - "IP Semester 2"
 #| column: page
 #| layout-ncol: 2
 #| layout-nrow: 3
@@ -706,6 +720,14 @@ for col in numeric_cols_no_id:
 ```
 
 ```{python}
+#| label: fig-boxplots-numeric
+#| fig-cap: "Boxplot Fitur Numerik untuk Deteksi Outlier"
+#| fig-subcap:
+#|   - "Nilai SMA"
+#|   - "Nilai Ujian Masuk"
+#|   - "Usia saat mendaftar"
+#|   - "IP Semester 1"
+#|   - "IP Semester 2"
 #| column: page
 #| layout-ncol: 2
 #| layout-nrow: 3
@@ -720,6 +742,9 @@ for col in numeric_cols_no_id:
 ```
 
 ```{python}
+#| label: fig-correlation-heatmap
+#| fig-cap: "Heatmap Korelasi Antar Fitur Numerik"
+
 corr = data_skew_analysis[numeric_cols_no_id].corr()
 fig, ax = plt.subplots(figsize=(8, 6))
 im = ax.imshow(corr, cmap="coolwarm", vmin=-1, vmax=1)
@@ -733,15 +758,16 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Preprocessing Data untuk Pemodelan
+## Preprocessing Data untuk Pemodelan {#sec-preprocessing}
 
-Sebelum melatih model machine learning, data perlu dipersiapkan terlebih dahulu agar dapat diproses oleh algoritma klasifikasi. Tahap ini meliputi encoding variabel target, encoding fitur kategorikal, pemisahan fitur ($X$) dan target ($y$) dengan mempertahankan baris yang memiliki nilai IP 0, serta pembagian data (*train-test split*) dan standardisasi fitur numerik.
+Sebelum melatih model *machine learning*, data perlu dipersiapkan terlebih dahulu agar dapat diproses oleh algoritma klasifikasi. Tahap ini meliputi encoding variabel target, encoding fitur kategorikal, pemisahan fitur ($X$) dan target ($y$) dengan mempertahankan baris yang memiliki nilai IP 0, serta pembagian data (*train-test split*) dan standardisasi fitur numerik.
 
-Untuk standardisasi fitur numerik, ini akan dilakukan **setelah** proses pembagian data (*train-test split*), agar informasi dari data testing tidak bocor ke data training. Selengkapnya akan dibahas pada bagian selanjutnya.
+Untuk standardisasi fitur numerik, ini akan dilakukan **setelah** proses pembagian data (*train-test split*), agar informasi dari data *testing* tidak bocor ke data *training*. Selengkapnya akan dibahas pada bagian selanjutnya.
 
 ### Encoding Target dan Fitur Kategorikal
 
 Variabel target (`Target`) dikodekan secara manual menjadi nilai numerik sebagai berikut:
+
 - `Gagal`: 0
 - `Lulus Tidak Tepat Waktu`: 1
 - `Lulus Tepat Waktu`: 2
@@ -787,15 +813,14 @@ X = data_encoded.drop(columns=['ID', 'Target'])
 y = data_encoded['Target']
 ```
 
-# Pemodelan Machine Learning
+# Pemodelan Machine Learning {#sec-modeling}
 
-## Penanganan Class Imbalance (Task 7a)
+## Penanganan Class Imbalance (Task 7a) {#sec-class-imbalance}
 
-<!-- Oke, sepertinya sudah siap, tapi kok jumlah data per-kelas nya tidak seimbang ya, ada beberapa algoritma yang akan terpengaruh dengan kondisi ini, kita akan gunakan algoritma **$\color{orange}{\text{(Nama Algoritma)}}$** untuk menyelesaikan masalah ini, jadi kita **$\color{orange}{\text{(akan/tidak akan)}}$** melakukan proses augmentasi data karena **$\color{orange}{\text{(Alasan melakukan augmentasi/tidak)}}$** -->
-
-Untuk menentukan perlunya penanganan class imbalance, kita perlu melihat distribusi kelas target terlebih dahulu.
+Untuk menentukan perlunya penanganan *class imbalance*, kita perlu melihat distribusi kelas target terlebih dahulu.
 
 ```{python}
+#| label: tbl-class-imbalance-analysis
 #| output: asis
 
 # hitung jumlah data target
@@ -813,9 +838,11 @@ for target_class, count in target_counts.items():
 
 ```
 
-Rasio Gagal : Lulus Tidak Tepat Waktu : Lulus Tepat Waktu adalah sekitar 3:2:5. Ini dikategorikan sebagai ketidakseimbangan kelas ringan hingga sedang (mild to moderate imbalance), bukan ketidakseimbangan yang ekstrem (seperti pada kasus deteksi penipuan kartu kredit atau penyakit langka yang rasionya bisa < 1%). Oleh karena itu, penanganan class imbalance dengan teknik augmentasi data seperti SMOTE atau ADASYN tidak diperlukan dalam kasus ini, karena algoritma klasifikasi yang umum seperti Random Forest, Gradient Boosting, atau Logistic Regression masih dapat bekerja dengan baik tanpa penanganan khusus untuk ketidakseimbangan kelas yang ringan hingga sedang. Namun, kita tetap perlu memantau metrik evaluasi yang sensitif terhadap ketidakseimbangan kelas seperti F1-score, Precision, dan Recall untuk memastikan bahwa model tidak bias terhadap kelas mayoritas.
+Rasio Gagal : Lulus Tidak Tepat Waktu : Lulus Tepat Waktu adalah sekitar 3:2:5. Ini dikategorikan sebagai ketidakseimbangan kelas ringan hingga sedang (*mild to moderate imbalance*), bukan ketidakseimbangan yang ekstrem (seperti pada kasus deteksi penipuan kartu kredit atau penyakit langka yang rasionya bisa < 1%). Oleh karena itu, penanganan *class imbalance* dengan teknik augmentasi data seperti SMOTE atau ADASYN tidak diperlukan dalam kasus ini, karena algoritma klasifikasi yang umum seperti **Random Forest**, Gradient Boosting, atau Logistic Regression masih dapat bekerja dengan baik tanpa penanganan khusus untuk ketidakseimbangan kelas yang ringan hingga sedang. Namun, kita tetap perlu memantau metrik evaluasi yang sensitif terhadap ketidakseimbangan kelas seperti *F1-score*, *Precision*, dan *Recall* untuk memastikan bahwa model tidak bias terhadap kelas mayoritas.
 
-Algoritma yang akan digunakan untuk klasifikasi ini adalah **Random Forest** karena algoritma ini cukup robust terhadap ketidakseimbangan kelas yang ringan hingga sedang, serta mampu menangani fitur numerik dan kategorikal dengan baik tanpa perlu banyak penyesuaian. Selain itu, Random Forest juga memiliki mekanisme internal untuk menangani overfitting melalui penggunaan banyak pohon keputusan yang dibangun pada subset data yang berbeda, sehingga dapat memberikan performa yang baik pada dataset ini tanpa perlu melakukan augmentasi data.
+<!-- Catatan: Bagian augmentasi data sengaja dilewati karena rasio ketidakseimbangan kelas tergolong ringan-sedang (3:2:5). Pembobotan kelas seimbang ('class_weight=balanced') akan digunakan secara langsung pada model Random Forest. -->
+
+Algoritma yang akan digunakan untuk klasifikasi ini adalah **Random Forest** karena algoritma ini cukup robust terhadap ketidakseimbangan kelas yang ringan hingga sedang, serta mampu menangani fitur numerik dan kategorikal dengan baik tanpa perlu banyak penyesuaian. Selain itu, **Random Forest** juga memiliki mekanisme internal untuk menangani *overfitting* melalui penggunaan banyak pohon keputusan yang dibangun pada subset data yang berbeda, sehingga dapat memberikan performa yang baik pada dataset ini tanpa perlu melakukan augmentasi data.
 
 <!--
 > Selanjutnya datanya perlu kita bagi dengan ratio **80** : **20**
@@ -823,11 +850,11 @@ Algoritma yang akan digunakan untuk klasifikasi ini adalah **Random Forest** kar
 > Dan **20%** adalah data testing
 -->
 
-### Pembagian Data Training dan Testing (Task 7b)
+### Pembagian Data Training dan Testing (Task 7b) {#sec-train-test-split-step}
 
-Untuk pembagian data training dan testing, kita akan menggunakan metode stratified split untuk memastikan bahwa rasio kelas target tetap terjaga pada kedua set data.
+Untuk pembagian data *training* dan *testing*, kita akan menggunakan metode *stratified split* untuk memastikan bahwa rasio kelas target tetap terjaga pada kedua set data.
 
-Setelah itu, kita akan melakukan standardisasi fitur numerik agar memiliki skala yang sama, yang dapat membantu algoritma klasifikasi dalam proses pembelajaran. Alasan dilakukan standardisasi setelah pembagian data adalah untuk menghindari data leakage, dimana informasi dari data testing tidak bocor ke data training melalui proses standardisasi yang dilakukan sebelum pembagian data.
+Setelah itu, kita akan melakukan standardisasi fitur numerik agar memiliki skala yang sama, yang dapat membantu algoritma klasifikasi dalam proses pembelajaran. Alasan dilakukan standardisasi setelah pembagian data adalah untuk menghindari *data leakage*, di mana informasi dari data *testing* tidak bocor ke data *training* melalui proses standardisasi yang dilakukan sebelum pembagian data.
 
 Untuk standardisasi, kita akan menggunakan `StandardScaler` dari library `sklearn`, yang akan mengubah fitur numerik menjadi distribusi dengan mean 0 dan standar deviasi 1. Fitur numerik yang akan distandardisasi adalah "Nilai SMA", "Nilai Ujian Masuk", "Usia saat mendaftar", "IP Semester 1", dan "IP Semester 2".
 
@@ -854,9 +881,9 @@ print(f"Jumlah data training (scaled): {X_train_scaled.shape}")
 print(f"Jumlah data testing (scaled): {X_test_scaled.shape}")
 ```
 
-## Pelatihan Model (Task 8)
+## Pelatihan Model (Task 8) {#sec-model-training}
 
-Kita melatih model **Random Forest** menggunakan data training yang sudah didefinisikan sebelumnya (`X_train_scaled`, `y_train`). Untuk mengantisipasi ketidakseimbangan kelas ringan-sedang, kita mengaktifkan opsi `class_weight='balanced'`. Setelah melatih model, kita mengevaluasi stabilitas model menggunakan **5-Fold Cross Validation**.
+Kita melatih model **Random Forest** menggunakan data *training* yang sudah didefinisikan sebelumnya (`X_train_scaled`, `y_train`). Untuk mengantisipasi ketidakseimbangan kelas ringan-sedang, kita mengaktifkan opsi `class_weight='balanced'`. Setelah melatih model, kita mengevaluasi stabilitas model menggunakan **5-Fold Cross Validation**.
 
 ```{python}
 #| label: code-model-training
@@ -884,12 +911,13 @@ Akurasi Cross-Validation per Fold:
 Rata-rata Akurasi Cross-Validation: 0.7231
 -->
 
-# Evaluasi Model (Task 9)
+# Evaluasi Model (Task 9) {#sec-evaluation}
 
-Setelah model dilatih, kita mengevaluasi performanya pada data testing (`X_test_scaled`, `y_test`) untuk melihat sejauh mana kemampuan model dalam melakukan generalisasi pada data baru. Kita akan mengukur kualitas klasifikasi melalui *Classification Report* (mengukur Precision, Recall, F1-score untuk masing-masing dari ketiga kelas target) dan menggambarkan *Confusion Matrix* serta analisis *Feature Importance*.
+Setelah model dilatih, kita mengevaluasi performanya pada data *testing* (`X_test_scaled`, `y_test`) untuk melihat sejauh mana kemampuan model dalam melakukan *generalisasi* pada data baru. Kita akan mengukur kualitas klasifikasi melalui *Classification Report* (mengukur *precision*, *recall*, *f1-score* untuk masing-masing dari ketiga kelas target) dan menggambarkan *Confusion Matrix* serta analisis *Feature Importance*.
 
 ```{python}
-#| label: code-model-evaluation
+#| label: tbl-classification-report
+#| tbl-cap: "Classification Report Model Random Forest"
 
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
@@ -904,6 +932,9 @@ print(classification_report(y_test, y_pred, target_names=target_names))
 ```
 
 ```{python}
+#| label: fig-confusion-matrix
+#| fig-cap: "Confusion Matrix Model Random Forest"
+
 # 3) Visualisasi Confusion Matrix
 
 # versi teks
@@ -939,10 +970,11 @@ Lulus Tidak Tepat Waktu       0.39      0.10      0.16       128
 -->
 ### Analisis Fitur Paling Berpengaruh (Feature Importance)
 
-Random Forest memungkinkan kita melihat fitur mana yang memiliki pengaruh terbesar dalam proses pengambilan keputusan model untuk memprediksi kelulusan mahasiswa.
+**Random Forest** memungkinkan kita melihat fitur mana yang memiliki pengaruh terbesar dalam proses pengambilan keputusan model untuk memprediksi kelulusan mahasiswa.
 
 ```{python}
-#| label: code-feature-importance-md
+#| label: tbl-feature-importance
+#| tbl-cap: "10 Fitur Teratas Berdasarkan Feature Importance"
 #| output: asis
 
 # Mendapatkan nilai importance fitur
@@ -961,7 +993,8 @@ for feature, score in top_features.items():
 ```
 
 ```{python}
-#| label: code-feature-importance-plot
+#| label: fig-feature-importance
+#| fig-cap: "Visualisasi 10 Fitur Paling Berpengaruh"
 
 # Visualisasi horizontal bar plot
 plt.figure(figsize=(8, 5))
@@ -973,26 +1006,28 @@ plt.tight_layout()
 plt.show()
 ```
 
-# Kesimpulan (Task 10)
+# Kesimpulan (Task 10) {#sec-conclusion}
 
 Berdasarkan hasil pemodelan dan evaluasi menggunakan algoritma **Random Forest**, kita dapat menarik beberapa kesimpulan penting:
 
 1. **Konsistensi Performa Model:**
-   Rata-rata akurasi *5-Fold Cross Validation* pada data training adalah **72,31%**, sedangkan akurasi pada data testing adalah **69,00%**. Selisih penurunan performa yang tipis (~3,3%) mengindikasikan adanya sedikit *overfitting* ringan, namun secara umum model masih stabil dan memiliki kemampuan generalisasi yang cukup wajar.
+   Rata-rata akurasi *5-Fold Cross Validation* pada data *training* adalah **72,31%**, sedangkan akurasi pada data *testing* adalah **69,00%**. Selisih penurunan performa yang tipis (~3,3%) mengindikasikan adanya sedikit *overfitting* ringan, namun secara umum model masih stabil dan memiliki kemampuan *generalisasi* yang cukup wajar.
 2. **Analisis Kualitas Klasifikasi Per-Kelas:**
    * **Lulus Tepat Waktu (Mayoritas):** Menunjukkan kinerja terbaik dengan tingkat sensitivitas (*Recall*) mencapai **92%**. Model sangat andal dalam mendeteksi mahasiswa yang dapat lulus tepat waktu (320 dari 348 mahasiswa berhasil diklasifikasikan dengan benar).
    * **Gagal (Kritis):** Memiliki performa deteksi dini yang cukup andal dengan tingkat ketepatan (*Precision*) **74%** dan sensitivitas (*Recall*) **67%** (153 dari 229 mahasiswa). Hal ini memberikan jaminan bahwa sebagian besar mahasiswa yang berisiko gagal dapat diidentifikasi secara dini.
-   * **Lulus Tidak Tepat Waktu (Minoritas - Isu Kritis):** Model mengalami kesulitan yang signifikan pada kelas transisi ini, dengan *Recall* hanya **10%** (hanya 13 dari 128 mahasiswa) dan F1-score **16%**. Matrix kebingungan (*confusion matrix*) menunjukkan sebagian besar mahasiswa kelas ini salah diklasifikasikan sebagai `Lulus Tepat Waktu` (76) atau `Gagal` (39). Hal ini menunjukkan bahwa pembobotan kelas (`class_weight='balanced'`) saja belum cukup untuk membantu model membedakan karakteristik kelas transisi ini dari dua kelas ekstrem lainnya.
+   * **Lulus Tidak Tepat Waktu (Minoritas - Isu Kritis):** Model mengalami kesulitan yang signifikan pada kelas transisi ini, dengan *Recall* hanya **10%** (hanya 13 dari 128 mahasiswa) dan *f1-score* **16%**. Matrix kebingungan (*confusion matrix*) menunjukkan sebagian besar mahasiswa kelas ini salah diklasifikasikan sebagai `Lulus Tepat Waktu` (76) atau `Gagal` (39). Hal ini menunjukkan bahwa pembobotan kelas (`class_weight='balanced'`) saja belum cukup untuk membantu model membedakan karakteristik kelas transisi ini dari dua kelas ekstrem lainnya.
 3. **Variabel Penentu Utama Kelulusan:**
    Hasil *Feature Importance* memperkuat temuan bahwa performa akademis di tahun pertama adalah faktor penentu terbesar. Dua fitur teratas adalah **`IP Semester 2` (18,43%)** dan **`IP Semester 1` (13,27%)**. Faktor pendukung lainnya meliputi `Nilai Ujian Masuk` (9,23%), `Nilai SMA` (8,45%), dan `Usia saat mendaftar` (7,72%). Kondisi finansial berupa status pelunasan SPP (`Status pembayaran semester terakhir`) menempati posisi keenam dengan nilai kepentingan 4,97%.
 4. **Implikasi dan Rekomendasi Aksi:**
-   Wali akademik dapat menggunakan model ini dengan tingkat kepercayaan tinggi untuk membedakan dua skenario ekstrem (mahasiswa yang pasti lulus tepat waktu vs mahasiswa yang berisiko tinggi gagal). Namun, model harus dibaca secara hati-hati terkait kategori mahasiswa yang lulus lambat/terlambat karena tingginya tingkat *false negative* (terlewat deteksi). Untuk pengembangan sistem selanjutnya, disarankan mencoba teknik optimasi hiperparameter, algoritma *boosting* (seperti XGBoost/LightGBM), atau menguji metode penanganan ketimbang kelas lainnya seperti SMOTE khusus pada kelas minoritas tersebut.
+   Wali akademik dapat menggunakan model ini dengan tingkat kepercayaan tinggi untuk membedakan dua skenario ekstrem (mahasiswa yang pasti lulus tepat waktu vs mahasiswa yang berisiko tinggi gagal). Namun, model harus dibaca secara hati-hati terkait kategori mahasiswa yang lulus lambat/terlambat karena tingginya tingkat *false negative* (terlewat deteksi). Untuk pengembangan sistem selanjutnya, disarankan mencoba teknik optimasi *hiperparameter*, algoritma *boosting* (seperti XGBoost/LightGBM), atau menguji metode penanganan ketimbang kelas lainnya seperti SMOTE khusus pada kelas minoritas tersebut.
 
 # Lampiran {#sec-appendix}
 
 ## Diagnostik Python {.appendix}
 
 ```{python}
+#| label: code-python-diagnostics
+
 import IPython as ipy
 print(ipy.sys_info())
 ```
