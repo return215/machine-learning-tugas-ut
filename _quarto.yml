@@ -1,6 +1,9 @@
 project:
   title: "Tugas Machine Learning Universitas Terbuka"
   output-dir: docs
+  preview: 
+    browser: false
+    port: 8484
 author: "Muhammad Hidayat"
 lang: "id"
 website:
@@ -10,6 +13,8 @@ website:
         href: index.qmd
       - text: "Tugas 1"
         href: tugas1/index.qmd
+      - text: "Tugas 2"
+        href: tugas2/index.qmd
 format: 
   html:
     theme: cosmo
