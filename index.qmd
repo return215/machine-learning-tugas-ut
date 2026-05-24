@@ -16,6 +16,7 @@ NIM: 052747132
 ## Daftar Tugas
 
 - [Tugas 1](./tugas1/)
+- [Tugas 2](./tugas2/)
 
 Masing-masing file tugas dapat dijalankan secara terpisah dan dapat diexport ke format notebook (ipynb), Markdown, HTML, dan PDF.
 
