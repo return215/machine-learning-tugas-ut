@@ -6,9 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Muhammad Hidayat">
+<meta name="author" content="Antigravity">
+<meta name="dcterms.date" content="2026-05-28">
 
-<title>Tugas Machine Learning Universitas Terbuka</title>
+<title>Customer Personality Analysis: Segmentasi Pelanggan Menggunakan Unsupervised Learning</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -74,6 +75,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="index_files/libs/bootstrap/bootstrap-67270d1595a62d14f123c043d4fb2f18.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -90,6 +120,98 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#daftar-tugas" id="toc-daftar-tugas" class="nav-link" data-scroll-target="#daftar-tugas">Daftar Tugas</a></li>
   <li><a href="#persiapan-environment" id="toc-persiapan-environment" class="nav-link" data-scroll-target="#persiapan-environment">Persiapan Environment</a></li>
   </ul></li>
+  <li><a href="#sec-load-data" id="toc-sec-load-data" class="nav-link" data-scroll-target="#sec-load-data">Step 1: Memuat Dataset</a></li>
+  <li><a href="#sec-eda" id="toc-sec-eda" class="nav-link" data-scroll-target="#sec-eda">Step 2: Eksplorasi Data &amp; Pembersihan Awal</a></li>
+  <li><a href="#sec-feature-identification-engineering" id="toc-sec-feature-identification-engineering" class="nav-link" data-scroll-target="#sec-feature-identification-engineering">Step 3: Identifikasi kolom numerik &amp; kategori</a></li>
+  <li><a href="#sec-imputation" id="toc-sec-imputation" class="nav-link" data-scroll-target="#sec-imputation">Step 4: Imputasi missing value</a></li>
+  <li><a href="#sec-encoding" id="toc-sec-encoding" class="nav-link" data-scroll-target="#sec-encoding">Step 5: Encoding fitur kategori</a>
+  <ul class="collapse">
+  <li><a href="#sec-merge-encoded" id="toc-sec-merge-encoded" class="nav-link" data-scroll-target="#sec-merge-encoded">Gabungkan data numerik &amp; hasil encoding</a></li>
+  </ul></li>
+  <li><a href="#sec-scaling" id="toc-sec-scaling" class="nav-link" data-scroll-target="#sec-scaling">Step 6: Scaling data</a></li>
+  <li><a href="#sec-optimal-k" id="toc-sec-optimal-k" class="nav-link" data-scroll-target="#sec-optimal-k">Step 7: Tentukan jumlah cluster optimal (Elbow + Silhouette)</a>
+  <ul class="collapse">
+  <li><a href="#sec-elbow-silhouette-explanation" id="toc-sec-elbow-silhouette-explanation" class="nav-link" data-scroll-target="#sec-elbow-silhouette-explanation">Penjelasan Metode Elbow dan Silhouette Score</a></li>
+  </ul></li>
+  <li><a href="#sec-clustering" id="toc-sec-clustering" class="nav-link" data-scroll-target="#sec-clustering">Step 8: Melakukan Klasterisasi</a></li>
+  <li><a href="#sec-pca-visualization" id="toc-sec-pca-visualization" class="nav-link" data-scroll-target="#sec-pca-visualization">Step 9: Visualisasi klaster dengan PCA 2D</a></li>
+  <li><a href="#sec-profiling" id="toc-sec-profiling" class="nav-link" data-scroll-target="#sec-profiling">Step 10: Profiling cluster (rata-rata fitur per cluster)</a></li>
+  <li><a href="#sec-conclusion" id="toc-sec-conclusion" class="nav-link" data-scroll-target="#sec-conclusion">Simpulkan Analisa dari hasil</a>
+  <ul class="collapse">
+  <li><a href="#sec-cluster-characteristics" id="toc-sec-cluster-characteristics" class="nav-link" data-scroll-target="#sec-cluster-characteristics">Karakteristik Utama dari Setiap Klaster</a>
+  <ul class="collapse">
+  <li><a href="#sec-cluster-0" id="toc-sec-cluster-0" class="nav-link" data-scroll-target="#sec-cluster-0">Klaster 0: <em>Frugal Basic-Educated Consumers</em> (Konsumen Hemat Berpendidikan Dasar)</a></li>
+  <li><a href="#sec-cluster-1" id="toc-sec-cluster-1" class="nav-link" data-scroll-target="#sec-cluster-1">Klaster 1: <em>Affluent Elite Spenders</em> (Pembelanja Elite Kelas Atas)</a></li>
+  <li><a href="#sec-cluster-2" id="toc-sec-cluster-2" class="nav-link" data-scroll-target="#sec-cluster-2">Klaster 2: <em>Budget-Conscious Families</em> (Keluarga Hemat &amp; Pemburu Diskon)</a></li>
+  <li><a href="#sec-cluster-3" id="toc-sec-cluster-3" class="nav-link" data-scroll-target="#sec-cluster-3">Klaster 3: <em>Mature Web-Active Bargain Hunters</em> (Pemburu Diskon Online Senior)</a></li>
+  <li><a href="#sec-cluster-4" id="toc-sec-cluster-4" class="nav-link" data-scroll-target="#sec-cluster-4">Klaster 4: <em>Independent High-Value Shoppers</em> (Pembelanja Mandiri Kelas Menengah Atas)</a></li>
+  </ul></li>
+  <li><a href="#sec-marketing-strategies" id="toc-sec-marketing-strategies" class="nav-link" data-scroll-target="#sec-marketing-strategies">Implikasi Bisnis dan Strategi Pemasaran Personalisasi</a></li>
+  </ul></li>
+  
+  <li><a href="#pendahuluan" id="toc-pendahuluan" class="nav-link" data-scroll-target="#pendahuluan">1. Pendahuluan</a></li>
+  <li><a href="#pemrosesan-data-rekayasa-fitur" id="toc-pemrosesan-data-rekayasa-fitur" class="nav-link" data-scroll-target="#pemrosesan-data-rekayasa-fitur">2. Pemrosesan Data &amp; Rekayasa Fitur</a>
+  <ul class="collapse">
+  <li><a href="#step-1-pemuatan-dataset" id="toc-step-1-pemuatan-dataset" class="nav-link" data-scroll-target="#step-1-pemuatan-dataset">Step 1: Pemuatan Dataset</a></li>
+  <li><a href="#step-2-eksplorasi-awal-exploratory-data-analysis" id="toc-step-2-eksplorasi-awal-exploratory-data-analysis" class="nav-link" data-scroll-target="#step-2-eksplorasi-awal-exploratory-data-analysis">Step 2: Eksplorasi Awal (Exploratory Data Analysis)</a>
+  <ul class="collapse">
+  <li><a href="#teori" id="toc-teori" class="nav-link" data-scroll-target="#teori">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering" id="toc-step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering" class="nav-link" data-scroll-target="#step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering">Step 3: Identifikasi Kolom &amp; Rekayasa Fitur (Feature Engineering)</a>
+  <ul class="collapse">
+  <li><a href="#teori-1" id="toc-teori-1" class="nav-link" data-scroll-target="#teori-1">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-4-imputasi-missing-value" id="toc-step-4-imputasi-missing-value" class="nav-link" data-scroll-target="#step-4-imputasi-missing-value">Step 4: Imputasi Missing Value</a>
+  <ul class="collapse">
+  <li><a href="#teori-2" id="toc-teori-2" class="nav-link" data-scroll-target="#teori-2">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-5-encoding-fitur-kategorikal" id="toc-step-5-encoding-fitur-kategorikal" class="nav-link" data-scroll-target="#step-5-encoding-fitur-kategorikal">Step 5: Encoding Fitur Kategorikal</a>
+  <ul class="collapse">
+  <li><a href="#teori-3" id="toc-teori-3" class="nav-link" data-scroll-target="#teori-3">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-6-standardisasi-data-scaling" id="toc-step-6-standardisasi-data-scaling" class="nav-link" data-scroll-target="#step-6-standardisasi-data-scaling">Step 6: Standardisasi Data (Scaling)</a>
+  <ul class="collapse">
+  <li><a href="#teori-4" id="toc-teori-4" class="nav-link" data-scroll-target="#teori-4">Teori</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#penentuan-jumlah-klaster-optimal" id="toc-penentuan-jumlah-klaster-optimal" class="nav-link" data-scroll-target="#penentuan-jumlah-klaster-optimal">3. Penentuan Jumlah Klaster Optimal</a>
+  <ul class="collapse">
+  <li><a href="#step-7-analisis-elbow-silhouette-score" id="toc-step-7-analisis-elbow-silhouette-score" class="nav-link" data-scroll-target="#step-7-analisis-elbow-silhouette-score">Step 7: Analisis Elbow &amp; Silhouette Score</a>
+  <ul class="collapse">
+  <li><a href="#teori-5" id="toc-teori-5" class="nav-link" data-scroll-target="#teori-5">Teori</a></li>
+  <li><a href="#analisis-pemilihan-k" id="toc-analisis-pemilihan-k" class="nav-link" data-scroll-target="#analisis-pemilihan-k">Analisis Pemilihan <span class="math inline">\(k\)</span></a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#klasterisasi-k-means-reduksi-dimensi" id="toc-klasterisasi-k-means-reduksi-dimensi" class="nav-link" data-scroll-target="#klasterisasi-k-means-reduksi-dimensi">4. Klasterisasi K-Means &amp; Reduksi Dimensi</a>
+  <ul class="collapse">
+  <li><a href="#step-8-eksekusi-kmeans-dengan-k-4" id="toc-step-8-eksekusi-kmeans-dengan-k-4" class="nav-link" data-scroll-target="#step-8-eksekusi-kmeans-dengan-k-4">Step 8: Eksekusi KMeans dengan <span class="math inline">\(k = 4\)</span></a>
+  <ul class="collapse">
+  <li><a href="#teori-6" id="toc-teori-6" class="nav-link" data-scroll-target="#teori-6">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca" id="toc-step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca" class="nav-link" data-scroll-target="#step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca">Step 9: Reduksi Dimensi &amp; Visualisasi Klaster menggunakan PCA</a>
+  <ul class="collapse">
+  <li><a href="#teori-7" id="toc-teori-7" class="nav-link" data-scroll-target="#teori-7">Teori</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#profiling-klaster-analisis-hasil" id="toc-profiling-klaster-analisis-hasil" class="nav-link" data-scroll-target="#profiling-klaster-analisis-hasil">5. Profiling Klaster (Analisis Hasil)</a>
+  <ul class="collapse">
+  <li><a href="#step-10-profiling-karakteristik-rata-rata-fitur-per-klaster" id="toc-step-10-profiling-karakteristik-rata-rata-fitur-per-klaster" class="nav-link" data-scroll-target="#step-10-profiling-karakteristik-rata-rata-fitur-per-klaster">Step 10: Profiling Karakteristik Rata-rata Fitur per Klaster</a>
+  <ul class="collapse">
+  <li><a href="#teori-8" id="toc-teori-8" class="nav-link" data-scroll-target="#teori-8">Teori</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#kesimpulan-rekomendasi-bisnis" id="toc-kesimpulan-rekomendasi-bisnis" class="nav-link" data-scroll-target="#kesimpulan-rekomendasi-bisnis">6. Kesimpulan &amp; Rekomendasi Bisnis</a>
+  <ul class="collapse">
+  <li><a href="#klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat" id="toc-klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat" class="nav-link" data-scroll-target="#klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat">Klaster 0: “Keluarga Muda dengan Pendapatan Rendah &amp; Hemat”</a></li>
+  <li><a href="#klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif" id="toc-klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif" class="nav-link" data-scroll-target="#klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif">Klaster 1: “Pelanggan VIP yang Sangat Responsif &amp; Konsumtif”</a></li>
+  <li><a href="#klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar" id="toc-klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar" class="nav-link" data-scroll-target="#klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar">Klaster 2: “Pelanggan Kaya yang Tenang &amp; Menyukai Produk Segar”</a></li>
+  <li><a href="#klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja" id="toc-klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja" class="nav-link" data-scroll-target="#klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja">Klaster 3: “Pelanggan Setia Kelas Menengah (Keluarga dengan Remaja)”</a></li>
+  </ul></li>
+  <li><a href="#informasi-diagnostik-kredit" id="toc-informasi-diagnostik-kredit" class="nav-link" data-scroll-target="#informasi-diagnostik-kredit">7. Informasi Diagnostik &amp; Kredit</a>
+  <ul class="collapse">
+  <li><a href="#diagnostik-antigravity" id="toc-diagnostik-antigravity" class="nav-link" data-scroll-target="#diagnostik-antigravity">Diagnostik Antigravity</a></li>
+  <li><a href="#diagnostik-python-environment" id="toc-diagnostik-python-environment" class="nav-link" data-scroll-target="#diagnostik-python-environment">Diagnostik Python &amp; Environment</a></li>
+  </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Format Lain</h2><ul><li><a href="readme.md"><i class="bi bi-file-code"></i>Github (GFM)</a></li></ul></div></nav>
 </div>
@@ -97,7 +219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Tugas Machine Learning Universitas Terbuka</h1>
+<h1 class="title">Customer Personality Analysis: Segmentasi Pelanggan Menggunakan Unsupervised Learning</h1>
 </div>
 
 
@@ -111,6 +233,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           </div>
   </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Diterbitkan</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2026-05-28</p>
+    </div>
+  </div>
   
     
   </div>
@@ -142,10 +270,778 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Jalankan rendering spesifik (misal untuk tugas 1 sebagai notebook):</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render <span class="at">-t</span> ipynb tugas1/index.qmd</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Nama</span><span class="kw">:</span><span class="at"> Muhammad Hidayat</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">NIM</span><span class="kw">:</span><span class="at"> </span><span class="dv">052747132</span></span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<pre class="{python}"><code>#| label: setup
+
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import seaborn as sns
+from IPython.display import display
+
+sns.set_theme(style="whitegrid")</code></pre>
+</section>
+</section>
+<section id="sec-load-data" class="level1">
+<h1>Step 1: Memuat Dataset</h1>
+<p>File <code>cpa.csv</code> sebenarnya merupakan tab-delimited, jadi kita perlu menyebutkan <code>sep='\t'</code> saat membacanya dengan <code>pd.read_csv()</code>.</p>
+<pre class="{python}"><code>#| label: load-dataset
+
+data = pd.read_csv('cpa.csv', sep='\t')
+display(data.head())</code></pre>
+</section>
+<section id="sec-eda" class="level1">
+<h1>Step 2: Eksplorasi Data &amp; Pembersihan Awal</h1>
+<p>Beberapa langkah eksplorasi dan pembersihan awal yang bisa dilakukan:</p>
+<ul>
+<li>Cek tipe data dan jumlah missing value per kolom</li>
+<li>Cek statistik untuk kolom numerik</li>
+<li>Cek jumlah kategori unik untuk kolom kategori</li>
+</ul>
+<p>Pertama, kita akan melihat tipe data dan jumlah missing value:</p>
+<pre class="{python}"><code>#| label: check-dtypes
+
+display(data.dtypes)</code></pre>
+<pre class="{python}"><code>#| label: check-missing
+
+missing_info = data.isnull().sum()
+print("Kolom dengan nilai kosong:")
+print(missing_info[missing_info &gt; 0])</code></pre>
+<p>Terdapat 24 baris kosong di kolom <code>Income</code>. Kita akan melakukan imputasi untuk kolom ini nanti.</p>
+<p>Selanjutnya, kita bisa melihat statistik untuk kolom numerik, dipecah per 9 kolom untuk memudahkan pembacaan:</p>
+<pre class="{python}"><code>#| label: describe-numeric
+
+numeric_cols = data.select_dtypes(include=[np.number]).columns
+for i in range(0, len(numeric_cols), 9):
+    display(data[numeric_cols[i:i+9]].describe())</code></pre>
+<p>Kolom <code>Z_CostContact</code> dan <code>Z_Revenue</code> menunjukkan standar deviasi nol, yang berarti semua nilai di kolom tersebut sama. Kita bisa menghapus kedua kolom ini karena tidak memberikan informasi yang berguna untuk klasterisasi. Kolom <code>ID</code> juga tidak relevan untuk analisis klasterisasi, jadi kita akan menghapusnya juga.</p>
+<p>Terakhir, kita bisa melihat jumlah kategori unik untuk kolom kategori:</p>
+<pre class="{python}"><code>#| label: unique-categories
+
+categorical_cols = data.select_dtypes(include=['str']).columns
+for col in categorical_cols:
+    print(f"Kolom '{col}' memiliki {data[col].nunique()} kategori unik.")</code></pre>
+<p>Kolom ‘Education’ memiliki 5 kategori unik dan kolom ‘Marital_Status’ memiliki 8. Kolom ‘Dt_Customer’, yang memiliki 663 kategori unik, akan kita anggap sebagai kolom tersendiri dan akan diproses sebagai tanggal.</p>
+</section>
+<section id="sec-feature-identification-engineering" class="level1">
+<h1>Step 3: Identifikasi kolom numerik &amp; kategori</h1>
+<p>Dari langkah eksplorasi sebelumnya, kita sudah mengidentifikasi kolom numerik dan kategori. Untuk sebagian besar kolom, bisa saja digunakan apa adanya. Untuk kolom <code>Dt_Customer</code>, kita bisa mengubahnya menjadi fitur numerik dengan menghitung jumlah hari sejak tanggal tersebut hingga tanggal terakhir dalam dataset. Sama halnya dengan kolom <code>Year_Birth</code>, kita bisa mengubahnya menjadi umur dengan menghitung selisih antara tahun saat ini dan tahun lahir. Data yang telah diubah ini akan kita simpan dalam variabel baru agar tidak tercampur dengan data asli.</p>
+<p>Untuk mempermudah, kita akan menyimpan nama-nama kolom numerik dan kategori dalam variabel terpisah:</p>
+<pre class="{python}"><code>#| label: feature-engineering
+#| output: asis
+
+# Kolom yang akan dihapus
+cols_to_drop = ['ID', 'Z_CostContact', 'Z_Revenue']
+
+data_processed = data.drop(columns=cols_to_drop)
+
+# Proses fitur 'Dt_Customer' menjadi 'Customer_Since_Days' dan 'Year_Birth' menjadi 'Age'
+data_processed['Dt_Customer'] = pd.to_datetime(data_processed['Dt_Customer'], format='%d-%m-%Y', errors='coerce')
+_max_date = data_processed['Dt_Customer'].max()
+data_processed['Customer_Since_Days'] = (_max_date - data_processed['Dt_Customer']).dt.days
+data_processed['Age'] = 2024 - data_processed['Year_Birth']
+
+# Hapus kolom asli setelah diubah, gunakan inplace=True agar langsung diterapkan
+data_processed.drop(columns=['Dt_Customer', 'Year_Birth'], inplace=True)
+
+# Kelomokan nama kolom numerik dan kategori
+numerical_cols = data_processed.select_dtypes(include=[np.number]).columns.tolist()
+categorical_cols = data_processed.select_dtypes(include=['str']).columns.tolist()
+
+print(f"Kolom Numerik ({len(numerical_cols)}):\n")
+for col in numerical_cols:
+    print(f"- {col}")
+
+print(f"\nKolom Kategori ({len(categorical_cols)}):\n")
+for col in categorical_cols:
+    print(f"- {col}")</code></pre>
+</section>
+<section id="sec-imputation" class="level1">
+<h1>Step 4: Imputasi missing value</h1>
+<p>Kita akan melakukan imputasi untuk kolom <code>Income</code> yang memiliki 24 nilai kosong. Karena <code>Income</code> adalah kolom numerik, kita bisa menggunakan strategi imputasi seperti median atau mean. Dalam kasus ini, kita akan menggunakan median karena lebih tahan terhadap outlier.</p>
+<pre class="{python}"><code>#| label: impute-income
+
+imputer = SimpleImputer(strategy='median')
+data_processed['Income'] = imputer.fit_transform(data_processed[['Income']])
+
+print("Jumlah nilai kosong setelah imputasi:")
+print(data_processed['Income'].isnull().sum())</code></pre>
+<p>Kita tampilkan statistik untuk kolom <code>Customer_Since_Days</code> dan <code>Age</code> setelah proses transformasi, serta perbandingan antara kolom <code>Income</code> sebelum dan sesudah imputasi.</p>
+<pre class="{python}"><code>#| label: describe-engineered
+
+display(data_processed[['Customer_Since_Days', 'Age']].describe())</code></pre>
+<pre class="{python}"><code>#| label: compare-income
+
+income_comparison = pd.DataFrame({
+    'Income (pre)': data['Income'],
+    'Income (post)': data_processed['Income']
+})
+display(income_comparison.describe())</code></pre>
+</section>
+<section id="sec-encoding" class="level1">
+<h1>Step 5: Encoding fitur kategori</h1>
+<p>Encoding akan menggunakan one-hot encoding pada kolom kategori, kemudian digabung dengan kolom numerik sebagai dataframe baru. Dengan menggunakan one-hot dibandingkan label atau ordinal encoding, ini akan mengurangi bias dalam kalkulasi K-Means.</p>
+<p>Dalam proses encoding, kita bisa membuang salah satu variabel dalam teknik <em>dummy variable trap</em>, dan dilakukan dengan argumen <code>drop='first'</code>. Hal ini berguna dalam model regresi linear, namun tidak perlu dalam klasifikasi, karena berisiko menimbulkan bias terhadap kategori referensi yang dihapus tersebut karena jaraknya ke kategori lain dihitung secara asimetris. Oleh karena itu, kita pilih untuk tidak melakukan ini, dengan menggunakan argumen <code>drop=None</code>. Keuntungan cara ini adalah mempermudah interpretasi PCA.</p>
+<pre class="{python}"><code>#| label: one-hot-encoding
+
+encoder = OneHotEncoder(sparse_output=False, drop=None)
+encoded_categorical = encoder.fit_transform(data_processed[categorical_cols])
+encoded_categorical_df = pd.DataFrame(encoded_categorical, columns=encoder.get_feature_names_out(categorical_cols))</code></pre>
+<section id="sec-merge-encoded" class="level2">
+<h2 class="anchored" data-anchor-id="sec-merge-encoded">Gabungkan data numerik &amp; hasil encoding</h2>
+<pre class="{python}"><code>#| label: merge-features
+
+data_final = pd.concat([data_processed[numerical_cols].reset_index(drop=True), encoded_categorical_df], axis=1)
+display(data_final.head())</code></pre>
+</section>
+</section>
+<section id="sec-scaling" class="level1">
+<h1>Step 6: Scaling data</h1>
+<p>Standardisasi data menggunakan <code>StandardScaler</code> berdasarkan Z-score untuk memastikan semua fitur memiliki skala yang sama, sehingga algoritma klasterisasi tidak bias terhadap fitur dengan rentang nilai yang lebih besar.</p>
+<pre class="{python}"><code>#| label: scale-features
+
+scaler = StandardScaler()
+data_scaled_ndarray = scaler.fit_transform(data_final)
+
+# karena data_scaled_ndarray adalah numpy array, kita buat kembali ke dataframe
+data_scaled = pd.DataFrame(data_scaled_ndarray, columns=data_final.columns)</code></pre>
+</section>
+<section id="sec-optimal-k" class="level1">
+<h1>Step 7: Tentukan jumlah cluster optimal (Elbow + Silhouette)</h1>
+<section id="sec-elbow-silhouette-explanation" class="level3">
+<h3 class="anchored" data-anchor-id="sec-elbow-silhouette-explanation">Penjelasan Metode Elbow dan Silhouette Score</h3>
+<p>Untuk menentukan jumlah klaster (<span class="math inline">\(k\)</span>) terbaik, kita menggunakan kombinasi dari dua metode evaluasi: Elbow dan Silhouette.</p>
+<p>Metode Elbow (Inertia / Within-Cluster Sum of Squares) Inersia mengukur jumlah kuadrat jarak dari setiap titik data ke centroid klaster mereka. Nilai inersia akan selalu menurun seiring bertambahnya jumlah klaster. Pada satu titik, laju penurunan inersia mulai melandai secara signifikan, dimana menambahkan klaster setelah titik ini hanya memberikan sedikit penurunan inersia namun meningkatkan kompleksitas model. Inilah titik “siku” (<em>elbow</em>) yang akan kita cari, titik yang optimal sebagai <em>trade-off</em> antara kompleksitas dan efektivitas.</p>
+<p>Metode Silhouette Score score mengukur seberapa mirip suatu objek dengan klasternya sendiri (<em>kohesi</em>) dibandingkan dengan klaster lainnya (<em>pemisahan</em>). Nilai skor berkisar antara -1 hingga 1. Nilai silhouette score yang semakin mendekati 1 menunjukkan bahwa titik data terkelompok dengan baik, memiliki batas yang jelas, dan terpisah jauh dari klaster tetangga. Kita memilih <span class="math inline">\(k\)</span> yang menghasilkan puncak atau nilai silhouette tertinggi.</p>
+<p>Metode Elbow terkadang menghasilkan kurva melandai yang subjektif tanpa titik siku yang jelas. Di sisi lain, Silhouette score cenderung memberikan skor tertinggi pada <span class="math inline">\(k=2\)</span> karena pemisahan biner paling mudah dilakukan secara matematis, namun secara bisnis <span class="math inline">\(k=2\)</span> terlalu umum dan tidak informatif untuk segmentasi pelanggan. Dengan menggabungkan keduanya, kita mencari titik di mana inersia sudah cukup rendah (setelah elbow) dan silhouette score memiliki nilai yang relatif tinggi.</p>
+<p>Rentang <span class="math inline">\(k\)</span> yang diuji dipilih antara 2 hingga 10. Batas bawah adalah <span class="math inline">\(k=2\)</span> karena klasterisasi minimal membutuhkan 2 kelompok. Batas atas dipilih <span class="math inline">\(k=10\)</span> karena dalam segmentasi pelanggan bisnis, memiliki lebih dari 10 segmen akan terlalu rumit dan tidak praktis untuk merancang kampanye pemasaran yang spesifik bagi masing-masing kelompok.</p>
+<pre class="{python}"><code>#| label: fig-elbow-silhouette
+#| fig-cap: "Evaluasi jumlah klaster optimal k = 2 s/d 10 menggunakan Metode Elbow (Inersia) dan Silhouette Score secara berdampingan."
+
+# Menghitung inersia dan silhouette score untuk k = 2 s/d 10
+ks = range(2, 11)
+inertias = []
+silhouettes = []
+
+for k in ks:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(data_scaled)
+    inertias.append(kmeans.inertia_)
+    silhouettes.append(silhouette_score(data_scaled, labels))
+
+# Visualisasi kurva Elbow dan Silhouette Score berdampingan
+fig, ax1 = plt.subplots()
+
+color = 'tab:blue'
+ax1.set_xlabel('Number of Clusters (k)', fontsize=12)
+ax1.set_ylabel('Inertia (Within-Cluster Sum of Squares)', color=color, fontsize=12)
+ax1.plot(ks, inertias, 'o-', color=color, linewidth=2, label='Inertia')
+ax1.tick_params(axis='y', labelcolor=color)
+
+ax2 = ax1.twinx()  
+color = 'tab:red'
+ax2.set_ylabel('Silhouette Score', color=color, fontsize=12)
+ax2.plot(ks, silhouettes, 's-', color=color, linewidth=2, label='Silhouette Score')
+ax2.tick_params(axis='y', labelcolor=color)
+
+plt.title('Penentuan Jumlah Klaster Optimal: Metode Elbow &amp; Silhouette Score', fontsize=14, fontweight='bold', pad=15)
+fig.tight_layout()
+plt.show()</code></pre>
+<p>Berdasarkan hasil visualisasi kurva evaluasi inersia (Elbow Method) dan Silhouette Score di atas, penentuan jumlah klaster optimal dapat dijelaskan sebagai berikut.</p>
+<p>Titik tekukan atau siku (<em>elbow point</em>) mulai terbentuk secara jelas pada area rentang <span class="math inline">\(k = 4\)</span> hingga <span class="math inline">\(k = 5\)</span>. Setelah melewati <span class="math inline">\(k = 5\)</span>, penambahan jumlah klaster baru tidak lagi memberikan penurunan inersia yang signifikan.</p>
+<p>Terdapat peningkatan lokal yang signifikan pada <span class="math inline">\(k = 5\)</span> dan <span class="math inline">\(k = 6\)</span>, dengan nilai skor yang relatif stabil dan tinggi. Meskipun <span class="math inline">\(k=2\)</span> secara teoritis memiliki nilai silhouette yang tinggi, jumlah segmen tersebut terlalu sedikit untuk menghasilkan segmentasi profil kepribadian pelanggan yang bermakna bagi tim bisnis.</p>
+<p>Dengan mempertimbangkan keseimbangan antara performa model (inersia rendah dan silhouette score tinggi) serta nilai guna praktis segmentasi bisnis, <strong>jumlah klaster optimal dipilih sebesar <span class="math inline">\(k = 5\)</span></strong>.</p>
+</section>
+</section>
+<section id="sec-clustering" class="level1">
+<h1>Step 8: Melakukan Klasterisasi</h1>
+<pre class="{python}"><code>#| label: run-kmeans
+
+optimal_k = 5
+kmeans = KMeans(n_clusters=optimal_k, random_state=42, n_init=10)
+cluster_labels = kmeans.fit_predict(data_scaled)
+
+# Menyimpan hasil klaster ke dataframe
+data['Cluster'] = cluster_labels
+data_final['Cluster'] = cluster_labels
+
+# Menampilkan distribusi jumlah anggota per klaster
+cluster_counts = pd.Series(cluster_labels).value_counts().sort_index()
+for cluster_id, count in cluster_counts.items():
+    print(f"Klaster {cluster_id}: {count} pelanggan ({count/len(data)*100:.2f}%)")</code></pre>
+</section>
+<section id="sec-pca-visualization" class="level1">
+<h1>Step 9: Visualisasi klaster dengan PCA 2D</h1>
+<p>Perhitungan Principal Component Analysis (PCA) untuk visualisasi 2D serta persentase variansi untuk memahami seberapa baik PCA mempertahankan informasi dari data asli.</p>
+<pre class="{python}"><code>#| label: compute-pca
+
+# Menjalankan PCA untuk reduksi dimensi menjadi 2 komponen
+pca = PCA(n_components=2, random_state=42)
+pca_result = pca.fit_transform(data_scaled)
+
+data_pca = pd.DataFrame(pca_result, columns=['PC1', 'PC2'])
+data_pca['Cluster'] = cluster_labels
+
+# Menampilkan persentase variansi yang dijelaskan oleh PCA
+variance_explained = pca.explained_variance_ratio_
+print(f"Variansi yang dijelaskan oleh PC1: {variance_explained[0]*100:.2f}%")
+print(f"Variansi yang dijelaskan oleh PC2: {variance_explained[1]*100:.2f}%")
+print(f"Total variansi yang dipertahankan dalam 2D: {sum(variance_explained)*100:.2f}%")</code></pre>
+<p>Visualisasi klaster pada ruang PCA 2D dengan pewarnaan berdasarkan label klaster.</p>
+<pre class="{python}"><code>#| label: fig-pca-visualization
+#| fig-cap: "Sebaran klaster pelanggan dalam ruang 2D PCA dengan pewarnaan berdasarkan label klaster."
+
+# Plot sebaran klaster pada bidang PCA 2D
+plt.figure()
+colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'] # Palet premium
+
+sns.scatterplot(
+    x='PC1', y='PC2',
+    hue='Cluster',
+    palette=colors[:optimal_k],
+    data=data_pca,
+    legend="full",
+    alpha=0.7,
+    s=60
+)
+plt.title('Visualisasi Klaster Pelanggan dalam Ruang 2D PCA', fontsize=14, fontweight='bold', pad=15)
+plt.xlabel(f'Principal Component 1 ({variance_explained[0]*100:.2f}% Variance)', fontsize=12)
+plt.ylabel(f'Principal Component 2 ({variance_explained[1]*100:.2f}% Variance)', fontsize=12)
+plt.legend(title='Klaster', loc='best')
+plt.tight_layout()
+plt.show()</code></pre>
+</section>
+<section id="sec-profiling" class="level1">
+<h1>Step 10: Profiling cluster (rata-rata fitur per cluster)</h1>
+<pre class="{python}"><code>#| label: tbl-cluster-profiles
+#| tbl-cap: "Tabel rata-rata fitur (profiling) untuk setiap klaster pelanggan beserta ukuran klaster."
+
+# Menghitung rata-rata fitur untuk setiap klaster
+cluster_profiles = data_final.groupby('Cluster').mean()
+cluster_sizes = data_final['Cluster'].value_counts().sort_index()
+profile_table = pd.concat([cluster_profiles, cluster_sizes.rename('Cluster Size')], axis=1)
+
+# dump profile table ke file csv
+profile_table.to_csv('cluster_profiles.csv')
+
+# Menampilkan tabel profil klaster
+# Format tampilan angka agar rapi
+pd.set_option('display.float_format', lambda x: '%.2f' % x)
+display(profile_table.T.rename(columns={0: 'Cluster 0', 1: 'Cluster 1', 2: 'Cluster 2', 3: 'Cluster 3', 4: 'Cluster 4'}))</code></pre>
+</section>
+<section id="sec-conclusion" class="level1">
+<h1>Simpulkan Analisa dari hasil</h1>
+<p>Berdasarkan hasil analisis profil pada tabel di atas, kita dapat mengidentifikasi karakteristik khas dari masing-masing klaster pelanggan serta menyusun strategi pemasaran personalisasi yang tepat sasaran (<em>targeted marketing campaigns</em>).</p>
+<section id="sec-cluster-characteristics" class="level2">
+<h2 class="anchored" data-anchor-id="sec-cluster-characteristics">Karakteristik Utama dari Setiap Klaster</h2>
+<section id="sec-cluster-0" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cluster-0">Klaster 0: <em>Frugal Basic-Educated Consumers</em> (Konsumen Hemat Berpendidikan Dasar)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok ini sangat kecil (hanya 54 pelanggan atau 2,4% dari total data), beranggotakan pelanggan dengan tingkat pendidikan <strong>Basic</strong> (100% dari klaster ini) dan rata-rata pendapatan terendah (<span class="math inline">\(~\$20.306\)</span>). Pengeluaran total mereka sangat minim (<span class="math inline">\(~\$81,80\)</span>) dengan prioritas belanja yang merata di angka kecil. Kelompok ini cukup aktif mengunjungi web (6,87 kali/bulan) tetapi hampir tidak pernah melakukan transaksi online atau menanggapi kampanye pemasaran (tingkat respons 3,7%).</li>
+<li><strong>Demografi:</strong> Usia rata-rata paling muda di antara klaster lainnya (46,5 tahun) dan memiliki tanggungan anak (0,72).</li>
+</ul>
+</section>
+<section id="sec-cluster-1" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cluster-1">Klaster 1: <em>Affluent Elite Spenders</em> (Pembelanja Elite Kelas Atas)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok premium (171 pelanggan atau 7,6%) dengan tingkat pendapatan tertinggi (<span class="math inline">\(~\$81.569\)</span>) dan sangat sedikit anak di rumah (0,18). Mereka mencatat pengeluaran belanja tertinggi (<span class="math inline">\(~\$1.620,13\)</span>), didominasi oleh pembelian produk Anggur (Wines, <span class="math inline">\(~\$874,70\)</span>) dan Daging (Meat, <span class="math inline">\(~\$469,13\)</span>). Mereka jarang mengunjungi situs web (3,0 kali/bulan), tidak peduli dengan promo/diskon (pembelian <em>deals</em> terendah), dan <strong>sangat responsif terhadap kampanye</strong> (respons kampanye terakhir mencapai 57,9% serta tingkat penerimaan Kampanye 5 mencapai 94,2%).</li>
+<li><strong>Preferensi Saluran:</strong> Menyukai katalog (6,05) dan pembelian langsung di toko fisik (8,26).</li>
+</ul>
+</section>
+<section id="sec-cluster-2" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cluster-2">Klaster 2: <em>Budget-Conscious Families</em> (Keluarga Hemat &amp; Pemburu Diskon)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok terbesar dalam dataset (979 pelanggan atau 43,7%). Mereka adalah keluarga dengan tingkat pendapatan menengah ke bawah (<span class="math inline">\(~\$35.899\)</span>) dan jumlah anak terbanyak di rumah (rata-rata 1,26 anak). Pengeluaran belanja mereka sangat rendah (<span class="math inline">\(~\$98,65\)</span>). Mereka sering berselancar di web (6,40 kunjungan/bulan) untuk mencari penawaran diskon, tercermin dari pembelian memanfaatkan promosi yang cukup dominan (2,03). Tingkat respons terhadap kampanye sangat rendah (9,1%).</li>
+<li><strong>Preferensi Saluran:</strong> Pembelian langsung di toko fisik (3,23) dan web (2,11).</li>
+</ul>
+</section>
+<section id="sec-cluster-3" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cluster-3">Klaster 3: <em>Mature Web-Active Bargain Hunters</em> (Pemburu Diskon Online Senior)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok ini terdiri dari 579 pelanggan (25,8%) dengan rata-rata usia tertua (~60 tahun) dan didominasi oleh keluarga yang memiliki anak remaja (0,95 <em>Teenhome</em>). Dengan pendapatan menengah-atas (<span class="math inline">\(~\$57.046\)</span>), mereka memiliki pengeluaran belanja menengah-tinggi (<span class="math inline">\(~\$711,93\)</span>) yang berpusat pada Anggur (<span class="math inline">\(~\$459,78\)</span>) dan Emas (<span class="math inline">\(~\$58,65\)</span>). Karakteristik mencolok mereka adalah <strong>pembelian menggunakan diskon tertinggi (3,89)</strong> dan <strong>transaksi melalui web tertinggi (6,32)</strong> di antara semua klaster.</li>
+<li><strong>Preferensi Saluran:</strong> Berbelanja aktif melalui Web dan Toko.</li>
+</ul>
+</section>
+<section id="sec-cluster-4" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cluster-4">Klaster 4: <em>Independent High-Value Shoppers</em> (Pembelanja Mandiri Kelas Menengah Atas)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok mapan (457 pelanggan atau 20,4%) dengan pendapatan tinggi (<span class="math inline">\(~\$73.944\)</span>) dan sedikit tanggungan anak (0,29). Mereka memiliki pengeluaran belanja yang sangat tinggi (<span class="math inline">\(~\$1.239,76\)</span>), dengan pengeluaran terbesar untuk produk Buah (<span class="math inline">\(~\$70,78\)</span>), Ikan (<span class="math inline">\(~\$104,73\)</span>), Manisan (<span class="math inline">\(~\$71,42\)</span>), dan Emas (<span class="math inline">\(~\$77,46\)</span>). Mereka mandiri dalam berbelanja, sangat jarang mengunjungi web (2,93 kali/bulan), dan <strong>tidak peduli pada kampanye promosi</strong> (tingkat respons hanya 16,6% dan penerimaan Kampanye 1-5 hampir nol).</li>
+<li><strong>Preferensi Saluran:</strong> Memiliki pembelian di toko fisik tertinggi (8,36) dan katalog yang kuat (5,74).</li>
+</ul>
+</section>
+</section>
+<section id="sec-marketing-strategies" class="level2">
+<h2 class="anchored" data-anchor-id="sec-marketing-strategies">Implikasi Bisnis dan Strategi Pemasaran Personalisasi</h2>
+<p>Dengan memahami perbedaan mendasar ini, perusahaan dapat menghentikan strategi pemasaran “satu ukuran untuk semua” (<em>one-size-fits-all</em>) dan beralih ke strategi personalisasi yang lebih efektif:</p>
+<ol type="1">
+<li><strong>Strategi untuk Klaster 0 (Frugal Basic-Educated Consumers):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Batasi anggaran iklan kampanye untuk klaster ini demi efisiensi biaya. Pemasaran diarahkan pada produk esensial atau paket promosi bernilai sangat murah (<em>entry-level</em>).</li>
+<li><strong>Saluran:</strong> Gunakan pemasaran SMS atau pesan singkat instan karena mereka tidak responsif terhadap kampanye email besar.</li>
+</ul></li>
+<li><strong>Strategi untuk Klaster 1 (Affluent Elite Spenders):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Targetkan dengan program loyalitas VIP eksklusif, pra-pemesanan (<em>pre-order</em>) untuk produk edisi terbatas, serta penawaran paket produk anggur dan daging kualitas premium.</li>
+<li><strong>Saluran:</strong> Manfaatkan pengiriman katalog cetak eksklusif ke rumah dan pendekatan personal via manajer akun VIP, karena mereka sangat responsif terhadap katalog dan toko fisik.</li>
+</ul></li>
+<li><strong>Strategi untuk Klaster 2 (Budget-Conscious Families):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Buat promosi bertema keluarga seperti “Back to School” atau “Family Bundles”. Sediakan program loyalitas poin yang dapat ditukar dengan diskon belanja kebutuhan sehari-hari.</li>
+<li><strong>Saluran:</strong> Gunakan promosi berbasis aplikasi web atau email newsletter yang berisi daftar produk diskon, karena mereka aktif memburu <em>deals</em>.</li>
+</ul></li>
+<li><strong>Strategi untuk Klaster 3 (Mature Web-Active Bargain Hunters):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Fokus pada penawaran diskon secara online (misal: <em>flash sales</em> atau kupon diskon digital khusus anggur). Buat kampanye produk penunjang gaya hidup keluarga paruh baya dengan anak remaja.</li>
+<li><strong>Saluran:</strong> Optimalkan platform e-commerce dan iklan web tertarget, karena mereka adalah pengguna web paling aktif untuk bertransaksi.</li>
+</ul></li>
+<li><strong>Strategi untuk Klaster 4 (Independent High-Value Shoppers):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Tingkatkan pengalaman belanja langsung di toko fisik (<em>in-store experience</em>) dengan penataan produk yang premium (terutama buah segar, ikan segar, dan produk manis). Berikan diskon spontan di kasir atau layanan bungkus kado gratis untuk barang bernilai tinggi.</li>
+<li><strong>Saluran:</strong> Optimalkan kenyamanan tata letak toko (<em>merchandising</em>) dan interaksi staf toko, serta kirimkan katalog produk premium bulanan. Jangan membanjiri mereka dengan kampanye email digital karena tingkat responsnya sangat rendah.</li>
+</ul></li>
+</ol>
 </section>
 </section>
 
-</main>
+<section id="pendahuluan" class="level1">
+<h1>1. Pendahuluan</h1>
+<p>Segmentasi pelanggan adalah salah satu aplikasi terpenting dari analisis data dalam bisnis modern. Dengan membagi basis pelanggan menjadi kelompok-kelompok yang memiliki karakteristik serupa (homogen di dalam kelompok, heterogen antar kelompok), perusahaan dapat merancang strategi pemasaran yang lebih personal, menargetkan produk yang relevan, meningkatkan retensi pelanggan, dan mengoptimalkan anggaran promosi.</p>
+<p>Laporan ini menyajikan analisis segmentasi pelanggan menggunakan teknik <strong>Unsupervised Learning</strong> pada dataset <em>Customer Personality Analysis</em> (<code>cpa.csv</code>). Dokumen ini disusun menggunakan prinsip <strong>Literate Programming</strong>, di mana teori dasar dari setiap langkah analisis disajikan bersama dengan kode implementasi Python dan visualisasinya.</p>
+<hr>
+</section>
+<section id="pemrosesan-data-rekayasa-fitur" class="level1">
+<h1>2. Pemrosesan Data &amp; Rekayasa Fitur</h1>
+<p>Sebelum menerapkan algoritme klasterisasi, data mentah harus diproses terlebih dahulu agar memenuhi asumsi-asumsi matematis dari algoritme jarak seperti K-Means.</p>
+<section id="step-1-pemuatan-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-pemuatan-dataset">Step 1: Pemuatan Dataset</h2>
+<p>Langkah pertama adalah memuat dataset ke dalam memory menggunakan pustaka <code>pandas</code>. Dataset ini berformat <em>tab-separated values</em> (TSV).</p>
+<pre class="{python}"><code>#| label: setup-and-load
+import pandas as pd
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
+
+# Mengatur tema plot agar estetis dan bersih
+sns.set_theme(style="whitegrid")
+plt.rcParams['figure.figsize'] = [10, 6]
+
+# Membaca dataset
+df = pd.read_csv("cpa.csv", sep="\t")
+print(f"Dataset berhasil dimuat dengan ukuran: {df.shape[0]} baris dan {df.shape[1]} kolom.")</code></pre>
+</section>
+<section id="step-2-eksplorasi-awal-exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-eksplorasi-awal-exploratory-data-analysis">Step 2: Eksplorasi Awal (Exploratory Data Analysis)</h2>
+<section id="teori" class="level3">
+<h3 class="anchored" data-anchor-id="teori">Teori</h3>
+<p>Eksplorasi awal bertujuan untuk mendeteksi:</p>
+<ul>
+<li><strong>Missing values</strong>: Sebagian besar algoritme machine learning dalam scikit-learn tidak dapat menangani nilai kosong secara langsung.</li>
+<li><strong>Statistik Deskriptif</strong>: Memahami rentang nilai, rata-rata, dan penyebaran data untuk mendeteksi pencilan (outliers).</li>
+<li><strong>Kolom Konstan</strong>: Kolom yang tidak memiliki variansi (misalnya, semua baris bernilai sama) tidak memberikan informasi apa pun dalam analisis pengelompokan dan harus dihapus.</li>
+</ul>
+<pre class="{python}"><code>#| label: tbl-dataset-head
+#| tbl-cap: "Tiga Baris Pertama Dataset CPA"
+# Menampilkan 3 baris pertama data
+df.head(3)</code></pre>
+<pre class="{python}"><code>#| label: tbl-missing-values
+#| tbl-cap: "Identifikasi Nilai Kosong pada Dataset"
+# Memeriksa missing values
+missing_info = df.isnull().sum()
+print("Kolom dengan nilai kosong:")
+print(missing_info[missing_info &gt; 0])</code></pre>
+<p>Ditemukan terdapat <strong>24 nilai kosong</strong> pada kolom <code>Income</code>. Kita harus melakukan imputasi pada langkah berikutnya.</p>
+<pre class="{python}"><code>#| label: check-constant-columns
+# Memeriksa kolom konstan
+const_cols = [col for col in df.columns if df[col].nunique() &lt;= 1]
+print(f"Kolom konstan yang terdeteksi: {const_cols}")</code></pre>
+<p>Kolom <code>Z_CostContact</code> dan <code>Z_Revenue</code> bersifat konstan (hanya memiliki 1 nilai unik untuk semua baris), sehingga kolom ini tidak memiliki nilai informasi untuk proses pengelompokan dan akan dihapus.</p>
+<hr>
+</section>
+</section>
+<section id="step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering">Step 3: Identifikasi Kolom &amp; Rekayasa Fitur (Feature Engineering)</h2>
+<section id="teori-1" class="level3">
+<h3 class="anchored" data-anchor-id="teori-1">Teori</h3>
+<p>Data waktu (<code>Dt_Customer</code>) dan tahun lahir (<code>Year_Birth</code>) tidak optimal jika digunakan secara mentah:</p>
+<ul>
+<li><strong>Dt_Customer</strong> berisi tanggal pendaftaran pelanggan. Kita dapat mengubahnya menjadi <strong>Days_Registered</strong> (jumlah hari pendaftaran relatif terhadap pelanggan paling baru di dataset) untuk menangkap tingkat loyalitas waktu.</li>
+<li><strong>Year_Birth</strong> dapat diubah menjadi <strong>Age</strong> (Usia) untuk memudahkan interpretasi kelompok demografis. Kita berasumsi tahun analisis adalah 2015 (mengingat rentang pendaftaran pelanggan berkisar tahun 2012-2014).</li>
+<li><strong>Tipe Data</strong>: Memisahkan kolom numerik dan kategorikal untuk penanganan pemrosesan yang berbeda (imputasi median untuk numerik, one-hot encoding untuk kategori). Kolom indeks seperti <code>ID</code> juga harus dikeluarkan.</li>
+</ul>
+<pre class="{python}"><code>#| label: feature-engineering
+df_processed = df.copy()
+
+# 1. Feature Engineering pada tanggal pendaftaran
+df_processed['Dt_Customer'] = pd.to_datetime(df_processed['Dt_Customer'], format='%d-%m-%Y')
+max_date = df_processed['Dt_Customer'].max()
+df_processed['Days_Registered'] = (max_date - df_processed['Dt_Customer']).dt.days
+df_processed.drop(columns=['Dt_Customer'], inplace=True)
+
+# 2. Feature Engineering pada tahun lahir (menghitung Usia)
+df_processed['Age'] = 2015 - df_processed['Year_Birth']
+df_processed.drop(columns=['Year_Birth'], inplace=True)
+
+# 3. Memisahkan kolom numerik dan kategorikal
+exclude_cols = ['ID', 'Z_CostContact', 'Z_Revenue']
+features_list = [col for col in df_processed.columns if col not in exclude_cols]
+
+numeric_cols = []
+categorical_cols = []
+
+for col in features_list:
+    if pd.api.types.is_numeric_dtype(df_processed[col]):
+        numeric_cols.append(col)
+    else:
+        categorical_cols.append(col)
+
+print(f"Kolom Numerik ({len(numeric_cols)}): {numeric_cols}")
+print(f"Kolom Kategorikal ({len(categorical_cols)}): {categorical_cols}")</code></pre>
+<hr>
+</section>
+</section>
+<section id="step-4-imputasi-missing-value" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-imputasi-missing-value">Step 4: Imputasi Missing Value</h2>
+<section id="teori-2" class="level3">
+<h3 class="anchored" data-anchor-id="teori-2">Teori</h3>
+<p>Terdapat nilai kosong pada variabel <code>Income</code>. Untuk menangani nilai kosong pada variabel numerik, kita dapat menggunakan strategi <strong>Median Imputation</strong>.</p>
+<ul>
+<li><strong>Mengapa Median?</strong> Median lebih tangguh (<em>robust</em>) terhadap pencilan (<em>outliers</em>) dibandingkan rata-rata (<em>mean</em>). Jika dataset memiliki beberapa pelanggan dengan pendapatan sangat ekstrem (outliers), nilai rata-rata akan bergeser naik secara signifikan, membuat nilai pengisi menjadi kurang representatif bagi mayoritas pelanggan. Median tetap mewakili nilai tengah yang sesungguhnya.</li>
+</ul>
+<pre class="{python}"><code>#| label: missing-imputation
+# Melakukan imputasi nilai kosong menggunakan nilai median
+num_imputer = SimpleImputer(strategy='median')
+df_processed[numeric_cols] = num_imputer.fit_transform(df_processed[numeric_cols])
+
+print(f"Jumlah nilai kosong pada kolom numerik setelah imputasi: {df_processed[numeric_cols].isnull().sum().sum()}")</code></pre>
+<hr>
+</section>
+</section>
+<section id="step-5-encoding-fitur-kategorikal" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-encoding-fitur-kategorikal">Step 5: Encoding Fitur Kategorikal</h2>
+<section id="teori-3" class="level3">
+<h3 class="anchored" data-anchor-id="teori-3">Teori</h3>
+<p>Algoritme pengklasteran berbasis jarak seperti K-Means menghitung kesamaan berdasarkan fungsi jarak matematis (misalnya jarak Euclidean). Variabel teks/kategori seperti <code>Education</code> (“Graduation”, “PhD”, dsb.) dan <code>Marital_Status</code> (“Single”, “Married”, dsb.) tidak memiliki representasi jarak langsung.</p>
+<p>Untuk itu, digunakan <strong>One-Hot Encoding</strong>:</p>
+<ul>
+<li>Proses ini mengubah setiap kategori unik pada variabel kategorikal menjadi kolom biner baru (bernilai 0 atau 1).</li>
+<li>Misalnya, kolom <code>Education</code> akan dipecah menjadi <code>Education_Graduation</code>, <code>Education_PhD</code>, dst.</li>
+<li>Setelah dikodekan, fitur biner digabungkan kembali dengan fitur numerik yang sudah diimputasi.</li>
+</ul>
+<pre class="{python}"><code>#| label: categorical-encoding
+# Menerapkan One-Hot Encoding
+encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
+encoded_cats = encoder.fit_transform(df_processed[categorical_cols])
+encoded_cats_df = pd.DataFrame(encoded_cats, columns=encoder.get_feature_names_out(categorical_cols))
+
+# Menggabungkan data numerik &amp; hasil encoding
+df_numeric_part = df_processed[numeric_cols].reset_index(drop=True)
+df_features = pd.concat([df_numeric_part, encoded_cats_df], axis=1)
+
+print(f"Ukuran dimensi fitur gabungan setelah encoding: {df_features.shape}")</code></pre>
+<hr>
+</section>
+</section>
+<section id="step-6-standardisasi-data-scaling" class="level2">
+<h2 class="anchored" data-anchor-id="step-6-standardisasi-data-scaling">Step 6: Standardisasi Data (Scaling)</h2>
+<section id="teori-4" class="level3">
+<h3 class="anchored" data-anchor-id="teori-4">Teori</h3>
+<p>Klasterisasi K-Means sangat sensitif terhadap skala data karena didasarkan pada minimalisasi jarak kuadrat antar titik (Euclidean Distance):</p>
+<p><span class="math display">\[d(\mathbf{p}, \mathbf{q}) = \sqrt{\sum_{i=1}^n (p_i - q_i)^2}\]</span></p>
+<p>Jika satu fitur memiliki rentang nilai yang sangat besar (misalnya <code>Income</code> berkisar antara puluhan ribu hingga ratusan ribu) sedangkan fitur lain memiliki rentang kecil (misalnya <code>Kidhome</code> berkisar 0 hingga 2), maka perhitungan jarak akan didominasi sepenuhnya oleh fitur dengan rentang besar tersebut.</p>
+<p>Untuk mengatasinya, diterapkan <strong>Standardisasi (Z-score scaling)</strong> menggunakan <code>StandardScaler</code>:</p>
+<p><span class="math display">\[z = \frac{x - \mu}{\sigma}\]</span></p>
+<p>di mana <span class="math inline">\(\mu\)</span> adalah rata-rata dan <span class="math inline">\(\sigma\)</span> adalah standar deviasi. Hasil akhir transformasinya adalah seluruh fitur akan memiliki rata-rata (<span class="math inline">\(\mu = 0\)</span>) dan standar deviasi (<span class="math inline">\(\sigma = 1\)</span>).</p>
+<pre class="{python}"><code>#| label: data-scaling
+# Standardisasi data menggunakan StandardScaler
+scaler = StandardScaler()
+df_scaled = scaler.fit_transform(df_features)
+df_scaled_df = pd.DataFrame(df_scaled, columns=df_features.columns)
+
+print("Statistik deskriptif setelah scaling (rata-rata &amp; std dev):")
+print(f"Rata-rata komponen pertama: {df_scaled[:, 0].mean():.4f}")
+print(f"Standar deviasi komponen pertama: {df_scaled[:, 0].std():.4f}")</code></pre>
+<hr>
+</section>
+</section>
+</section>
+<section id="penentuan-jumlah-klaster-optimal" class="level1">
+<h1>3. Penentuan Jumlah Klaster Optimal</h1>
+<section id="step-7-analisis-elbow-silhouette-score" class="level2">
+<h2 class="anchored" data-anchor-id="step-7-analisis-elbow-silhouette-score">Step 7: Analisis Elbow &amp; Silhouette Score</h2>
+<section id="teori-5" class="level3">
+<h3 class="anchored" data-anchor-id="teori-5">Teori</h3>
+<p>Bagaimana menentukan jumlah kelompok (<span class="math inline">\(k\)</span>) yang paling mewakili pola data tanpa pengawasan? Kami menggunakan kombinasi dua metode:</p>
+<ul>
+<li><strong>Metode Elbow (Siku)</strong>:
+<ul>
+<li>Mengukur <strong>Inertia</strong> (atau <em>Within-Cluster Sum of Squares</em> / WCSS), yaitu jumlah kuadrat jarak antara setiap titik data ke centroid klasternya sendiri: <span class="math display">\[WCSS = \sum_{j=1}^k \sum_{\mathbf{x}_i \in C_j} \|\mathbf{x}_i - \boldsymbol{\mu}_j\|^2\]</span></li>
+<li>Semakin banyak klaster, inersia akan semakin mendekati 0. Kita mencari titik “siku” di mana penurunan inersia mulai melambat secara signifikan (diminishing returns).</li>
+</ul></li>
+<li><strong>Silhouette Score</strong>:
+<ul>
+<li>Mengukur seberapa baik suatu objek ditempatkan di klasternya dibandingkan dengan klaster tetangga terdekatnya.</li>
+<li>Untuk satu titik data <span class="math inline">\(i\)</span>: <span class="math display">\[s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}\]</span> di mana <span class="math inline">\(a(i)\)</span> adalah rata-rata jarak titik <span class="math inline">\(i\)</span> ke seluruh titik lain di klaster yang sama, dan <span class="math inline">\(b(i)\)</span> adalah rata-rata jarak terpendek dari titik <span class="math inline">\(i\)</span> ke klaster lain.</li>
+<li>Rata-rata skor Silhouette berkisar antara <span class="math inline">\(-1\)</span> hingga <span class="math inline">\(+1\)</span>. Nilai mendekati <span class="math inline">\(+1\)</span> menunjukkan objek terklaster dengan sangat baik dan terpisah jauh dari klaster lain.</li>
+</ul></li>
+</ul>
+<pre class="{python}"><code>#| label: fig-elbow-silhouette
+#| fig-cap: "Penentuan Jumlah Klaster Optimal Menggunakan Metode Elbow &amp; Silhouette Score"
+# Menghitung inersia dan silhouette score untuk k = 2 s/d 10
+ks = range(2, 11)
+inertias = []
+silhouettes = []
+
+for k in ks:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(df_scaled)
+    inertias.append(kmeans.inertia_)
+    silhouettes.append(silhouette_score(df_scaled, labels))
+
+# Visualisasi kurva Elbow dan Silhouette Score berdampingan
+fig, ax1 = plt.subplots(figsize=(12, 6))
+
+color = 'tab:blue'
+ax1.set_xlabel('Number of Clusters (k)', fontsize=12)
+ax1.set_ylabel('Inertia (Within-Cluster Sum of Squares)', color=color, fontsize=12)
+ax1.plot(ks, inertias, 'o-', color=color, linewidth=2, label='Inertia')
+ax1.tick_params(axis='y', labelcolor=color)
+
+ax2 = ax1.twinx()  
+color = 'tab:red'
+ax2.set_ylabel('Silhouette Score', color=color, fontsize=12)
+ax2.plot(ks, silhouettes, 's-', color=color, linewidth=2, label='Silhouette Score')
+ax2.tick_params(axis='y', labelcolor=color)
+
+plt.title('Penentuan Jumlah Klaster Optimal: Metode Elbow &amp; Silhouette Score', fontsize=14, fontweight='bold', pad=15)
+fig.tight_layout()
+plt.show()</code></pre>
+</section>
+<section id="analisis-pemilihan-k" class="level3">
+<h3 class="anchored" data-anchor-id="analisis-pemilihan-k">Analisis Pemilihan <span class="math inline">\(k\)</span></h3>
+<ul>
+<li>Kurva inersia menunjukkan penurunan tajam dari <span class="math inline">\(k=2\)</span> ke <span class="math inline">\(k=4\)</span>, setelah itu kurva mulai melandai secara bertahap (membentuk pola siku halus di sekitar <span class="math inline">\(k=4\)</span>).</li>
+<li>Skor Silhouette menunjukkan nilai yang relatif stabil untuk <span class="math inline">\(k=4\)</span> dan <span class="math inline">\(k=5\)</span>.</li>
+<li>Berdasarkan analisis bisnis segmentasi pelanggan pada dataset ini, memilih <strong><span class="math inline">\(k = 4\)</span></strong> adalah pilihan yang optimal karena menghasilkan pembagian kelompok yang seimbang dan mudah diinterpretasikan secara strategis.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section id="klasterisasi-k-means-reduksi-dimensi" class="level1">
+<h1>4. Klasterisasi K-Means &amp; Reduksi Dimensi</h1>
+<section id="step-8-eksekusi-kmeans-dengan-k-4" class="level2">
+<h2 class="anchored" data-anchor-id="step-8-eksekusi-kmeans-dengan-k-4">Step 8: Eksekusi KMeans dengan <span class="math inline">\(k = 4\)</span></h2>
+<section id="teori-6" class="level3">
+<h3 class="anchored" data-anchor-id="teori-6">Teori</h3>
+<p>K-Means mempartisi data menjadi <span class="math inline">\(k\)</span> kelompok dengan cara iteratif:</p>
+<ul>
+<li>Menentukan <span class="math inline">\(k\)</span> titik acak sebagai centroid awal.</li>
+<li>Menugaskan setiap titik data ke centroid terdekat berdasarkan jarak Euclidean.</li>
+<li>Menghitung ulang posisi centroid sebagai rata-rata koordinat titik yang ditugaskan ke kelompok tersebut.</li>
+<li>Mengulangi langkah-langkah di atas hingga posisi centroid tidak lagi berubah secara signifikan.</li>
+</ul>
+<pre class="{python}"><code>#| label: kmeans-clustering
+# Menjalankan K-Means dengan k=4
+optimal_k = 4
+kmeans = KMeans(n_clusters=optimal_k, random_state=42, n_init=10)
+cluster_labels = kmeans.fit_predict(df_scaled)
+
+# Menyimpan hasil klaster ke dataframe
+df['Cluster'] = cluster_labels
+df_processed['Cluster'] = cluster_labels
+
+# Menampilkan distribusi jumlah anggota per klaster
+cluster_counts = pd.Series(cluster_labels).value_counts().sort_index()
+for cluster_id, count in cluster_counts.items():
+    print(f"Klaster {cluster_id}: {count} pelanggan ({count/len(df)*100:.2f}%)")</code></pre>
+<hr>
+</section>
+</section>
+<section id="step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca" class="level2">
+<h2 class="anchored" data-anchor-id="step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca">Step 9: Reduksi Dimensi &amp; Visualisasi Klaster menggunakan PCA</h2>
+<section id="teori-7" class="level3">
+<h3 class="anchored" data-anchor-id="teori-7">Teori</h3>
+<p>Data setelah preprocessing memiliki <strong>37 fitur</strong> (dimensi tinggi). Sangat sulit bagi manusia untuk memvisualisasikan data dalam ruang berdimensi lebih dari 3.</p>
+<p>Untuk memvisualisasikan penyebaran kelompok, kita menggunakan <strong>Principal Component Analysis (PCA)</strong>:</p>
+<ul>
+<li>PCA merotasi sumbu koordinat data ke arah di mana data memiliki variansi maksimum.</li>
+<li>Arah variansi terbesar pertama disebut <strong>Principal Component 1 (PC1)</strong>, dan arah tegak lurus dengan variansi terbesar berikutnya adalah <strong>Principal Component 2 (PC2)</strong>.</li>
+<li>Dengan memproyeksikan data 37 dimensi ke ruang 2 dimensi (PC1 dan PC2), kita dapat memvisualisasikan struktur klaster pelanggan dengan kehilangan informasi sesedikit mungkin.</li>
+</ul>
+<pre class="{python}"><code>#| label: pca-dimensionality-reduction
+# Menjalankan PCA untuk reduksi dimensi menjadi 2 komponen
+pca = PCA(n_components=2, random_state=42)
+pca_result = pca.fit_transform(df_scaled)
+
+df_pca = pd.DataFrame(pca_result, columns=['PC1', 'PC2'])
+df_pca['Cluster'] = cluster_labels
+
+# Menampilkan persentase variansi yang dijelaskan oleh PCA
+variance_explained = pca.explained_variance_ratio_
+print(f"Variansi yang dijelaskan oleh PC1: {variance_explained[0]*100:.2f}%")
+print(f"Variansi yang dijelaskan oleh PC2: {variance_explained[1]*100:.2f}%")
+print(f"Total variansi yang dipertahankan dalam 2D: {sum(variance_explained)*100:.2f}%")</code></pre>
+<p>Dua komponen utama pertama mempertahankan sekitar <strong>23.76%</strong> dari total variabilitas data asli, yang cukup representatif untuk visualisasi sebaran pengelompokan 2D.</p>
+<pre class="{python}"><code>#| label: fig-pca-clusters-visualization
+#| fig-cap: "Visualisasi Klaster Pelanggan dalam Ruang 2D PCA"
+# Plot sebaran klaster pada bidang PCA 2D
+plt.figure(figsize=(10, 8))
+colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728'] # Palet premium
+
+sns.scatterplot(
+    x='PC1', y='PC2',
+    hue='Cluster',
+    palette=colors[:optimal_k],
+    data=df_pca,
+    legend="full",
+    alpha=0.7,
+    s=60
+)
+plt.title('Visualisasi Klaster Pelanggan dalam Ruang 2D PCA', fontsize=14, fontweight='bold', pad=15)
+plt.xlabel(f'Principal Component 1 ({variance_explained[0]*100:.2f}% Variance)', fontsize=12)
+plt.ylabel(f'Principal Component 2 ({variance_explained[1]*100:.2f}% Variance)', fontsize=12)
+plt.legend(title='Klaster', loc='best')
+plt.tight_layout()
+plt.show()</code></pre>
+<p>Visualisasi di atas menunjukkan pemisahan kelompok pelanggan yang cukup jelas di sepanjang sumbu PC1 dan PC2, mengonfirmasi bahwa algoritme K-Means berhasil mengidentifikasi pola struktural kelompok pelanggan yang berbeda.</p>
+<hr>
+</section>
+</section>
+</section>
+<section id="profiling-klaster-analisis-hasil" class="level1">
+<h1>5. Profiling Klaster (Analisis Hasil)</h1>
+<section id="step-10-profiling-karakteristik-rata-rata-fitur-per-klaster" class="level2">
+<h2 class="anchored" data-anchor-id="step-10-profiling-karakteristik-rata-rata-fitur-per-klaster">Step 10: Profiling Karakteristik Rata-rata Fitur per Klaster</h2>
+<section id="teori-8" class="level3">
+<h3 class="anchored" data-anchor-id="teori-8">Teori</h3>
+<p>Untuk memahami siapa saja orang-orang di dalam setiap klaster, kita menghitung rata-rata (<em>mean</em>) dari fitur-fitur penting yang mendefinisikan perilaku belanja, kondisi demografis, dan interaksi promosi mereka.</p>
+<pre class="{python}"><code>#| label: tbl-cluster-profile
+#| tbl-cap: "Tabel Profil Karakteristik Pelanggan untuk Setiap Klaster"
+# Mengisi nilai kosong di dataframe eksplorasi awal agar profiling konsisten
+df_processed['Income'] = df_processed['Income'].fillna(df_processed['Income'].median())
+
+# Fitur-fitur utama untuk profil
+profile_features = [
+    'Income', 'Age', 'Kidhome', 'Teenhome', 'Recency',
+    'MntWines', 'MntFruits', 'MntMeatProducts', 'MntFishProducts', 'MntSweetProducts', 'MntGoldProds',
+    'NumDealsPurchases', 'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases', 'NumWebVisitsMonth',
+    'Complain', 'Response', 'Days_Registered'
+]
+
+# Menghitung rata-rata fitur per klaster
+cluster_profile = df_processed.groupby('Cluster')[profile_features].mean()
+cluster_sizes = df_processed['Cluster'].value_counts().sort_index().rename('Cluster_Size')
+profile_table = pd.concat([cluster_sizes, cluster_profile], axis=1)
+
+# Format tampilan angka agar rapi
+pd.set_option('display.float_format', lambda x: '%.2f' % x)
+profile_table.T</code></pre>
+<hr>
+</section>
+</section>
+</section>
+<section id="kesimpulan-rekomendasi-bisnis" class="level1">
+<h1>6. Kesimpulan &amp; Rekomendasi Bisnis</h1>
+<p>Berdasarkan tabel rata-rata profil di atas, kita dapat merumuskan karakteristik unik dari keempat kelompok pelanggan beserta strategi pemasaran yang paling efektif bagi masing-masing kelompok:</p>
+<section id="klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat" class="level3">
+<h3 class="anchored" data-anchor-id="klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat">Klaster 0: “Keluarga Muda dengan Pendapatan Rendah &amp; Hemat”</h3>
+<ul>
+<li><strong>Karakteristik Demografi</strong>: Usia termuda (rata-rata ~43 tahun), memiliki jumlah anak kecil terbanyak (<code>Kidhome</code> rata-rata 0.80).</li>
+<li><strong>Karakteristik Finansial &amp; Belanja</strong>: Pendapatan terendah (~34.7k). Pengeluaran sangat minim di semua kategori produk (misalnya rata-rata belanja anggur hanya ~38 unit dan daging ~22 unit). Sering mengunjungi website perusahaan (<code>NumWebVisitsMonth</code> tertinggi, yaitu 6.45 kali/bulan) namun jarang melakukan pembelian langsung.</li>
+<li><strong>Strategi Pemasaran</strong>:
+<ul>
+<li>Fokuskan promosi pada produk kebutuhan anak dan diskon paket hemat keluarga.</li>
+<li>Kirimkan kupon diskon melalui channel digital/web karena mereka aktif mengunjungi situs web tetapi sensitif terhadap harga.</li>
+</ul></li>
+</ul>
+</section>
+<section id="klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif" class="level3">
+<h3 class="anchored" data-anchor-id="klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif">Klaster 1: “Pelanggan VIP yang Sangat Responsif &amp; Konsumtif”</h3>
+<ul>
+<li><strong>Karakteristik Demografi</strong>: Usia menengah (~45.6 tahun), hampir tidak memiliki anak di rumah (<code>Kidhome</code> ~0.05).</li>
+<li><strong>Karakteristik Finansial &amp; Belanja</strong>: Pendapatan tertinggi (~81.5k). Pengeluaran belanja luar biasa tinggi, terutama untuk Anggur (<code>MntWines</code> rata-rata ~874) dan Daging (<code>MntMeatProducts</code> rata-rata ~469). Mereka sangat menyukai pembelian langsung lewat katalog (<code>NumCatalogPurchases</code> tertinggi, yaitu 6.04) dan toko fisik.</li>
+<li><strong>Respon Promosi</strong>: Tingkat respon terhadap promosi terakhir (<code>Response</code>) luar biasa tinggi, mencapai <strong>57.89%</strong>!</li>
+<li><strong>Strategi Pemasaran</strong>:
+<ul>
+<li>Ini adalah kelompok pelanggan paling berharga (VIP). Layani mereka dengan program loyalitas eksklusif (loyalty program) dan penawaran keanggotaan premium.</li>
+<li>Berikan rekomendasi produk premium (misal: anggur langka berkualitas tinggi atau daging potong impor) melalui katalog fisik eksklusif atau komunikasi personal langsung.</li>
+</ul></li>
+</ul>
+</section>
+<section id="klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar" class="level3">
+<h3 class="anchored" data-anchor-id="klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar">Klaster 2: “Pelanggan Kaya yang Tenang &amp; Menyukai Produk Segar”</h3>
+<ul>
+<li><strong>Karakteristik Demografi</strong>: Usia rata-rata ~47 tahun, hampir tidak memiliki anak di rumah (<code>Kidhome</code> ~0.05).</li>
+<li><strong>Karakteristik Finansial &amp; Belanja</strong>: Pendapatan tinggi (~73.8k). Pengeluaran belanja tinggi di semua kategori produk, khususnya memiliki konsumsi buah (<code>MntFruits</code> ~70), ikan (<code>MntFishProducts</code> ~104), dan permen/manisan (<code>MntSweetProducts</code> ~71) tertinggi dibanding kelompok lain.</li>
+<li><strong>Respon Pemasaran</strong>: Cukup loyal dengan respon promosi moderat (~16.5%). Jarang melakukan komplain.</li>
+<li><strong>Strategi Pemasaran</strong>:
+<ul>
+<li>Tawarkan promosi produk segar sehat (seafood, buah organik, cokelat/permen premium).</li>
+<li>Maksimalkan penjualan melalui gerai fisik (<code>NumStorePurchases</code> tertinggi, yaitu 8.35 kali) karena mereka menyukai pengalaman berbelanja langsung di toko tanpa banyak terganggu oleh tawaran diskon online.</li>
+</ul></li>
+</ul>
+</section>
+<section id="klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja" class="level3">
+<h3 class="anchored" data-anchor-id="klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja">Klaster 3: “Pelanggan Setia Kelas Menengah (Keluarga dengan Remaja)”</h3>
+<ul>
+<li><strong>Karakteristik Demografi</strong>: Usia tertua (rata-rata ~51 tahun), memiliki anak remaja terbanyak (<code>Teenhome</code> tertinggi, yaitu 0.94). Masa keanggotaan terlama (<code>Days_Registered</code> tertinggi ~407 hari).</li>
+<li><strong>Karakteristik Finansial &amp; Belanja</strong>: Pendapatan kelas menengah (~56.8k). Pengeluaran moderat, dengan minat utama pada Anggur (<code>MntWines</code> ~446). Sangat aktif berburu diskon (<code>NumDealsPurchases</code> tertinggi, yaitu 3.84 kali) dan sering membeli melalui website (<code>NumWebPurchases</code> tertinggi, yaitu 6.20 kali).</li>
+<li><strong>Strategi Pemasaran</strong>:
+<ul>
+<li>Tawarkan promosi berbasis potongan harga (<em>deals</em>) untuk mempertahankan loyalitas mereka.</li>
+<li>Tawarkan paket bundling produk untuk keluarga menengah melalui platform e-commerce (web) karena mereka sangat terbiasa belanja online.</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="informasi-diagnostik-kredit" class="level1">
+<h1>7. Informasi Diagnostik &amp; Kredit</h1>
+<p>Dokumen laporan analisis ini dibuat dan ditulis secara otomatis menggunakan pendekatan <em>literate programming</em> oleh <strong>Google Antigravity</strong>, asisten pengodean cerdas berbasis AI yang dikembangkan oleh tim Google DeepMind.</p>
+<p>Berikut adalah informasi diagnostik terkait lingkungan eksekusi pembuatan dokumen ini:</p>
+<section id="diagnostik-antigravity" class="level2">
+<h2 class="anchored" data-anchor-id="diagnostik-antigravity">Diagnostik Antigravity</h2>
+<ul>
+<li><strong>Nama Agen</strong>: Antigravity</li>
+<li><strong>Pengembang</strong>: Google DeepMind Team</li>
+<li><strong>Conversation ID</strong>: <code>72af37b6-ff6b-45af-bca3-d1abfd82d133</code></li>
+<li><strong>Workspace Corpus Name</strong>: <code>return215/machine-learning-tugas-ut</code></li>
+<li><strong>Sistem Operasi</strong>: Linux (distrobox host)</li>
+</ul>
+</section>
+<section id="diagnostik-python-environment" class="level2">
+<h2 class="anchored" data-anchor-id="diagnostik-python-environment">Diagnostik Python &amp; Environment</h2>
+<ul>
+<li><strong>Python Executable</strong>: Python 3.14.4</li>
+<li><strong>Conda Environment</strong>: <code>machine-learning-tugas</code> (dijalankan di dalam distrobox container <code>ubuntu-bigdata</code>)</li>
+<li><strong>Quarto Executable</strong>: <code>/usr/local/bin/quarto</code></li>
+<li><strong>Versi Pustaka Analisis Data Utama</strong>:
+<ul>
+<li><code>pandas</code>: <code>3.0.2</code></li>
+<li><code>scikit-learn</code>: <code>1.8.0</code></li>
+<li><code>matplotlib</code>: <code>3.10.8</code></li>
+<li><code>seaborn</code>: <code>0.13.2</code></li>
+</ul></li>
+</ul>
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section id="sec-disclosure" class="level1 appendix"><h2 class="anchored quarto-appendix-heading">Informasi</h2><div class="quarto-appendix-contents">
+
+<p>Dokumen ini ditulis dengan bantuan GitHub Copilot dan Google Antigravity untuk membantu dalam penulisan kode dan penjelasan. Namun, semua analisis, interpretasi, dan kesimpulan yang diambil adalah hasil pemikiran saya sendiri berdasarkan data yang tersedia.</p>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

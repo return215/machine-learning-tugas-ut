@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Muhammad Hidayat">
+
+<title>Customer Personality Analysis - Unsupervised Learning Tugas 3</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="index_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="index_files/libs/bootstrap/bootstrap-67270d1595a62d14f123c043d4fb2f18.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Daftar Isi</h2>
+   
+  <ul>
+  <li><a href="#sec-load-data" id="toc-sec-load-data" class="nav-link active" data-scroll-target="#sec-load-data"><span class="header-section-number">1</span> Step 1: Memuat Dataset</a></li>
+  <li><a href="#sec-eda" id="toc-sec-eda" class="nav-link" data-scroll-target="#sec-eda"><span class="header-section-number">2</span> Step 2: Eksplorasi Data &amp; Pembersihan Awal</a></li>
+  <li><a href="#sec-feature-identification-engineering" id="toc-sec-feature-identification-engineering" class="nav-link" data-scroll-target="#sec-feature-identification-engineering"><span class="header-section-number">3</span> Step 3: Identifikasi kolom numerik &amp; kategori</a></li>
+  <li><a href="#sec-imputation" id="toc-sec-imputation" class="nav-link" data-scroll-target="#sec-imputation"><span class="header-section-number">4</span> Step 4: Imputasi missing value</a></li>
+  <li><a href="#sec-encoding" id="toc-sec-encoding" class="nav-link" data-scroll-target="#sec-encoding"><span class="header-section-number">5</span> Step 5: Encoding fitur kategori</a>
+  <ul class="collapse">
+  <li><a href="#sec-merge-encoded" id="toc-sec-merge-encoded" class="nav-link" data-scroll-target="#sec-merge-encoded"><span class="header-section-number">5.1</span> Gabungkan data numerik &amp; hasil encoding</a></li>
+  </ul></li>
+  <li><a href="#sec-scaling" id="toc-sec-scaling" class="nav-link" data-scroll-target="#sec-scaling"><span class="header-section-number">6</span> Step 6: Scaling data</a></li>
+  <li><a href="#sec-optimal-k" id="toc-sec-optimal-k" class="nav-link" data-scroll-target="#sec-optimal-k"><span class="header-section-number">7</span> Step 7: Tentukan jumlah cluster optimal (Elbow + Silhouette)</a>
+  <ul class="collapse">
+  <li><a href="#sec-elbow-silhouette-explanation" id="toc-sec-elbow-silhouette-explanation" class="nav-link" data-scroll-target="#sec-elbow-silhouette-explanation"><span class="header-section-number">7.0.1</span> Penjelasan Metode Elbow dan Silhouette Score</a></li>
+  </ul></li>
+  <li><a href="#sec-clustering" id="toc-sec-clustering" class="nav-link" data-scroll-target="#sec-clustering"><span class="header-section-number">8</span> Step 8: Melakukan Klasterisasi</a></li>
+  <li><a href="#sec-pca-visualization" id="toc-sec-pca-visualization" class="nav-link" data-scroll-target="#sec-pca-visualization"><span class="header-section-number">9</span> Step 9: Visualisasi klaster dengan PCA 2D</a></li>
+  <li><a href="#sec-profiling" id="toc-sec-profiling" class="nav-link" data-scroll-target="#sec-profiling"><span class="header-section-number">10</span> Step 10: Profiling cluster (rata-rata fitur per cluster)</a></li>
+  <li><a href="#sec-conclusion" id="toc-sec-conclusion" class="nav-link" data-scroll-target="#sec-conclusion"><span class="header-section-number">11</span> Simpulkan Analisa dari hasil</a>
+  <ul class="collapse">
+  <li><a href="#sec-cluster-characteristics" id="toc-sec-cluster-characteristics" class="nav-link" data-scroll-target="#sec-cluster-characteristics"><span class="header-section-number">11.1</span> Karakteristik Utama dari Setiap Klaster</a>
+  <ul class="collapse">
+  <li><a href="#sec-cluster-0" id="toc-sec-cluster-0" class="nav-link" data-scroll-target="#sec-cluster-0"><span class="header-section-number">11.1.1</span> Klaster 0: <em>Frugal Basic-Educated Consumers</em> (Konsumen Hemat Berpendidikan Dasar)</a></li>
+  <li><a href="#sec-cluster-1" id="toc-sec-cluster-1" class="nav-link" data-scroll-target="#sec-cluster-1"><span class="header-section-number">11.1.2</span> Klaster 1: <em>Affluent Elite Spenders</em> (Pembelanja Elite Kelas Atas)</a></li>
+  <li><a href="#sec-cluster-2" id="toc-sec-cluster-2" class="nav-link" data-scroll-target="#sec-cluster-2"><span class="header-section-number">11.1.3</span> Klaster 2: <em>Budget-Conscious Families</em> (Keluarga Hemat &amp; Pemburu Diskon)</a></li>
+  <li><a href="#sec-cluster-3" id="toc-sec-cluster-3" class="nav-link" data-scroll-target="#sec-cluster-3"><span class="header-section-number">11.1.4</span> Klaster 3: <em>Mature Web-Active Bargain Hunters</em> (Pemburu Diskon Online Senior)</a></li>
+  <li><a href="#sec-cluster-4" id="toc-sec-cluster-4" class="nav-link" data-scroll-target="#sec-cluster-4"><span class="header-section-number">11.1.5</span> Klaster 4: <em>Independent High-Value Shoppers</em> (Pembelanja Mandiri Kelas Menengah Atas)</a></li>
+  </ul></li>
+  <li><a href="#sec-marketing-strategies" id="toc-sec-marketing-strategies" class="nav-link" data-scroll-target="#sec-marketing-strategies"><span class="header-section-number">11.2</span> Implikasi Bisnis dan Strategi Pemasaran Personalisasi</a></li>
+  </ul></li>
+  
+  </ul>
+<div class="quarto-alternate-formats"><h2>Format Lain</h2><ul><li><a href="index.md"><i class="bi bi-file-code"></i>Github (GFM)</a></li><li><a href="index.ipynb" download="index.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Customer Personality Analysis - Unsupervised Learning Tugas 3</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Penulis</div>
+    <div class="quarto-title-meta-contents">
+             <p>Muhammad Hidayat </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Nama</span><span class="kw">:</span><span class="at"> Muhammad Hidayat</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">NIM</span><span class="kw">:</span><span class="at"> </span><span class="dv">052747132</span></span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="setup" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler, OneHotEncoder</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.impute <span class="im">import</span> SimpleImputer</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="sec-load-data" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Step 1: Memuat Dataset</h1>
+<p>File <code>cpa.csv</code> sebenarnya merupakan tab-delimited, jadi kita perlu menyebutkan <code>sep='\t'</code> saat membacanya dengan <code>pd.read_csv()</code>.</p>
+<div id="cell-load-dataset" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_csv(<span class="st">'cpa.csv'</span>, sep<span class="op">=</span><span class="st">'</span><span class="ch">\t</span><span class="st">'</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>display(data.head())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="load-dataset" class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">Year_Birth</th>
+<th data-quarto-table-cell-role="th">Education</th>
+<th data-quarto-table-cell-role="th">Marital_Status</th>
+<th data-quarto-table-cell-role="th">Income</th>
+<th data-quarto-table-cell-role="th">Kidhome</th>
+<th data-quarto-table-cell-role="th">Teenhome</th>
+<th data-quarto-table-cell-role="th">Dt_Customer</th>
+<th data-quarto-table-cell-role="th">Recency</th>
+<th data-quarto-table-cell-role="th">MntWines</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">NumWebVisitsMonth</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp3</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp4</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp5</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp1</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp2</th>
+<th data-quarto-table-cell-role="th">Complain</th>
+<th data-quarto-table-cell-role="th">Z_CostContact</th>
+<th data-quarto-table-cell-role="th">Z_Revenue</th>
+<th data-quarto-table-cell-role="th">Response</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>5524</td>
+<td>1957</td>
+<td>Graduation</td>
+<td>Single</td>
+<td>58138.0</td>
+<td>0</td>
+<td>0</td>
+<td>04-09-2012</td>
+<td>58</td>
+<td>635</td>
+<td>...</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>11</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>2174</td>
+<td>1954</td>
+<td>Graduation</td>
+<td>Single</td>
+<td>46344.0</td>
+<td>1</td>
+<td>1</td>
+<td>08-03-2014</td>
+<td>38</td>
+<td>11</td>
+<td>...</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>11</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>4141</td>
+<td>1965</td>
+<td>Graduation</td>
+<td>Together</td>
+<td>71613.0</td>
+<td>0</td>
+<td>0</td>
+<td>21-08-2013</td>
+<td>26</td>
+<td>426</td>
+<td>...</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>11</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>6182</td>
+<td>1984</td>
+<td>Graduation</td>
+<td>Together</td>
+<td>26646.0</td>
+<td>1</td>
+<td>0</td>
+<td>10-02-2014</td>
+<td>26</td>
+<td>11</td>
+<td>...</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>11</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>5324</td>
+<td>1981</td>
+<td>PhD</td>
+<td>Married</td>
+<td>58293.0</td>
+<td>1</td>
+<td>0</td>
+<td>19-01-2014</td>
+<td>94</td>
+<td>173</td>
+<td>...</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>11</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 29 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-eda" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Step 2: Eksplorasi Data &amp; Pembersihan Awal</h1>
+<p>Beberapa langkah eksplorasi dan pembersihan awal yang bisa dilakukan:</p>
+<ul>
+<li>Cek tipe data dan jumlah missing value per kolom</li>
+<li>Cek statistik untuk kolom numerik</li>
+<li>Cek jumlah kategori unik untuk kolom kategori</li>
+</ul>
+<p>Pertama, kita akan melihat tipe data dan jumlah missing value:</p>
+<div id="cell-check-dtypes" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>display(data.dtypes)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="check-dtypes" class="cell-output cell-output-display">
+<pre><code>ID                       int64
+Year_Birth               int64
+Education                  str
+Marital_Status             str
+Income                 float64
+Kidhome                  int64
+Teenhome                 int64
+Dt_Customer                str
+Recency                  int64
+MntWines                 int64
+MntFruits                int64
+MntMeatProducts          int64
+MntFishProducts          int64
+MntSweetProducts         int64
+MntGoldProds             int64
+NumDealsPurchases        int64
+NumWebPurchases          int64
+NumCatalogPurchases      int64
+NumStorePurchases        int64
+NumWebVisitsMonth        int64
+AcceptedCmp3             int64
+AcceptedCmp4             int64
+AcceptedCmp5             int64
+AcceptedCmp1             int64
+AcceptedCmp2             int64
+Complain                 int64
+Z_CostContact            int64
+Z_Revenue                int64
+Response                 int64
+dtype: object</code></pre>
+</div>
+</div>
+<div id="check-missing" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>missing_info <span class="op">=</span> data.isnull().<span class="bu">sum</span>()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Kolom dengan nilai kosong:"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(missing_info[missing_info <span class="op">&gt;</span> <span class="dv">0</span>])</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Kolom dengan nilai kosong:
+Income    24
+dtype: int64</code></pre>
+</div>
+</div>
+<p>Terdapat 24 baris kosong di kolom <code>Income</code>. Kita akan melakukan imputasi untuk kolom ini nanti.</p>
+<p>Selanjutnya, kita bisa melihat statistik untuk kolom numerik, dipecah per 9 kolom untuk memudahkan pembacaan:</p>
+<div id="describe-numeric" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>numeric_cols <span class="op">=</span> data.select_dtypes(include<span class="op">=</span>[np.number]).columns</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(numeric_cols), <span class="dv">9</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    display(data[numeric_cols[i:i<span class="op">+</span><span class="dv">9</span>]].describe())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="describe-numeric-1" class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">Year_Birth</th>
+<th data-quarto-table-cell-role="th">Income</th>
+<th data-quarto-table-cell-role="th">Kidhome</th>
+<th data-quarto-table-cell-role="th">Teenhome</th>
+<th data-quarto-table-cell-role="th">Recency</th>
+<th data-quarto-table-cell-role="th">MntWines</th>
+<th data-quarto-table-cell-role="th">MntFruits</th>
+<th data-quarto-table-cell-role="th">MntMeatProducts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2216.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>5592.159821</td>
+<td>1968.805804</td>
+<td>52247.251354</td>
+<td>0.444196</td>
+<td>0.506250</td>
+<td>49.109375</td>
+<td>303.935714</td>
+<td>26.302232</td>
+<td>166.950000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>3246.662198</td>
+<td>11.984069</td>
+<td>25173.076661</td>
+<td>0.538398</td>
+<td>0.544538</td>
+<td>28.962453</td>
+<td>336.597393</td>
+<td>39.773434</td>
+<td>225.715373</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>0.000000</td>
+<td>1893.000000</td>
+<td>1730.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>2828.250000</td>
+<td>1959.000000</td>
+<td>35303.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>24.000000</td>
+<td>23.750000</td>
+<td>1.000000</td>
+<td>16.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>5458.500000</td>
+<td>1970.000000</td>
+<td>51381.500000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>49.000000</td>
+<td>173.500000</td>
+<td>8.000000</td>
+<td>67.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>8427.750000</td>
+<td>1977.000000</td>
+<td>68522.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>74.000000</td>
+<td>504.250000</td>
+<td>33.000000</td>
+<td>232.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>11191.000000</td>
+<td>1996.000000</td>
+<td>666666.000000</td>
+<td>2.000000</td>
+<td>2.000000</td>
+<td>99.000000</td>
+<td>1493.000000</td>
+<td>199.000000</td>
+<td>1725.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div id="describe-numeric-2" class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">MntFishProducts</th>
+<th data-quarto-table-cell-role="th">MntSweetProducts</th>
+<th data-quarto-table-cell-role="th">MntGoldProds</th>
+<th data-quarto-table-cell-role="th">NumDealsPurchases</th>
+<th data-quarto-table-cell-role="th">NumWebPurchases</th>
+<th data-quarto-table-cell-role="th">NumCatalogPurchases</th>
+<th data-quarto-table-cell-role="th">NumStorePurchases</th>
+<th data-quarto-table-cell-role="th">NumWebVisitsMonth</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>37.525446</td>
+<td>27.062946</td>
+<td>44.021875</td>
+<td>2.325000</td>
+<td>4.084821</td>
+<td>2.662054</td>
+<td>5.790179</td>
+<td>5.316518</td>
+<td>0.072768</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>54.628979</td>
+<td>41.280498</td>
+<td>52.167439</td>
+<td>1.932238</td>
+<td>2.778714</td>
+<td>2.923101</td>
+<td>3.250958</td>
+<td>2.426645</td>
+<td>0.259813</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>3.000000</td>
+<td>1.000000</td>
+<td>9.000000</td>
+<td>1.000000</td>
+<td>2.000000</td>
+<td>0.000000</td>
+<td>3.000000</td>
+<td>3.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>12.000000</td>
+<td>8.000000</td>
+<td>24.000000</td>
+<td>2.000000</td>
+<td>4.000000</td>
+<td>2.000000</td>
+<td>5.000000</td>
+<td>6.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>50.000000</td>
+<td>33.000000</td>
+<td>56.000000</td>
+<td>3.000000</td>
+<td>6.000000</td>
+<td>4.000000</td>
+<td>8.000000</td>
+<td>7.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>259.000000</td>
+<td>263.000000</td>
+<td>362.000000</td>
+<td>15.000000</td>
+<td>27.000000</td>
+<td>28.000000</td>
+<td>13.000000</td>
+<td>20.000000</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div id="describe-numeric-3" class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">AcceptedCmp4</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp5</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp1</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp2</th>
+<th data-quarto-table-cell-role="th">Complain</th>
+<th data-quarto-table-cell-role="th">Z_CostContact</th>
+<th data-quarto-table-cell-role="th">Z_Revenue</th>
+<th data-quarto-table-cell-role="th">Response</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.000000</td>
+<td>2240.0</td>
+<td>2240.0</td>
+<td>2240.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>0.074554</td>
+<td>0.072768</td>
+<td>0.064286</td>
+<td>0.013393</td>
+<td>0.009375</td>
+<td>3.0</td>
+<td>11.0</td>
+<td>0.149107</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>0.262728</td>
+<td>0.259813</td>
+<td>0.245316</td>
+<td>0.114976</td>
+<td>0.096391</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.356274</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>3.0</td>
+<td>11.0</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>3.0</td>
+<td>11.0</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>3.0</td>
+<td>11.0</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>3.0</td>
+<td>11.0</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>3.0</td>
+<td>11.0</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Kolom <code>Z_CostContact</code> dan <code>Z_Revenue</code> menunjukkan standar deviasi nol, yang berarti semua nilai di kolom tersebut sama. Kita bisa menghapus kedua kolom ini karena tidak memberikan informasi yang berguna untuk klasterisasi. Kolom <code>ID</code> juga tidak relevan untuk analisis klasterisasi, jadi kita akan menghapusnya juga.</p>
+<p>Terakhir, kita bisa melihat jumlah kategori unik untuk kolom kategori:</p>
+<div id="unique-categories" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>categorical_cols <span class="op">=</span> data.select_dtypes(include<span class="op">=</span>[<span class="st">'str'</span>]).columns</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> categorical_cols:</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Kolom '</span><span class="sc">{</span>col<span class="sc">}</span><span class="ss">' memiliki </span><span class="sc">{</span>data[col]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> kategori unik."</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Kolom 'Education' memiliki 5 kategori unik.
+Kolom 'Marital_Status' memiliki 8 kategori unik.
+Kolom 'Dt_Customer' memiliki 663 kategori unik.</code></pre>
+</div>
+</div>
+<p>Kolom ‘Education’ memiliki 5 kategori unik dan kolom ‘Marital_Status’ memiliki 8. Kolom ‘Dt_Customer’, yang memiliki 663 kategori unik, akan kita anggap sebagai kolom tersendiri dan akan diproses sebagai tanggal.</p>
+</section>
+<section id="sec-feature-identification-engineering" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Step 3: Identifikasi kolom numerik &amp; kategori</h1>
+<p>Dari langkah eksplorasi sebelumnya, kita sudah mengidentifikasi kolom numerik dan kategori. Untuk sebagian besar kolom, bisa saja digunakan apa adanya. Untuk kolom <code>Dt_Customer</code>, kita bisa mengubahnya menjadi fitur numerik dengan menghitung jumlah hari sejak tanggal tersebut hingga tanggal terakhir dalam dataset. Sama halnya dengan kolom <code>Year_Birth</code>, kita bisa mengubahnya menjadi umur dengan menghitung selisih antara tahun saat ini dan tahun lahir. Data yang telah diubah ini akan kita simpan dalam variabel baru agar tidak tercampur dengan data asli.</p>
+<p>Untuk mempermudah, kita akan menyimpan nama-nama kolom numerik dan kategori dalam variabel terpisah:</p>
+<div id="feature-engineering" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Kolom yang akan dihapus</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cols_to_drop <span class="op">=</span> [<span class="st">'ID'</span>, <span class="st">'Z_CostContact'</span>, <span class="st">'Z_Revenue'</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>data_processed <span class="op">=</span> data.drop(columns<span class="op">=</span>cols_to_drop)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Proses fitur 'Dt_Customer' menjadi 'Customer_Since_Days' dan 'Year_Birth' menjadi 'Age'</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>data_processed[<span class="st">'Dt_Customer'</span>] <span class="op">=</span> pd.to_datetime(data_processed[<span class="st">'Dt_Customer'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'</span><span class="sc">%d</span><span class="st">-%m-%Y'</span>, errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>_max_date <span class="op">=</span> data_processed[<span class="st">'Dt_Customer'</span>].<span class="bu">max</span>()</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>data_processed[<span class="st">'Customer_Since_Days'</span>] <span class="op">=</span> (_max_date <span class="op">-</span> data_processed[<span class="st">'Dt_Customer'</span>]).dt.days</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>data_processed[<span class="st">'Age'</span>] <span class="op">=</span> <span class="dv">2024</span> <span class="op">-</span> data_processed[<span class="st">'Year_Birth'</span>]</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Hapus kolom asli setelah diubah, gunakan inplace=True agar langsung diterapkan</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>data_processed.drop(columns<span class="op">=</span>[<span class="st">'Dt_Customer'</span>, <span class="st">'Year_Birth'</span>], inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Kelomokan nama kolom numerik dan kategori</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>numerical_cols <span class="op">=</span> data_processed.select_dtypes(include<span class="op">=</span>[np.number]).columns.tolist()</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>categorical_cols <span class="op">=</span> data_processed.select_dtypes(include<span class="op">=</span>[<span class="st">'str'</span>]).columns.tolist()</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Kolom Numerik (</span><span class="sc">{</span><span class="bu">len</span>(numerical_cols)<span class="sc">}</span><span class="ss">):</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> numerical_cols:</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"- </span><span class="sc">{</span>col<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Kolom Kategori (</span><span class="sc">{</span><span class="bu">len</span>(categorical_cols)<span class="sc">}</span><span class="ss">):</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> categorical_cols:</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"- </span><span class="sc">{</span>col<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Kolom Numerik (24):</p>
+<ul>
+<li>Income</li>
+<li>Kidhome</li>
+<li>Teenhome</li>
+<li>Recency</li>
+<li>MntWines</li>
+<li>MntFruits</li>
+<li>MntMeatProducts</li>
+<li>MntFishProducts</li>
+<li>MntSweetProducts</li>
+<li>MntGoldProds</li>
+<li>NumDealsPurchases</li>
+<li>NumWebPurchases</li>
+<li>NumCatalogPurchases</li>
+<li>NumStorePurchases</li>
+<li>NumWebVisitsMonth</li>
+<li>AcceptedCmp3</li>
+<li>AcceptedCmp4</li>
+<li>AcceptedCmp5</li>
+<li>AcceptedCmp1</li>
+<li>AcceptedCmp2</li>
+<li>Complain</li>
+<li>Response</li>
+<li>Customer_Since_Days</li>
+<li>Age</li>
+</ul>
+<p>Kolom Kategori (2):</p>
+<ul>
+<li>Education</li>
+<li>Marital_Status</li>
+</ul>
+</div>
+</section>
+<section id="sec-imputation" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Step 4: Imputasi missing value</h1>
+<p>Kita akan melakukan imputasi untuk kolom <code>Income</code> yang memiliki 24 nilai kosong. Karena <code>Income</code> adalah kolom numerik, kita bisa menggunakan strategi imputasi seperti median atau mean. Dalam kasus ini, kita akan menggunakan median karena lebih tahan terhadap outlier.</p>
+<div id="impute-income" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>imputer <span class="op">=</span> SimpleImputer(strategy<span class="op">=</span><span class="st">'median'</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>data_processed[<span class="st">'Income'</span>] <span class="op">=</span> imputer.fit_transform(data_processed[[<span class="st">'Income'</span>]])</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Jumlah nilai kosong setelah imputasi:"</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data_processed[<span class="st">'Income'</span>].isnull().<span class="bu">sum</span>())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Jumlah nilai kosong setelah imputasi:
+0</code></pre>
+</div>
+</div>
+<p>Kita tampilkan statistik untuk kolom <code>Customer_Since_Days</code> dan <code>Age</code> setelah proses transformasi, serta perbandingan antara kolom <code>Income</code> sebelum dan sesudah imputasi.</p>
+<div id="cell-describe-engineered" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>display(data_processed[[<span class="st">'Customer_Since_Days'</span>, <span class="st">'Age'</span>]].describe())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="describe-engineered" class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Customer_Since_Days</th>
+<th data-quarto-table-cell-role="th">Age</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>2240.000000</td>
+<td>2240.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>353.582143</td>
+<td>55.194196</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>202.122512</td>
+<td>11.984069</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>0.000000</td>
+<td>28.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>180.750000</td>
+<td>47.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>355.500000</td>
+<td>54.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>529.000000</td>
+<td>65.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>699.000000</td>
+<td>131.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-compare-income" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>income_comparison <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Income (pre)'</span>: data[<span class="st">'Income'</span>],</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Income (post)'</span>: data_processed[<span class="st">'Income'</span>]</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>display(income_comparison.describe())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="compare-income" class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Income (pre)</th>
+<th data-quarto-table-cell-role="th">Income (post)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">count</th>
+<td>2216.000000</td>
+<td>2240.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mean</th>
+<td>52247.251354</td>
+<td>52237.975446</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">std</th>
+<td>25173.076661</td>
+<td>25037.955891</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">min</th>
+<td>1730.000000</td>
+<td>1730.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">25%</th>
+<td>35303.000000</td>
+<td>35538.750000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">50%</th>
+<td>51381.500000</td>
+<td>51381.500000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">75%</th>
+<td>68522.000000</td>
+<td>68289.750000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">max</th>
+<td>666666.000000</td>
+<td>666666.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="sec-encoding" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Step 5: Encoding fitur kategori</h1>
+<p>Encoding akan menggunakan one-hot encoding pada kolom kategori, kemudian digabung dengan kolom numerik sebagai dataframe baru. Dengan menggunakan one-hot dibandingkan label atau ordinal encoding, ini akan mengurangi bias dalam kalkulasi K-Means.</p>
+<p>Dalam proses encoding, kita bisa membuang salah satu variabel dalam teknik <em>dummy variable trap</em>, dan dilakukan dengan argumen <code>drop='first'</code>. Hal ini berguna dalam model regresi linear, namun tidak perlu dalam klasifikasi, karena berisiko menimbulkan bias terhadap kategori referensi yang dihapus tersebut karena jaraknya ke kategori lain dihitung secara asimetris. Oleh karena itu, kita pilih untuk tidak melakukan ini, dengan menggunakan argumen <code>drop=None</code>. Keuntungan cara ini adalah mempermudah interpretasi PCA.</p>
+<div id="one-hot-encoding" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>encoder <span class="op">=</span> OneHotEncoder(sparse_output<span class="op">=</span><span class="va">False</span>, drop<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>encoded_categorical <span class="op">=</span> encoder.fit_transform(data_processed[categorical_cols])</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>encoded_categorical_df <span class="op">=</span> pd.DataFrame(encoded_categorical, columns<span class="op">=</span>encoder.get_feature_names_out(categorical_cols))</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="sec-merge-encoded" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="sec-merge-encoded"><span class="header-section-number">5.1</span> Gabungkan data numerik &amp; hasil encoding</h2>
+<div id="cell-merge-features" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>data_final <span class="op">=</span> pd.concat([data_processed[numerical_cols].reset_index(drop<span class="op">=</span><span class="va">True</span>), encoded_categorical_df], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>display(data_final.head())</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="merge-features" class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Income</th>
+<th data-quarto-table-cell-role="th">Kidhome</th>
+<th data-quarto-table-cell-role="th">Teenhome</th>
+<th data-quarto-table-cell-role="th">Recency</th>
+<th data-quarto-table-cell-role="th">MntWines</th>
+<th data-quarto-table-cell-role="th">MntFruits</th>
+<th data-quarto-table-cell-role="th">MntMeatProducts</th>
+<th data-quarto-table-cell-role="th">MntFishProducts</th>
+<th data-quarto-table-cell-role="th">MntSweetProducts</th>
+<th data-quarto-table-cell-role="th">MntGoldProds</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Education_Master</th>
+<th data-quarto-table-cell-role="th">Education_PhD</th>
+<th data-quarto-table-cell-role="th">Marital_Status_Absurd</th>
+<th data-quarto-table-cell-role="th">Marital_Status_Alone</th>
+<th data-quarto-table-cell-role="th">Marital_Status_Divorced</th>
+<th data-quarto-table-cell-role="th">Marital_Status_Married</th>
+<th data-quarto-table-cell-role="th">Marital_Status_Single</th>
+<th data-quarto-table-cell-role="th">Marital_Status_Together</th>
+<th data-quarto-table-cell-role="th">Marital_Status_Widow</th>
+<th data-quarto-table-cell-role="th">Marital_Status_YOLO</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>58138.0</td>
+<td>0</td>
+<td>0</td>
+<td>58</td>
+<td>635</td>
+<td>88</td>
+<td>546</td>
+<td>172</td>
+<td>88</td>
+<td>88</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>46344.0</td>
+<td>1</td>
+<td>1</td>
+<td>38</td>
+<td>11</td>
+<td>1</td>
+<td>6</td>
+<td>2</td>
+<td>1</td>
+<td>6</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>71613.0</td>
+<td>0</td>
+<td>0</td>
+<td>26</td>
+<td>426</td>
+<td>49</td>
+<td>127</td>
+<td>111</td>
+<td>21</td>
+<td>42</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>26646.0</td>
+<td>1</td>
+<td>0</td>
+<td>26</td>
+<td>11</td>
+<td>4</td>
+<td>20</td>
+<td>10</td>
+<td>3</td>
+<td>5</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>58293.0</td>
+<td>1</td>
+<td>0</td>
+<td>94</td>
+<td>173</td>
+<td>43</td>
+<td>118</td>
+<td>46</td>
+<td>27</td>
+<td>15</td>
+<td>...</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 37 columns</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-scaling" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Step 6: Scaling data</h1>
+<p>Standardisasi data menggunakan <code>StandardScaler</code> berdasarkan Z-score untuk memastikan semua fitur memiliki skala yang sama, sehingga algoritma klasterisasi tidak bias terhadap fitur dengan rentang nilai yang lebih besar.</p>
+<div id="scale-features" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>data_scaled_ndarray <span class="op">=</span> scaler.fit_transform(data_final)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># karena data_scaled_ndarray adalah numpy array, kita buat kembali ke dataframe</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>data_scaled <span class="op">=</span> pd.DataFrame(data_scaled_ndarray, columns<span class="op">=</span>data_final.columns)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="sec-optimal-k" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Step 7: Tentukan jumlah cluster optimal (Elbow + Silhouette)</h1>
+<section id="sec-elbow-silhouette-explanation" class="level3" data-number="7.0.1">
+<h3 data-number="7.0.1" class="anchored" data-anchor-id="sec-elbow-silhouette-explanation"><span class="header-section-number">7.0.1</span> Penjelasan Metode Elbow dan Silhouette Score</h3>
+<p>Untuk menentukan jumlah klaster (<span class="math inline">\(k\)</span>) terbaik, kita menggunakan kombinasi dari dua metode evaluasi: Elbow dan Silhouette.</p>
+<p>Metode Elbow (Inertia / Within-Cluster Sum of Squares) Inersia mengukur jumlah kuadrat jarak dari setiap titik data ke centroid klaster mereka. Nilai inersia akan selalu menurun seiring bertambahnya jumlah klaster. Pada satu titik, laju penurunan inersia mulai melandai secara signifikan, dimana menambahkan klaster setelah titik ini hanya memberikan sedikit penurunan inersia namun meningkatkan kompleksitas model. Inilah titik “siku” (<em>elbow</em>) yang akan kita cari, titik yang optimal sebagai <em>trade-off</em> antara kompleksitas dan efektivitas.</p>
+<p>Metode Silhouette Score score mengukur seberapa mirip suatu objek dengan klasternya sendiri (<em>kohesi</em>) dibandingkan dengan klaster lainnya (<em>pemisahan</em>). Nilai skor berkisar antara -1 hingga 1. Nilai silhouette score yang semakin mendekati 1 menunjukkan bahwa titik data terkelompok dengan baik, memiliki batas yang jelas, dan terpisah jauh dari klaster tetangga. Kita memilih <span class="math inline">\(k\)</span> yang menghasilkan puncak atau nilai silhouette tertinggi.</p>
+<p>Metode Elbow terkadang menghasilkan kurva melandai yang subjektif tanpa titik siku yang jelas. Di sisi lain, Silhouette score cenderung memberikan skor tertinggi pada <span class="math inline">\(k=2\)</span> karena pemisahan biner paling mudah dilakukan secara matematis, namun secara bisnis <span class="math inline">\(k=2\)</span> terlalu umum dan tidak informatif untuk segmentasi pelanggan. Dengan menggabungkan keduanya, kita mencari titik di mana inersia sudah cukup rendah (setelah elbow) dan silhouette score memiliki nilai yang relatif tinggi.</p>
+<p>Rentang <span class="math inline">\(k\)</span> yang diuji dipilih antara 2 hingga 10. Batas bawah adalah <span class="math inline">\(k=2\)</span> karena klasterisasi minimal membutuhkan 2 kelompok. Batas atas dipilih <span class="math inline">\(k=10\)</span> karena dalam segmentasi pelanggan bisnis, memiliki lebih dari 10 segmen akan terlalu rumit dan tidak praktis untuk merancang kampanye pemasaran yang spesifik bagi masing-masing kelompok.</p>
+<div id="cell-fig-elbow-silhouette" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menghitung inersia dan silhouette score untuk k = 2 s/d 10</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>ks <span class="op">=</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">11</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>inertias <span class="op">=</span> []</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>silhouettes <span class="op">=</span> []</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> ks:</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> kmeans.fit_predict(data_scaled)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    inertias.append(kmeans.inertia_)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    silhouettes.append(silhouette_score(data_scaled, labels))</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualisasi kurva Elbow dan Silhouette Score berdampingan</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>fig, ax1 <span class="op">=</span> plt.subplots()</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>color <span class="op">=</span> <span class="st">'tab:blue'</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>ax1.set_xlabel(<span class="st">'Number of Clusters (k)'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>ax1.set_ylabel(<span class="st">'Inertia (Within-Cluster Sum of Squares)'</span>, color<span class="op">=</span>color, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>ax1.plot(ks, inertias, <span class="st">'o-'</span>, color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'Inertia'</span>)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>ax1.tick_params(axis<span class="op">=</span><span class="st">'y'</span>, labelcolor<span class="op">=</span>color)</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> ax1.twinx()  </span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>color <span class="op">=</span> <span class="st">'tab:red'</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">'Silhouette Score'</span>, color<span class="op">=</span>color, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>ax2.plot(ks, silhouettes, <span class="st">'s-'</span>, color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'Silhouette Score'</span>)</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>ax2.tick_params(axis<span class="op">=</span><span class="st">'y'</span>, labelcolor<span class="op">=</span>color)</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Penentuan Jumlah Klaster Optimal: Metode Elbow &amp; Silhouette Score'</span>, fontsize<span class="op">=</span><span class="dv">14</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-elbow-silhouette" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-elbow-silhouette-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-elbow-silhouette-output-1.png" width="748" height="465" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elbow-silhouette-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Gambar&nbsp;1: Evaluasi jumlah klaster optimal k = 2 s/d 10 menggunakan Metode Elbow (Inersia) dan Silhouette Score secara berdampingan.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Berdasarkan hasil visualisasi kurva evaluasi inersia (Elbow Method) dan Silhouette Score di atas, penentuan jumlah klaster optimal dapat dijelaskan sebagai berikut.</p>
+<p>Titik tekukan atau siku (<em>elbow point</em>) mulai terbentuk secara jelas pada area rentang <span class="math inline">\(k = 4\)</span> hingga <span class="math inline">\(k = 5\)</span>. Setelah melewati <span class="math inline">\(k = 5\)</span>, penambahan jumlah klaster baru tidak lagi memberikan penurunan inersia yang signifikan.</p>
+<p>Terdapat peningkatan lokal yang signifikan pada <span class="math inline">\(k = 5\)</span> dan <span class="math inline">\(k = 6\)</span>, dengan nilai skor yang relatif stabil dan tinggi. Meskipun <span class="math inline">\(k=2\)</span> secara teoritis memiliki nilai silhouette yang tinggi, jumlah segmen tersebut terlalu sedikit untuk menghasilkan segmentasi profil kepribadian pelanggan yang bermakna bagi tim bisnis.</p>
+<p>Dengan mempertimbangkan keseimbangan antara performa model (inersia rendah dan silhouette score tinggi) serta nilai guna praktis segmentasi bisnis, <strong>jumlah klaster optimal dipilih sebesar <span class="math inline">\(k = 5\)</span></strong>.</p>
+</section>
+</section>
+<section id="sec-clustering" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Step 8: Melakukan Klasterisasi</h1>
+<div id="run-kmeans" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>optimal_k <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>optimal_k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>cluster_labels <span class="op">=</span> kmeans.fit_predict(data_scaled)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Menyimpan hasil klaster ke dataframe</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>data[<span class="st">'Cluster'</span>] <span class="op">=</span> cluster_labels</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>data_final[<span class="st">'Cluster'</span>] <span class="op">=</span> cluster_labels</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan distribusi jumlah anggota per klaster</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>cluster_counts <span class="op">=</span> pd.Series(cluster_labels).value_counts().sort_index()</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cluster_id, count <span class="kw">in</span> cluster_counts.items():</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Klaster </span><span class="sc">{</span>cluster_id<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>count<span class="sc">}</span><span class="ss"> pelanggan (</span><span class="sc">{</span>count<span class="op">/</span><span class="bu">len</span>(data)<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%)"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Klaster 0: 54 pelanggan (2.41%)
+Klaster 1: 171 pelanggan (7.63%)
+Klaster 2: 979 pelanggan (43.71%)
+Klaster 3: 579 pelanggan (25.85%)
+Klaster 4: 457 pelanggan (20.40%)</code></pre>
+</div>
+</div>
+</section>
+<section id="sec-pca-visualization" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Step 9: Visualisasi klaster dengan PCA 2D</h1>
+<p>Perhitungan Principal Component Analysis (PCA) untuk visualisasi 2D serta persentase variansi untuk memahami seberapa baik PCA mempertahankan informasi dari data asli.</p>
+<div id="compute-pca" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menjalankan PCA untuk reduksi dimensi menjadi 2 komponen</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>pca_result <span class="op">=</span> pca.fit_transform(data_scaled)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>data_pca <span class="op">=</span> pd.DataFrame(pca_result, columns<span class="op">=</span>[<span class="st">'PC1'</span>, <span class="st">'PC2'</span>])</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>data_pca[<span class="st">'Cluster'</span>] <span class="op">=</span> cluster_labels</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan persentase variansi yang dijelaskan oleh PCA</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>variance_explained <span class="op">=</span> pca.explained_variance_ratio_</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Variansi yang dijelaskan oleh PC1: </span><span class="sc">{</span>variance_explained[<span class="dv">0</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Variansi yang dijelaskan oleh PC2: </span><span class="sc">{</span>variance_explained[<span class="dv">1</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total variansi yang dipertahankan dalam 2D: </span><span class="sc">{</span><span class="bu">sum</span>(variance_explained)<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Variansi yang dijelaskan oleh PC1: 17.73%
+Variansi yang dijelaskan oleh PC2: 6.03%
+Total variansi yang dipertahankan dalam 2D: 23.76%</code></pre>
+</div>
+</div>
+<p>Visualisasi klaster pada ruang PCA 2D dengan pewarnaan berdasarkan label klaster.</p>
+<div id="cell-fig-pca-visualization" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot sebaran klaster pada bidang PCA 2D</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'#1f77b4'</span>, <span class="st">'#ff7f0e'</span>, <span class="st">'#2ca02c'</span>, <span class="st">'#d62728'</span>, <span class="st">'#9467bd'</span>] <span class="co"># Palet premium</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">'PC1'</span>, y<span class="op">=</span><span class="st">'PC2'</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">'Cluster'</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span>colors[:optimal_k],</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data_pca,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="st">"full"</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.7</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    s<span class="op">=</span><span class="dv">60</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Visualisasi Klaster Pelanggan dalam Ruang 2D PCA'</span>, fontsize<span class="op">=</span><span class="dv">14</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="ss">f'Principal Component 1 (</span><span class="sc">{</span>variance_explained[<span class="dv">0</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">% Variance)'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="ss">f'Principal Component 2 (</span><span class="sc">{</span>variance_explained[<span class="dv">1</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">% Variance)'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>plt.legend(title<span class="op">=</span><span class="st">'Klaster'</span>, loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="fig-pca-visualization" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pca-visualization-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-pca-visualization-output-1.png" width="657" height="465" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pca-visualization-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Gambar&nbsp;2: Sebaran klaster pelanggan dalam ruang 2D PCA dengan pewarnaan berdasarkan label klaster.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-profiling" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Step 10: Profiling cluster (rata-rata fitur per cluster)</h1>
+<div class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menghitung rata-rata fitur untuk setiap klaster</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>cluster_profiles <span class="op">=</span> data_final.groupby(<span class="st">'Cluster'</span>).mean()</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>cluster_sizes <span class="op">=</span> data_final[<span class="st">'Cluster'</span>].value_counts().sort_index()</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>profile_table <span class="op">=</span> pd.concat([cluster_profiles, cluster_sizes.rename(<span class="st">'Cluster Size'</span>)], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co"># dump profile table ke file csv</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>profile_table.to_csv(<span class="st">'cluster_profiles.csv'</span>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan tabel profil klaster</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Format tampilan angka agar rapi</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.float_format'</span>, <span class="kw">lambda</span> x: <span class="st">'</span><span class="sc">%.2f</span><span class="st">'</span> <span class="op">%</span> x)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>display(profile_table.T.rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">'Cluster 0'</span>, <span class="dv">1</span>: <span class="st">'Cluster 1'</span>, <span class="dv">2</span>: <span class="st">'Cluster 2'</span>, <span class="dv">3</span>: <span class="st">'Cluster 3'</span>, <span class="dv">4</span>: <span class="st">'Cluster 4'</span>}))</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-cluster-profiles" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="18">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-cluster-profiles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabel&nbsp;1: Tabel rata-rata fitur (profiling) untuk setiap klaster pelanggan beserta ukuran klaster.
+</figcaption>
+<div aria-describedby="tbl-cluster-profiles-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe cell caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Cluster</th>
+<th data-quarto-table-cell-role="th">Cluster 0</th>
+<th data-quarto-table-cell-role="th">Cluster 1</th>
+<th data-quarto-table-cell-role="th">Cluster 2</th>
+<th data-quarto-table-cell-role="th">Cluster 3</th>
+<th data-quarto-table-cell-role="th">Cluster 4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Income</th>
+<td>20306.26</td>
+<td>81569.49</td>
+<td>35899.20</td>
+<td>57046.90</td>
+<td>73944.58</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Kidhome</th>
+<td>0.63</td>
+<td>0.05</td>
+<td>0.80</td>
+<td>0.25</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Teenhome</th>
+<td>0.09</td>
+<td>0.13</td>
+<td>0.46</td>
+<td>0.95</td>
+<td>0.24</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Recency</th>
+<td>48.44</td>
+<td>49.83</td>
+<td>49.73</td>
+<td>47.72</td>
+<td>49.35</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MntWines</th>
+<td>7.24</td>
+<td>874.70</td>
+<td>42.51</td>
+<td>459.78</td>
+<td>488.02</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">MntFruits</th>
+<td>11.11</td>
+<td>56.43</td>
+<td>4.87</td>
+<td>19.96</td>
+<td>70.78</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MntMeatProducts</th>
+<td>11.44</td>
+<td>469.13</td>
+<td>24.21</td>
+<td>127.72</td>
+<td>427.75</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">MntFishProducts</th>
+<td>17.06</td>
+<td>77.05</td>
+<td>7.05</td>
+<td>26.25</td>
+<td>104.73</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MntSweetProducts</th>
+<td>12.11</td>
+<td>65.48</td>
+<td>4.90</td>
+<td>19.57</td>
+<td>71.42</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">MntGoldProds</th>
+<td>22.83</td>
+<td>77.34</td>
+<td>15.11</td>
+<td>58.65</td>
+<td>77.46</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NumDealsPurchases</th>
+<td>1.80</td>
+<td>1.05</td>
+<td>2.03</td>
+<td>3.89</td>
+<td>1.51</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">NumWebPurchases</th>
+<td>1.89</td>
+<td>5.44</td>
+<td>2.11</td>
+<td>6.32</td>
+<td>5.23</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NumCatalogPurchases</th>
+<td>0.48</td>
+<td>6.05</td>
+<td>0.56</td>
+<td>3.00</td>
+<td>5.74</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">NumStorePurchases</th>
+<td>2.85</td>
+<td>8.26</td>
+<td>3.23</td>
+<td>7.64</td>
+<td>8.36</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NumWebVisitsMonth</th>
+<td>6.87</td>
+<td>3.00</td>
+<td>6.40</td>
+<td>5.91</td>
+<td>2.93</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">AcceptedCmp3</th>
+<td>0.11</td>
+<td>0.14</td>
+<td>0.07</td>
+<td>0.06</td>
+<td>0.06</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">AcceptedCmp4</th>
+<td>0.00</td>
+<td>0.39</td>
+<td>0.01</td>
+<td>0.13</td>
+<td>0.03</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">AcceptedCmp5</th>
+<td>0.00</td>
+<td>0.94</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">AcceptedCmp1</th>
+<td>0.00</td>
+<td>0.44</td>
+<td>0.00</td>
+<td>0.03</td>
+<td>0.11</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">AcceptedCmp2</th>
+<td>0.00</td>
+<td>0.12</td>
+<td>0.00</td>
+<td>0.01</td>
+<td>0.00</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Complain</th>
+<td>0.00</td>
+<td>0.01</td>
+<td>0.01</td>
+<td>0.01</td>
+<td>0.01</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Response</th>
+<td>0.04</td>
+<td>0.58</td>
+<td>0.09</td>
+<td>0.12</td>
+<td>0.17</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Customer_Since_Days</th>
+<td>428.20</td>
+<td>356.05</td>
+<td>312.75</td>
+<td>413.16</td>
+<td>355.84</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Age</th>
+<td>46.54</td>
+<td>54.64</td>
+<td>52.60</td>
+<td>59.88</td>
+<td>56.05</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Education_2n Cycle</th>
+<td>0.00</td>
+<td>0.07</td>
+<td>0.12</td>
+<td>0.05</td>
+<td>0.11</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Education_Basic</th>
+<td>1.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Education_Graduation</th>
+<td>0.00</td>
+<td>0.52</td>
+<td>0.52</td>
+<td>0.45</td>
+<td>0.59</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Education_Master</th>
+<td>0.00</td>
+<td>0.16</td>
+<td>0.17</td>
+<td>0.20</td>
+<td>0.12</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Education_PhD</th>
+<td>0.00</td>
+<td>0.25</td>
+<td>0.20</td>
+<td>0.29</td>
+<td>0.18</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Marital_Status_Absurd</th>
+<td>0.00</td>
+<td>0.01</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Marital_Status_Alone</th>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Marital_Status_Divorced</th>
+<td>0.02</td>
+<td>0.08</td>
+<td>0.10</td>
+<td>0.13</td>
+<td>0.09</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Marital_Status_Married</th>
+<td>0.37</td>
+<td>0.42</td>
+<td>0.40</td>
+<td>0.39</td>
+<td>0.35</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Marital_Status_Single</th>
+<td>0.33</td>
+<td>0.19</td>
+<td>0.23</td>
+<td>0.16</td>
+<td>0.25</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Marital_Status_Together</th>
+<td>0.26</td>
+<td>0.26</td>
+<td>0.25</td>
+<td>0.28</td>
+<td>0.26</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Marital_Status_Widow</th>
+<td>0.02</td>
+<td>0.05</td>
+<td>0.02</td>
+<td>0.04</td>
+<td>0.05</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Marital_Status_YOLO</th>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+<td>0.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Cluster Size</th>
+<td>54.00</td>
+<td>171.00</td>
+<td>979.00</td>
+<td>579.00</td>
+<td>457.00</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="sec-conclusion" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Simpulkan Analisa dari hasil</h1>
+<p>Berdasarkan hasil analisis profil pada tabel di atas, kita dapat mengidentifikasi karakteristik khas dari masing-masing klaster pelanggan serta menyusun strategi pemasaran personalisasi yang tepat sasaran (<em>targeted marketing campaigns</em>).</p>
+<section id="sec-cluster-characteristics" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="sec-cluster-characteristics"><span class="header-section-number">11.1</span> Karakteristik Utama dari Setiap Klaster</h2>
+<section id="sec-cluster-0" class="level3" data-number="11.1.1">
+<h3 data-number="11.1.1" class="anchored" data-anchor-id="sec-cluster-0"><span class="header-section-number">11.1.1</span> Klaster 0: <em>Frugal Basic-Educated Consumers</em> (Konsumen Hemat Berpendidikan Dasar)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok ini sangat kecil (hanya 54 pelanggan atau 2,4% dari total data), beranggotakan pelanggan dengan tingkat pendidikan <strong>Basic</strong> (100% dari klaster ini) dan rata-rata pendapatan terendah (<span class="math inline">\(~\$20.306\)</span>). Pengeluaran total mereka sangat minim (<span class="math inline">\(~\$81,80\)</span>) dengan prioritas belanja yang merata di angka kecil. Kelompok ini cukup aktif mengunjungi web (6,87 kali/bulan) tetapi hampir tidak pernah melakukan transaksi online atau menanggapi kampanye pemasaran (tingkat respons 3,7%).</li>
+<li><strong>Demografi:</strong> Usia rata-rata paling muda di antara klaster lainnya (46,5 tahun) dan memiliki tanggungan anak (0,72).</li>
+</ul>
+</section>
+<section id="sec-cluster-1" class="level3" data-number="11.1.2">
+<h3 data-number="11.1.2" class="anchored" data-anchor-id="sec-cluster-1"><span class="header-section-number">11.1.2</span> Klaster 1: <em>Affluent Elite Spenders</em> (Pembelanja Elite Kelas Atas)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok premium (171 pelanggan atau 7,6%) dengan tingkat pendapatan tertinggi (<span class="math inline">\(~\$81.569\)</span>) dan sangat sedikit anak di rumah (0,18). Mereka mencatat pengeluaran belanja tertinggi (<span class="math inline">\(~\$1.620,13\)</span>), didominasi oleh pembelian produk Anggur (Wines, <span class="math inline">\(~\$874,70\)</span>) dan Daging (Meat, <span class="math inline">\(~\$469,13\)</span>). Mereka jarang mengunjungi situs web (3,0 kali/bulan), tidak peduli dengan promo/diskon (pembelian <em>deals</em> terendah), dan <strong>sangat responsif terhadap kampanye</strong> (respons kampanye terakhir mencapai 57,9% serta tingkat penerimaan Kampanye 5 mencapai 94,2%).</li>
+<li><strong>Preferensi Saluran:</strong> Menyukai katalog (6,05) dan pembelian langsung di toko fisik (8,26).</li>
+</ul>
+</section>
+<section id="sec-cluster-2" class="level3" data-number="11.1.3">
+<h3 data-number="11.1.3" class="anchored" data-anchor-id="sec-cluster-2"><span class="header-section-number">11.1.3</span> Klaster 2: <em>Budget-Conscious Families</em> (Keluarga Hemat &amp; Pemburu Diskon)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok terbesar dalam dataset (979 pelanggan atau 43,7%). Mereka adalah keluarga dengan tingkat pendapatan menengah ke bawah (<span class="math inline">\(~\$35.899\)</span>) dan jumlah anak terbanyak di rumah (rata-rata 1,26 anak). Pengeluaran belanja mereka sangat rendah (<span class="math inline">\(~\$98,65\)</span>). Mereka sering berselancar di web (6,40 kunjungan/bulan) untuk mencari penawaran diskon, tercermin dari pembelian memanfaatkan promosi yang cukup dominan (2,03). Tingkat respons terhadap kampanye sangat rendah (9,1%).</li>
+<li><strong>Preferensi Saluran:</strong> Pembelian langsung di toko fisik (3,23) dan web (2,11).</li>
+</ul>
+</section>
+<section id="sec-cluster-3" class="level3" data-number="11.1.4">
+<h3 data-number="11.1.4" class="anchored" data-anchor-id="sec-cluster-3"><span class="header-section-number">11.1.4</span> Klaster 3: <em>Mature Web-Active Bargain Hunters</em> (Pemburu Diskon Online Senior)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok ini terdiri dari 579 pelanggan (25,8%) dengan rata-rata usia tertua (~60 tahun) dan didominasi oleh keluarga yang memiliki anak remaja (0,95 <em>Teenhome</em>). Dengan pendapatan menengah-atas (<span class="math inline">\(~\$57.046\)</span>), mereka memiliki pengeluaran belanja menengah-tinggi (<span class="math inline">\(~\$711,93\)</span>) yang berpusat pada Anggur (<span class="math inline">\(~\$459,78\)</span>) dan Emas (<span class="math inline">\(~\$58,65\)</span>). Karakteristik mencolok mereka adalah <strong>pembelian menggunakan diskon tertinggi (3,89)</strong> dan <strong>transaksi melalui web tertinggi (6,32)</strong> di antara semua klaster.</li>
+<li><strong>Preferensi Saluran:</strong> Berbelanja aktif melalui Web dan Toko.</li>
+</ul>
+</section>
+<section id="sec-cluster-4" class="level3" data-number="11.1.5">
+<h3 data-number="11.1.5" class="anchored" data-anchor-id="sec-cluster-4"><span class="header-section-number">11.1.5</span> Klaster 4: <em>Independent High-Value Shoppers</em> (Pembelanja Mandiri Kelas Menengah Atas)</h3>
+<ul>
+<li><strong>Karakteristik Utama:</strong> Kelompok mapan (457 pelanggan atau 20,4%) dengan pendapatan tinggi (<span class="math inline">\(~\$73.944\)</span>) dan sedikit tanggungan anak (0,29). Mereka memiliki pengeluaran belanja yang sangat tinggi (<span class="math inline">\(~\$1.239,76\)</span>), dengan pengeluaran terbesar untuk produk Buah (<span class="math inline">\(~\$70,78\)</span>), Ikan (<span class="math inline">\(~\$104,73\)</span>), Manisan (<span class="math inline">\(~\$71,42\)</span>), dan Emas (<span class="math inline">\(~\$77,46\)</span>). Mereka mandiri dalam berbelanja, sangat jarang mengunjungi web (2,93 kali/bulan), dan <strong>tidak peduli pada kampanye promosi</strong> (tingkat respons hanya 16,6% dan penerimaan Kampanye 1-5 hampir nol).</li>
+<li><strong>Preferensi Saluran:</strong> Memiliki pembelian di toko fisik tertinggi (8,36) dan katalog yang kuat (5,74).</li>
+</ul>
+</section>
+</section>
+<section id="sec-marketing-strategies" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="sec-marketing-strategies"><span class="header-section-number">11.2</span> Implikasi Bisnis dan Strategi Pemasaran Personalisasi</h2>
+<p>Dengan memahami perbedaan mendasar ini, perusahaan dapat menghentikan strategi pemasaran “satu ukuran untuk semua” (<em>one-size-fits-all</em>) dan beralih ke strategi personalisasi yang lebih efektif:</p>
+<ol type="1">
+<li><strong>Strategi untuk Klaster 0 (Frugal Basic-Educated Consumers):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Batasi anggaran iklan kampanye untuk klaster ini demi efisiensi biaya. Pemasaran diarahkan pada produk esensial atau paket promosi bernilai sangat murah (<em>entry-level</em>).</li>
+<li><strong>Saluran:</strong> Gunakan pemasaran SMS atau pesan singkat instan karena mereka tidak responsif terhadap kampanye email besar.</li>
+</ul></li>
+<li><strong>Strategi untuk Klaster 1 (Affluent Elite Spenders):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Targetkan dengan program loyalitas VIP eksklusif, pra-pemesanan (<em>pre-order</em>) untuk produk edisi terbatas, serta penawaran paket produk anggur dan daging kualitas premium.</li>
+<li><strong>Saluran:</strong> Manfaatkan pengiriman katalog cetak eksklusif ke rumah dan pendekatan personal via manajer akun VIP, karena mereka sangat responsif terhadap katalog dan toko fisik.</li>
+</ul></li>
+<li><strong>Strategi untuk Klaster 2 (Budget-Conscious Families):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Buat promosi bertema keluarga seperti “Back to School” atau “Family Bundles”. Sediakan program loyalitas poin yang dapat ditukar dengan diskon belanja kebutuhan sehari-hari.</li>
+<li><strong>Saluran:</strong> Gunakan promosi berbasis aplikasi web atau email newsletter yang berisi daftar produk diskon, karena mereka aktif memburu <em>deals</em>.</li>
+</ul></li>
+<li><strong>Strategi untuk Klaster 3 (Mature Web-Active Bargain Hunters):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Fokus pada penawaran diskon secara online (misal: <em>flash sales</em> atau kupon diskon digital khusus anggur). Buat kampanye produk penunjang gaya hidup keluarga paruh baya dengan anak remaja.</li>
+<li><strong>Saluran:</strong> Optimalkan platform e-commerce dan iklan web tertarget, karena mereka adalah pengguna web paling aktif untuk bertransaksi.</li>
+</ul></li>
+<li><strong>Strategi untuk Klaster 4 (Independent High-Value Shoppers):</strong>
+<ul>
+<li><strong>Tindakan:</strong> Tingkatkan pengalaman belanja langsung di toko fisik (<em>in-store experience</em>) dengan penataan produk yang premium (terutama buah segar, ikan segar, dan produk manis). Berikan diskon spontan di kasir atau layanan bungkus kado gratis untuk barang bernilai tinggi.</li>
+<li><strong>Saluran:</strong> Optimalkan kenyamanan tata letak toko (<em>merchandising</em>) dan interaksi staf toko, serta kirimkan katalog produk premium bulanan. Jangan membanjiri mereka dengan kampanye email digital karena tingkat responsnya sangat rendah.</li>
+</ul></li>
+</ol>
+</section>
+</section>
+
+
+<div id="quarto-appendix"><section id="sec-disclosure" class="level1 appendix" data-number="12"><h2 class="anchored quarto-appendix-heading"><span class="header-section-number">12</span> Informasi</h2><div class="quarto-appendix-contents">
+
+<p>Dokumen ini ditulis dengan bantuan GitHub Copilot dan Google Antigravity untuk membantu dalam penulisan kode dan penjelasan. Namun, semua analisis, interpretasi, dan kesimpulan yang diambil adalah hasil pemikiran saya sendiri berdasarkan data yang tersedia.</p>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Disalin!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Disalin!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

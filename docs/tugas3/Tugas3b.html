@@ -8,7 +8,7 @@
 
 <meta name="author" content="Muhammad Hidayat">
 
-<title>readme</title>
+<title>Step 1: Load dataset</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -62,17 +62,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="readme_files/libs/clipboard/clipboard.min.js"></script>
-<script src="readme_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="readme_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="readme_files/libs/quarto-html/popper.min.js"></script>
-<script src="readme_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="readme_files/libs/quarto-html/anchor.min.js"></script>
-<link href="readme_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="readme_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="readme_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="readme_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="readme_files/libs/bootstrap/bootstrap-67270d1595a62d14f123c043d4fb2f18.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="Tugas3b_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Tugas3b_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Tugas3b_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Tugas3b_files/libs/quarto-html/popper.min.js"></script>
+<script src="Tugas3b_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Tugas3b_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Tugas3b_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Tugas3b_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Tugas3b_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Tugas3b_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Tugas3b_files/libs/bootstrap/bootstrap-67270d1595a62d14f123c043d4fb2f18.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -85,12 +85,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Daftar Isi</h2>
    
   <ul>
-  <li><a href="#tugas-machine-learning-universitas-terbuka" id="toc-tugas-machine-learning-universitas-terbuka" class="nav-link active" data-scroll-target="#tugas-machine-learning-universitas-terbuka">Tugas Machine Learning Universitas Terbuka</a></li>
-  <li><a href="#tugas-machine-learning-universitas-terbuka-1" id="toc-tugas-machine-learning-universitas-terbuka-1" class="nav-link" data-scroll-target="#tugas-machine-learning-universitas-terbuka-1">Tugas Machine Learning Universitas Terbuka</a>
-  <ul class="collapse">
-  <li><a href="#daftar-tugas" id="toc-daftar-tugas" class="nav-link" data-scroll-target="#daftar-tugas">Daftar Tugas</a></li>
-  <li><a href="#persiapan-environment" id="toc-persiapan-environment" class="nav-link" data-scroll-target="#persiapan-environment">Persiapan Environment</a></li>
-  </ul></li>
+  <li><a href="#step-3-identifikasi-kolom-numerik-kategori" id="toc-step-3-identifikasi-kolom-numerik-kategori" class="nav-link active" data-scroll-target="#step-3-identifikasi-kolom-numerik-kategori">Step 3: Identifikasi kolom numerik &amp; kategori</a></li>
+  <li><a href="#step-4-imputasi-missing-value" id="toc-step-4-imputasi-missing-value" class="nav-link" data-scroll-target="#step-4-imputasi-missing-value">Step 4: Imputasi missing value</a></li>
+  <li><a href="#step-5-encoding-fitur-kategori" id="toc-step-5-encoding-fitur-kategori" class="nav-link" data-scroll-target="#step-5-encoding-fitur-kategori">Step 5: Encoding fitur kategori</a></li>
+  <li><a href="#step-6-scaling-data" id="toc-step-6-scaling-data" class="nav-link" data-scroll-target="#step-6-scaling-data">Step 6: Scaling data</a></li>
+  <li><a href="#step-7-tentukan-jumlah-cluster-optimal-elbow-silhouette" id="toc-step-7-tentukan-jumlah-cluster-optimal-elbow-silhouette" class="nav-link" data-scroll-target="#step-7-tentukan-jumlah-cluster-optimal-elbow-silhouette">Step 7: Tentukan jumlah cluster optimal (Elbow + Silhouette)</a></li>
+  <li><a href="#step-8-pilih-k-optimal-dan-klasterisasi" id="toc-step-8-pilih-k-optimal-dan-klasterisasi" class="nav-link" data-scroll-target="#step-8-pilih-k-optimal-dan-klasterisasi">Step 8: Pilih k optimal dan klasterisasi</a></li>
+  <li><a href="#step-9-visualisasi-klaster-dengan-pca-2d" id="toc-step-9-visualisasi-klaster-dengan-pca-2d" class="nav-link" data-scroll-target="#step-9-visualisasi-klaster-dengan-pca-2d">Step 9: Visualisasi klaster dengan PCA 2D</a></li>
+  <li><a href="#step-10-profiling-cluster-rata-rata-fitur-per-cluster" id="toc-step-10-profiling-cluster-rata-rata-fitur-per-cluster" class="nav-link" data-scroll-target="#step-10-profiling-cluster-rata-rata-fitur-per-cluster">Step 10: Profiling cluster (rata-rata fitur per cluster)</a></li>
+  <li><a href="#simpulkan-analisa-dari-hasil" id="toc-simpulkan-analisa-dari-hasil" class="nav-link" data-scroll-target="#simpulkan-analisa-dari-hasil">Simpulkan Analisa dari hasil</a></li>
   </ul>
 </nav>
 </div>
@@ -98,6 +101,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
+<h1 class="title">Step 1: Load dataset</h1>
 </div>
 
 
@@ -120,33 +124,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="tugas-machine-learning-universitas-terbuka" class="level1">
-<h1>Tugas Machine Learning Universitas Terbuka</h1>
-<p>Muhammad Hidayat</p>
+<div id="cell-1" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Customer Personality Analysis - Unsupervised Learning Tugas 3</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler, OneHotEncoder</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.impute <span class="im">import</span> SimpleImputer</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>#Step2: lakukan Eksplorasi awal</p>
+<section id="step-3-identifikasi-kolom-numerik-kategori" class="level1">
+<h1>Step 3: Identifikasi kolom numerik &amp; kategori</h1>
 </section>
-<section id="tugas-machine-learning-universitas-terbuka-1" class="level1">
-<h1>Tugas Machine Learning Universitas Terbuka</h1>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Nama</span><span class="kw">:</span><span class="at"> Muhammad Hidayat</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">NIM</span><span class="kw">:</span><span class="at"> </span><span class="dv">052747132</span></span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
-<section id="daftar-tugas" class="level2">
-<h2 class="anchored" data-anchor-id="daftar-tugas">Daftar Tugas</h2>
-<ul>
-<li><a href="./tugas1/">Tugas 1</a></li>
-<li><a href="./tugas2/">Tugas 2</a></li>
-</ul>
-<p>Masing-masing file tugas dapat dijalankan secara terpisah dan dapat diexport ke format notebook (ipynb), Markdown, HTML, dan PDF.</p>
+<section id="step-4-imputasi-missing-value" class="level1">
+<h1>Step 4: Imputasi missing value</h1>
 </section>
-<section id="persiapan-environment" class="level2">
-<h2 class="anchored" data-anchor-id="persiapan-environment">Persiapan Environment</h2>
-<p>Project ini menggunakan <a href="https://quarto.org/">Quarto</a> dan <a href="https://www.anaconda.com">Anaconda</a>. Ikuti panduan dari <a href="https://quarto.org/docs/get-started/">Quarto</a> dan <a href="https://www.anaconda.com/docs/getting-started/main">Anaconda</a> untuk menginstal Quarto dan Conda.</p>
-<p>Buat dan aktifkan lingkungan Conda:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> env create <span class="at">-f</span> environment.yml</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate quarto-python-project</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Jalankan rendering:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Jalankan rendering spesifik (misal untuk tugas 1 sebagai notebook):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render <span class="at">-t</span> ipynb tugas1/index.qmd</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="step-5-encoding-fitur-kategori" class="level1">
+<h1>Step 5: Encoding fitur kategori</h1>
+<p>#Gabungkan data numerik &amp; hasil encoding</p>
 </section>
+<section id="step-6-scaling-data" class="level1">
+<h1>Step 6: Scaling data</h1>
+</section>
+<section id="step-7-tentukan-jumlah-cluster-optimal-elbow-silhouette" class="level1">
+<h1>Step 7: Tentukan jumlah cluster optimal (Elbow + Silhouette)</h1>
+</section>
+<section id="step-8-pilih-k-optimal-dan-klasterisasi" class="level1">
+<h1>Step 8: Pilih k optimal dan klasterisasi</h1>
+</section>
+<section id="step-9-visualisasi-klaster-dengan-pca-2d" class="level1">
+<h1>Step 9: Visualisasi klaster dengan PCA 2D</h1>
+</section>
+<section id="step-10-profiling-cluster-rata-rata-fitur-per-cluster" class="level1">
+<h1>Step 10: Profiling cluster (rata-rata fitur per cluster)</h1>
+</section>
+<section id="simpulkan-analisa-dari-hasil" class="level1">
+<h1>Simpulkan Analisa dari hasil</h1>
 </section>
 
 </main>

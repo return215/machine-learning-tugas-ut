@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="id" xml:lang="id"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Antigravity">
+
+<title>Customer Personality Analysis: Segmentasi Pelanggan Menggunakan Unsupervised Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="antigravity-run_files/libs/clipboard/clipboard.min.js"></script>
+<script src="antigravity-run_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="antigravity-run_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="antigravity-run_files/libs/quarto-html/popper.min.js"></script>
+<script src="antigravity-run_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="antigravity-run_files/libs/quarto-html/anchor.min.js"></script>
+<link href="antigravity-run_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="antigravity-run_files/libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="antigravity-run_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="antigravity-run_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="antigravity-run_files/libs/bootstrap/bootstrap-f57a4283c55baea7e81cb02c48ccb52d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Daftar Isi</h2>
+   
+  <ul>
+  <li><a href="#pendahuluan" id="toc-pendahuluan" class="nav-link active" data-scroll-target="#pendahuluan">1. Pendahuluan</a></li>
+  <li><a href="#pemrosesan-data-rekayasa-fitur" id="toc-pemrosesan-data-rekayasa-fitur" class="nav-link" data-scroll-target="#pemrosesan-data-rekayasa-fitur">2. Pemrosesan Data &amp; Rekayasa Fitur</a>
+  <ul class="collapse">
+  <li><a href="#step-1-pemuatan-dataset" id="toc-step-1-pemuatan-dataset" class="nav-link" data-scroll-target="#step-1-pemuatan-dataset">Step 1: Pemuatan Dataset</a></li>
+  <li><a href="#step-2-eksplorasi-awal-exploratory-data-analysis" id="toc-step-2-eksplorasi-awal-exploratory-data-analysis" class="nav-link" data-scroll-target="#step-2-eksplorasi-awal-exploratory-data-analysis">Step 2: Eksplorasi Awal (Exploratory Data Analysis)</a>
+  <ul class="collapse">
+  <li><a href="#teori" id="toc-teori" class="nav-link" data-scroll-target="#teori">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering" id="toc-step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering" class="nav-link" data-scroll-target="#step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering">Step 3: Identifikasi Kolom &amp; Rekayasa Fitur (Feature Engineering)</a>
+  <ul class="collapse">
+  <li><a href="#teori-1" id="toc-teori-1" class="nav-link" data-scroll-target="#teori-1">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-4-imputasi-missing-value" id="toc-step-4-imputasi-missing-value" class="nav-link" data-scroll-target="#step-4-imputasi-missing-value">Step 4: Imputasi Missing Value</a>
+  <ul class="collapse">
+  <li><a href="#teori-2" id="toc-teori-2" class="nav-link" data-scroll-target="#teori-2">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-5-encoding-fitur-kategorikal" id="toc-step-5-encoding-fitur-kategorikal" class="nav-link" data-scroll-target="#step-5-encoding-fitur-kategorikal">Step 5: Encoding Fitur Kategorikal</a>
+  <ul class="collapse">
+  <li><a href="#teori-3" id="toc-teori-3" class="nav-link" data-scroll-target="#teori-3">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-6-standardisasi-data-scaling" id="toc-step-6-standardisasi-data-scaling" class="nav-link" data-scroll-target="#step-6-standardisasi-data-scaling">Step 6: Standardisasi Data (Scaling)</a>
+  <ul class="collapse">
+  <li><a href="#teori-4" id="toc-teori-4" class="nav-link" data-scroll-target="#teori-4">Teori</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#penentuan-jumlah-klaster-optimal" id="toc-penentuan-jumlah-klaster-optimal" class="nav-link" data-scroll-target="#penentuan-jumlah-klaster-optimal">3. Penentuan Jumlah Klaster Optimal</a>
+  <ul class="collapse">
+  <li><a href="#step-7-analisis-elbow-silhouette-score" id="toc-step-7-analisis-elbow-silhouette-score" class="nav-link" data-scroll-target="#step-7-analisis-elbow-silhouette-score">Step 7: Analisis Elbow &amp; Silhouette Score</a>
+  <ul class="collapse">
+  <li><a href="#teori-5" id="toc-teori-5" class="nav-link" data-scroll-target="#teori-5">Teori</a></li>
+  <li><a href="#analisis-pemilihan-k" id="toc-analisis-pemilihan-k" class="nav-link" data-scroll-target="#analisis-pemilihan-k">Analisis Pemilihan <span class="math inline">\(k\)</span></a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#klasterisasi-k-means-reduksi-dimensi" id="toc-klasterisasi-k-means-reduksi-dimensi" class="nav-link" data-scroll-target="#klasterisasi-k-means-reduksi-dimensi">4. Klasterisasi K-Means &amp; Reduksi Dimensi</a>
+  <ul class="collapse">
+  <li><a href="#step-8-eksekusi-kmeans-dengan-k-4" id="toc-step-8-eksekusi-kmeans-dengan-k-4" class="nav-link" data-scroll-target="#step-8-eksekusi-kmeans-dengan-k-4">Step 8: Eksekusi KMeans dengan <span class="math inline">\(k = 4\)</span></a>
+  <ul class="collapse">
+  <li><a href="#teori-6" id="toc-teori-6" class="nav-link" data-scroll-target="#teori-6">Teori</a></li>
+  </ul></li>
+  <li><a href="#step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca" id="toc-step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca" class="nav-link" data-scroll-target="#step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca">Step 9: Reduksi Dimensi &amp; Visualisasi Klaster menggunakan PCA</a>
+  <ul class="collapse">
+  <li><a href="#teori-7" id="toc-teori-7" class="nav-link" data-scroll-target="#teori-7">Teori</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#profiling-klaster-analisis-hasil" id="toc-profiling-klaster-analisis-hasil" class="nav-link" data-scroll-target="#profiling-klaster-analisis-hasil">5. Profiling Klaster (Analisis Hasil)</a>
+  <ul class="collapse">
+  <li><a href="#step-10-profiling-karakteristik-rata-rata-fitur-per-klaster" id="toc-step-10-profiling-karakteristik-rata-rata-fitur-per-klaster" class="nav-link" data-scroll-target="#step-10-profiling-karakteristik-rata-rata-fitur-per-klaster">Step 10: Profiling Karakteristik Rata-rata Fitur per Klaster</a>
+  <ul class="collapse">
+  <li><a href="#teori-8" id="toc-teori-8" class="nav-link" data-scroll-target="#teori-8">Teori</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#kesimpulan-rekomendasi-bisnis" id="toc-kesimpulan-rekomendasi-bisnis" class="nav-link" data-scroll-target="#kesimpulan-rekomendasi-bisnis">6. Kesimpulan &amp; Rekomendasi Bisnis</a>
+  <ul class="collapse">
+  <li><a href="#klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat" id="toc-klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat" class="nav-link" data-scroll-target="#klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat">Klaster 0: “Keluarga Muda dengan Pendapatan Rendah &amp; Hemat”</a></li>
+  <li><a href="#klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif" id="toc-klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif" class="nav-link" data-scroll-target="#klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif">Klaster 1: “Pelanggan VIP yang Sangat Responsif &amp; Konsumtif”</a></li>
+  <li><a href="#klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar" id="toc-klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar" class="nav-link" data-scroll-target="#klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar">Klaster 2: “Pelanggan Kaya yang Tenang &amp; Menyukai Produk Segar”</a></li>
+  <li><a href="#klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja" id="toc-klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja" class="nav-link" data-scroll-target="#klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja">Klaster 3: “Pelanggan Setia Kelas Menengah (Keluarga dengan Remaja)”</a></li>
+  </ul></li>
+  <li><a href="#informasi-diagnostik-kredit" id="toc-informasi-diagnostik-kredit" class="nav-link" data-scroll-target="#informasi-diagnostik-kredit">7. Informasi Diagnostik &amp; Kredit</a>
+  <ul class="collapse">
+  <li><a href="#diagnostik-antigravity" id="toc-diagnostik-antigravity" class="nav-link" data-scroll-target="#diagnostik-antigravity">Diagnostik Antigravity</a></li>
+  <li><a href="#diagnostik-python-environment" id="toc-diagnostik-python-environment" class="nav-link" data-scroll-target="#diagnostik-python-environment">Diagnostik Python &amp; Environment</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Customer Personality Analysis: Segmentasi Pelanggan Menggunakan Unsupervised Learning</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Penulis</div>
+    <div class="quarto-title-meta-contents">
+             <p>Antigravity </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Diterbitkan</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">28 Mei 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="pendahuluan" class="level1">
+<h1>1. Pendahuluan</h1>
+<p>Segmentasi pelanggan adalah salah satu aplikasi terpenting dari analisis data dalam bisnis modern. Dengan membagi basis pelanggan menjadi kelompok-kelompok yang memiliki karakteristik serupa (homogen di dalam kelompok, heterogen antar kelompok), perusahaan dapat merancang strategi pemasaran yang lebih personal, menargetkan produk yang relevan, meningkatkan retensi pelanggan, dan mengoptimalkan anggaran promosi.</p>
+<p>Laporan ini menyajikan analisis segmentasi pelanggan menggunakan teknik <strong>Unsupervised Learning</strong> pada dataset <em>Customer Personality Analysis</em> (<code>cpa.csv</code>). Dokumen ini disusun menggunakan prinsip <strong>Literate Programming</strong>, di mana teori dasar dari setiap langkah analisis disajikan bersama dengan kode implementasi Python dan visualisasinya.</p>
+<hr>
+</section>
+<section id="pemrosesan-data-rekayasa-fitur" class="level1">
+<h1>2. Pemrosesan Data &amp; Rekayasa Fitur</h1>
+<p>Sebelum menerapkan algoritme klasterisasi, data mentah harus diproses terlebih dahulu agar memenuhi asumsi-asumsi matematis dari algoritme jarak seperti K-Means.</p>
+<section id="step-1-pemuatan-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-pemuatan-dataset">Step 1: Pemuatan Dataset</h2>
+<p>Langkah pertama adalah memuat dataset ke dalam memory menggunakan pustaka <code>pandas</code>. Dataset ini berformat <em>tab-separated values</em> (TSV).</p>
+<div id="setup-and-load" class="cell" data-execution_count="1">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler, OneHotEncoder</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.impute <span class="im">import</span> SimpleImputer</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Mengatur tema plot agar estetis dan bersih</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> [<span class="dv">10</span>, <span class="dv">6</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Membaca dataset</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"cpa.csv"</span>, sep<span class="op">=</span><span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset berhasil dimuat dengan ukuran: </span><span class="sc">{</span>df<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> baris dan </span><span class="sc">{</span>df<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> kolom."</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset berhasil dimuat dengan ukuran: 2240 baris dan 29 kolom.</code></pre>
+</div>
+</div>
+</section>
+<section id="step-2-eksplorasi-awal-exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-eksplorasi-awal-exploratory-data-analysis">Step 2: Eksplorasi Awal (Exploratory Data Analysis)</h2>
+<section id="teori" class="level3">
+<h3 class="anchored" data-anchor-id="teori">Teori</h3>
+<p>Eksplorasi awal bertujuan untuk mendeteksi:</p>
+<ul>
+<li><strong>Missing values</strong>: Sebagian besar algoritme machine learning dalam scikit-learn tidak dapat menangani nilai kosong secara langsung.</li>
+<li><strong>Statistik Deskriptif</strong>: Memahami rentang nilai, rata-rata, dan penyebaran data untuk mendeteksi pencilan (outliers).</li>
+<li><strong>Kolom Konstan</strong>: Kolom yang tidak memiliki variansi (misalnya, semua baris bernilai sama) tidak memberikan informasi apa pun dalam analisis pengelompokan dan harus dihapus.</li>
+</ul>
+<div class="cell" data-execution_count="2">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan 3 baris pertama data</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">3</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-dataset-head" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="2">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-dataset-head-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabel&nbsp;1: Tiga Baris Pertama Dataset CPA
+</figcaption>
+<div aria-describedby="tbl-dataset-head-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe cell caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ID</th>
+<th data-quarto-table-cell-role="th">Year_Birth</th>
+<th data-quarto-table-cell-role="th">Education</th>
+<th data-quarto-table-cell-role="th">Marital_Status</th>
+<th data-quarto-table-cell-role="th">Income</th>
+<th data-quarto-table-cell-role="th">Kidhome</th>
+<th data-quarto-table-cell-role="th">Teenhome</th>
+<th data-quarto-table-cell-role="th">Dt_Customer</th>
+<th data-quarto-table-cell-role="th">Recency</th>
+<th data-quarto-table-cell-role="th">MntWines</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">NumWebVisitsMonth</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp3</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp4</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp5</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp1</th>
+<th data-quarto-table-cell-role="th">AcceptedCmp2</th>
+<th data-quarto-table-cell-role="th">Complain</th>
+<th data-quarto-table-cell-role="th">Z_CostContact</th>
+<th data-quarto-table-cell-role="th">Z_Revenue</th>
+<th data-quarto-table-cell-role="th">Response</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>5524</td>
+<td>1957</td>
+<td>Graduation</td>
+<td>Single</td>
+<td>58138.0</td>
+<td>0</td>
+<td>0</td>
+<td>04-09-2012</td>
+<td>58</td>
+<td>635</td>
+<td>...</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>11</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>2174</td>
+<td>1954</td>
+<td>Graduation</td>
+<td>Single</td>
+<td>46344.0</td>
+<td>1</td>
+<td>1</td>
+<td>08-03-2014</td>
+<td>38</td>
+<td>11</td>
+<td>...</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>11</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>4141</td>
+<td>1965</td>
+<td>Graduation</td>
+<td>Together</td>
+<td>71613.0</td>
+<td>0</td>
+<td>0</td>
+<td>21-08-2013</td>
+<td>26</td>
+<td>426</td>
+<td>...</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+<td>11</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+<p>3 rows × 29 columns</p>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Memeriksa missing values</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>missing_info <span class="op">=</span> df.isnull().<span class="bu">sum</span>()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Kolom dengan nilai kosong:"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(missing_info[missing_info <span class="op">&gt;</span> <span class="dv">0</span>])</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-missing-values" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="3">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-missing-values-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabel&nbsp;2: Identifikasi Nilai Kosong pada Dataset
+</figcaption>
+<div aria-describedby="tbl-missing-values-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-stdout">
+<pre><code>Kolom dengan nilai kosong:
+Income    24
+dtype: int64</code></pre>
+</div>
+</div>
+</figure>
+</div>
+<p>Ditemukan terdapat <strong>24 nilai kosong</strong> pada kolom <code>Income</code>. Kita harus melakukan imputasi pada langkah berikutnya.</p>
+<div id="check-constant-columns" class="cell" data-execution_count="4">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Memeriksa kolom konstan</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>const_cols <span class="op">=</span> [col <span class="cf">for</span> col <span class="kw">in</span> df.columns <span class="cf">if</span> df[col].nunique() <span class="op">&lt;=</span> <span class="dv">1</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Kolom konstan yang terdeteksi: </span><span class="sc">{</span>const_cols<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Kolom konstan yang terdeteksi: ['Z_CostContact', 'Z_Revenue']</code></pre>
+</div>
+</div>
+<p>Kolom <code>Z_CostContact</code> dan <code>Z_Revenue</code> bersifat konstan (hanya memiliki 1 nilai unik untuk semua baris), sehingga kolom ini tidak memiliki nilai informasi untuk proses pengelompokan dan akan dihapus.</p>
+<hr>
+</section>
+</section>
+<section id="step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-identifikasi-kolom-rekayasa-fitur-feature-engineering">Step 3: Identifikasi Kolom &amp; Rekayasa Fitur (Feature Engineering)</h2>
+<section id="teori-1" class="level3">
+<h3 class="anchored" data-anchor-id="teori-1">Teori</h3>
+<p>Data waktu (<code>Dt_Customer</code>) dan tahun lahir (<code>Year_Birth</code>) tidak optimal jika digunakan secara mentah:</p>
+<ul>
+<li><strong>Dt_Customer</strong> berisi tanggal pendaftaran pelanggan. Kita dapat mengubahnya menjadi <strong>Days_Registered</strong> (jumlah hari pendaftaran relatif terhadap pelanggan paling baru di dataset) untuk menangkap tingkat loyalitas waktu.</li>
+<li><strong>Year_Birth</strong> dapat diubah menjadi <strong>Age</strong> (Usia) untuk memudahkan interpretasi kelompok demografis. Kita berasumsi tahun analisis adalah 2015 (mengingat rentang pendaftaran pelanggan berkisar tahun 2012-2014).</li>
+<li><strong>Tipe Data</strong>: Memisahkan kolom numerik dan kategorikal untuk penanganan pemrosesan yang berbeda (imputasi median untuk numerik, one-hot encoding untuk kategori). Kolom indeks seperti <code>ID</code> juga harus dikeluarkan.</li>
+</ul>
+<div id="feature-engineering" class="cell" data-execution_count="5">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_processed <span class="op">=</span> df.copy()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Feature Engineering pada tanggal pendaftaran</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>df_processed[<span class="st">'Dt_Customer'</span>] <span class="op">=</span> pd.to_datetime(df_processed[<span class="st">'Dt_Customer'</span>], <span class="bu">format</span><span class="op">=</span><span class="st">'</span><span class="sc">%d</span><span class="st">-%m-%Y'</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>max_date <span class="op">=</span> df_processed[<span class="st">'Dt_Customer'</span>].<span class="bu">max</span>()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>df_processed[<span class="st">'Days_Registered'</span>] <span class="op">=</span> (max_date <span class="op">-</span> df_processed[<span class="st">'Dt_Customer'</span>]).dt.days</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>df_processed.drop(columns<span class="op">=</span>[<span class="st">'Dt_Customer'</span>], inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Feature Engineering pada tahun lahir (menghitung Usia)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>df_processed[<span class="st">'Age'</span>] <span class="op">=</span> <span class="dv">2015</span> <span class="op">-</span> df_processed[<span class="st">'Year_Birth'</span>]</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>df_processed.drop(columns<span class="op">=</span>[<span class="st">'Year_Birth'</span>], inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Memisahkan kolom numerik dan kategorikal</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>exclude_cols <span class="op">=</span> [<span class="st">'ID'</span>, <span class="st">'Z_CostContact'</span>, <span class="st">'Z_Revenue'</span>]</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>features_list <span class="op">=</span> [col <span class="cf">for</span> col <span class="kw">in</span> df_processed.columns <span class="cf">if</span> col <span class="kw">not</span> <span class="kw">in</span> exclude_cols]</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>numeric_cols <span class="op">=</span> []</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>categorical_cols <span class="op">=</span> []</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> features_list:</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pd.api.types.is_numeric_dtype(df_processed[col]):</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        numeric_cols.append(col)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        categorical_cols.append(col)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Kolom Numerik (</span><span class="sc">{</span><span class="bu">len</span>(numeric_cols)<span class="sc">}</span><span class="ss">): </span><span class="sc">{</span>numeric_cols<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Kolom Kategorikal (</span><span class="sc">{</span><span class="bu">len</span>(categorical_cols)<span class="sc">}</span><span class="ss">): </span><span class="sc">{</span>categorical_cols<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Kolom Numerik (24): ['Income', 'Kidhome', 'Teenhome', 'Recency', 'MntWines', 'MntFruits', 'MntMeatProducts', 'MntFishProducts', 'MntSweetProducts', 'MntGoldProds', 'NumDealsPurchases', 'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases', 'NumWebVisitsMonth', 'AcceptedCmp3', 'AcceptedCmp4', 'AcceptedCmp5', 'AcceptedCmp1', 'AcceptedCmp2', 'Complain', 'Response', 'Days_Registered', 'Age']
+Kolom Kategorikal (2): ['Education', 'Marital_Status']</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="step-4-imputasi-missing-value" class="level2">
+<h2 class="anchored" data-anchor-id="step-4-imputasi-missing-value">Step 4: Imputasi Missing Value</h2>
+<section id="teori-2" class="level3">
+<h3 class="anchored" data-anchor-id="teori-2">Teori</h3>
+<p>Terdapat nilai kosong pada variabel <code>Income</code>. Untuk menangani nilai kosong pada variabel numerik, kita dapat menggunakan strategi <strong>Median Imputation</strong>.</p>
+<ul>
+<li><strong>Mengapa Median?</strong> Median lebih tangguh (<em>robust</em>) terhadap pencilan (<em>outliers</em>) dibandingkan rata-rata (<em>mean</em>). Jika dataset memiliki beberapa pelanggan dengan pendapatan sangat ekstrem (outliers), nilai rata-rata akan bergeser naik secara signifikan, membuat nilai pengisi menjadi kurang representatif bagi mayoritas pelanggan. Median tetap mewakili nilai tengah yang sesungguhnya.</li>
+</ul>
+<div id="missing-imputation" class="cell" data-execution_count="6">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Melakukan imputasi nilai kosong menggunakan nilai median</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>num_imputer <span class="op">=</span> SimpleImputer(strategy<span class="op">=</span><span class="st">'median'</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df_processed[numeric_cols] <span class="op">=</span> num_imputer.fit_transform(df_processed[numeric_cols])</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Jumlah nilai kosong pada kolom numerik setelah imputasi: </span><span class="sc">{</span>df_processed[numeric_cols]<span class="sc">.</span>isnull()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Jumlah nilai kosong pada kolom numerik setelah imputasi: 0</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="step-5-encoding-fitur-kategorikal" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-encoding-fitur-kategorikal">Step 5: Encoding Fitur Kategorikal</h2>
+<section id="teori-3" class="level3">
+<h3 class="anchored" data-anchor-id="teori-3">Teori</h3>
+<p>Algoritme pengklasteran berbasis jarak seperti K-Means menghitung kesamaan berdasarkan fungsi jarak matematis (misalnya jarak Euclidean). Variabel teks/kategori seperti <code>Education</code> (“Graduation”, “PhD”, dsb.) dan <code>Marital_Status</code> (“Single”, “Married”, dsb.) tidak memiliki representasi jarak langsung.</p>
+<p>Untuk itu, digunakan <strong>One-Hot Encoding</strong>:</p>
+<ul>
+<li>Proses ini mengubah setiap kategori unik pada variabel kategorikal menjadi kolom biner baru (bernilai 0 atau 1).</li>
+<li>Misalnya, kolom <code>Education</code> akan dipecah menjadi <code>Education_Graduation</code>, <code>Education_PhD</code>, dst.</li>
+<li>Setelah dikodekan, fitur biner digabungkan kembali dengan fitur numerik yang sudah diimputasi.</li>
+</ul>
+<div id="categorical-encoding" class="cell" data-execution_count="7">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menerapkan One-Hot Encoding</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>encoder <span class="op">=</span> OneHotEncoder(sparse_output<span class="op">=</span><span class="va">False</span>, handle_unknown<span class="op">=</span><span class="st">'ignore'</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>encoded_cats <span class="op">=</span> encoder.fit_transform(df_processed[categorical_cols])</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>encoded_cats_df <span class="op">=</span> pd.DataFrame(encoded_cats, columns<span class="op">=</span>encoder.get_feature_names_out(categorical_cols))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Menggabungkan data numerik &amp; hasil encoding</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>df_numeric_part <span class="op">=</span> df_processed[numeric_cols].reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>df_features <span class="op">=</span> pd.concat([df_numeric_part, encoded_cats_df], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Ukuran dimensi fitur gabungan setelah encoding: </span><span class="sc">{</span>df_features<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Ukuran dimensi fitur gabungan setelah encoding: (2240, 37)</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="step-6-standardisasi-data-scaling" class="level2">
+<h2 class="anchored" data-anchor-id="step-6-standardisasi-data-scaling">Step 6: Standardisasi Data (Scaling)</h2>
+<section id="teori-4" class="level3">
+<h3 class="anchored" data-anchor-id="teori-4">Teori</h3>
+<p>Klasterisasi K-Means sangat sensitif terhadap skala data karena didasarkan pada minimalisasi jarak kuadrat antar titik (Euclidean Distance):</p>
+<p><span class="math display">\[d(\mathbf{p}, \mathbf{q}) = \sqrt{\sum_{i=1}^n (p_i - q_i)^2}\]</span></p>
+<p>Jika satu fitur memiliki rentang nilai yang sangat besar (misalnya <code>Income</code> berkisar antara puluhan ribu hingga ratusan ribu) sedangkan fitur lain memiliki rentang kecil (misalnya <code>Kidhome</code> berkisar 0 hingga 2), maka perhitungan jarak akan didominasi sepenuhnya oleh fitur dengan rentang besar tersebut.</p>
+<p>Untuk mengatasinya, diterapkan <strong>Standardisasi (Z-score scaling)</strong> menggunakan <code>StandardScaler</code>:</p>
+<p><span class="math display">\[z = \frac{x - \mu}{\sigma}\]</span></p>
+<p>di mana <span class="math inline">\(\mu\)</span> adalah rata-rata dan <span class="math inline">\(\sigma\)</span> adalah standar deviasi. Hasil akhir transformasinya adalah seluruh fitur akan memiliki rata-rata (<span class="math inline">\(\mu = 0\)</span>) dan standar deviasi (<span class="math inline">\(\sigma = 1\)</span>).</p>
+<div id="data-scaling" class="cell" data-execution_count="8">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardisasi data menggunakan StandardScaler</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> StandardScaler()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>df_scaled <span class="op">=</span> scaler.fit_transform(df_features)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>df_scaled_df <span class="op">=</span> pd.DataFrame(df_scaled, columns<span class="op">=</span>df_features.columns)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Statistik deskriptif setelah scaling (rata-rata &amp; std dev):"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rata-rata komponen pertama: </span><span class="sc">{</span>df_scaled[:, <span class="dv">0</span>]<span class="sc">.</span>mean()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Standar deviasi komponen pertama: </span><span class="sc">{</span>df_scaled[:, <span class="dv">0</span>]<span class="sc">.</span>std()<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Statistik deskriptif setelah scaling (rata-rata &amp; std dev):
+Rata-rata komponen pertama: -0.0000
+Standar deviasi komponen pertama: 1.0000</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+</section>
+<section id="penentuan-jumlah-klaster-optimal" class="level1">
+<h1>3. Penentuan Jumlah Klaster Optimal</h1>
+<section id="step-7-analisis-elbow-silhouette-score" class="level2">
+<h2 class="anchored" data-anchor-id="step-7-analisis-elbow-silhouette-score">Step 7: Analisis Elbow &amp; Silhouette Score</h2>
+<section id="teori-5" class="level3">
+<h3 class="anchored" data-anchor-id="teori-5">Teori</h3>
+<p>Bagaimana menentukan jumlah kelompok (<span class="math inline">\(k\)</span>) yang paling mewakili pola data tanpa pengawasan? Kami menggunakan kombinasi dua metode:</p>
+<ul>
+<li><strong>Metode Elbow (Siku)</strong>:
+<ul>
+<li>Mengukur <strong>Inertia</strong> (atau <em>Within-Cluster Sum of Squares</em> / WCSS), yaitu jumlah kuadrat jarak antara setiap titik data ke centroid klasternya sendiri: <span class="math display">\[WCSS = \sum_{j=1}^k \sum_{\mathbf{x}_i \in C_j} \|\mathbf{x}_i - \boldsymbol{\mu}_j\|^2\]</span></li>
+<li>Semakin banyak klaster, inersia akan semakin mendekati 0. Kita mencari titik “siku” di mana penurunan inersia mulai melambat secara signifikan (diminishing returns).</li>
+</ul></li>
+<li><strong>Silhouette Score</strong>:
+<ul>
+<li>Mengukur seberapa baik suatu objek ditempatkan di klasternya dibandingkan dengan klaster tetangga terdekatnya.</li>
+<li>Untuk satu titik data <span class="math inline">\(i\)</span>: <span class="math display">\[s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}\]</span> di mana <span class="math inline">\(a(i)\)</span> adalah rata-rata jarak titik <span class="math inline">\(i\)</span> ke seluruh titik lain di klaster yang sama, dan <span class="math inline">\(b(i)\)</span> adalah rata-rata jarak terpendek dari titik <span class="math inline">\(i\)</span> ke klaster lain.</li>
+<li>Rata-rata skor Silhouette berkisar antara <span class="math inline">\(-1\)</span> hingga <span class="math inline">\(+1\)</span>. Nilai mendekati <span class="math inline">\(+1\)</span> menunjukkan objek terklaster dengan sangat baik dan terpisah jauh dari klaster lain.</li>
+</ul></li>
+</ul>
+<div id="cell-fig-elbow-silhouette" class="cell" data-execution_count="9">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menghitung inersia dan silhouette score untuk k = 2 s/d 10</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>ks <span class="op">=</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">11</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>inertias <span class="op">=</span> []</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>silhouettes <span class="op">=</span> []</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> ks:</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> kmeans.fit_predict(df_scaled)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    inertias.append(kmeans.inertia_)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    silhouettes.append(silhouette_score(df_scaled, labels))</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualisasi kurva Elbow dan Silhouette Score berdampingan</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>fig, ax1 <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>color <span class="op">=</span> <span class="st">'tab:blue'</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>ax1.set_xlabel(<span class="st">'Number of Clusters (k)'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>ax1.set_ylabel(<span class="st">'Inertia (Within-Cluster Sum of Squares)'</span>, color<span class="op">=</span>color, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>ax1.plot(ks, inertias, <span class="st">'o-'</span>, color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'Inertia'</span>)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>ax1.tick_params(axis<span class="op">=</span><span class="st">'y'</span>, labelcolor<span class="op">=</span>color)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>ax2 <span class="op">=</span> ax1.twinx()  </span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>color <span class="op">=</span> <span class="st">'tab:red'</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">'Silhouette Score'</span>, color<span class="op">=</span>color, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>ax2.plot(ks, silhouettes, <span class="st">'s-'</span>, color<span class="op">=</span>color, linewidth<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'Silhouette Score'</span>)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>ax2.tick_params(axis<span class="op">=</span><span class="st">'y'</span>, labelcolor<span class="op">=</span>color)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Penentuan Jumlah Klaster Optimal: Metode Elbow &amp; Silhouette Score'</span>, fontsize<span class="op">=</span><span class="dv">14</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-elbow-silhouette" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-elbow-silhouette-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="antigravity-run_files/figure-html/fig-elbow-silhouette-output-1.png" width="1137" height="561" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-elbow-silhouette-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Gambar&nbsp;1: Penentuan Jumlah Klaster Optimal Menggunakan Metode Elbow &amp; Silhouette Score
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="analisis-pemilihan-k" class="level3">
+<h3 class="anchored" data-anchor-id="analisis-pemilihan-k">Analisis Pemilihan <span class="math inline">\(k\)</span></h3>
+<ul>
+<li>Kurva inersia menunjukkan penurunan tajam dari <span class="math inline">\(k=2\)</span> ke <span class="math inline">\(k=4\)</span>, setelah itu kurva mulai melandai secara bertahap (membentuk pola siku halus di sekitar <span class="math inline">\(k=4\)</span>).</li>
+<li>Skor Silhouette menunjukkan nilai yang relatif stabil untuk <span class="math inline">\(k=4\)</span> dan <span class="math inline">\(k=5\)</span>.</li>
+<li>Berdasarkan analisis bisnis segmentasi pelanggan pada dataset ini, memilih <strong><span class="math inline">\(k = 4\)</span></strong> adalah pilihan yang optimal karena menghasilkan pembagian kelompok yang seimbang dan mudah diinterpretasikan secara strategis.</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section id="klasterisasi-k-means-reduksi-dimensi" class="level1">
+<h1>4. Klasterisasi K-Means &amp; Reduksi Dimensi</h1>
+<section id="step-8-eksekusi-kmeans-dengan-k-4" class="level2">
+<h2 class="anchored" data-anchor-id="step-8-eksekusi-kmeans-dengan-k-4">Step 8: Eksekusi KMeans dengan <span class="math inline">\(k = 4\)</span></h2>
+<section id="teori-6" class="level3">
+<h3 class="anchored" data-anchor-id="teori-6">Teori</h3>
+<p>K-Means mempartisi data menjadi <span class="math inline">\(k\)</span> kelompok dengan cara iteratif:</p>
+<ul>
+<li>Menentukan <span class="math inline">\(k\)</span> titik acak sebagai centroid awal.</li>
+<li>Menugaskan setiap titik data ke centroid terdekat berdasarkan jarak Euclidean.</li>
+<li>Menghitung ulang posisi centroid sebagai rata-rata koordinat titik yang ditugaskan ke kelompok tersebut.</li>
+<li>Mengulangi langkah-langkah di atas hingga posisi centroid tidak lagi berubah secara signifikan.</li>
+</ul>
+<div id="kmeans-clustering" class="cell" data-execution_count="10">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menjalankan K-Means dengan k=4</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>optimal_k <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>kmeans <span class="op">=</span> KMeans(n_clusters<span class="op">=</span>optimal_k, random_state<span class="op">=</span><span class="dv">42</span>, n_init<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>cluster_labels <span class="op">=</span> kmeans.fit_predict(df_scaled)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Menyimpan hasil klaster ke dataframe</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Cluster'</span>] <span class="op">=</span> cluster_labels</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>df_processed[<span class="st">'Cluster'</span>] <span class="op">=</span> cluster_labels</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan distribusi jumlah anggota per klaster</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>cluster_counts <span class="op">=</span> pd.Series(cluster_labels).value_counts().sort_index()</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> cluster_id, count <span class="kw">in</span> cluster_counts.items():</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Klaster </span><span class="sc">{</span>cluster_id<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>count<span class="sc">}</span><span class="ss"> pelanggan (</span><span class="sc">{</span>count<span class="op">/</span><span class="bu">len</span>(df)<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%)"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Klaster 0: 1009 pelanggan (45.04%)
+Klaster 1: 171 pelanggan (7.63%)
+Klaster 2: 459 pelanggan (20.49%)
+Klaster 3: 601 pelanggan (26.83%)</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca" class="level2">
+<h2 class="anchored" data-anchor-id="step-9-reduksi-dimensi-visualisasi-klaster-menggunakan-pca">Step 9: Reduksi Dimensi &amp; Visualisasi Klaster menggunakan PCA</h2>
+<section id="teori-7" class="level3">
+<h3 class="anchored" data-anchor-id="teori-7">Teori</h3>
+<p>Data setelah preprocessing memiliki <strong>37 fitur</strong> (dimensi tinggi). Sangat sulit bagi manusia untuk memvisualisasikan data dalam ruang berdimensi lebih dari 3.</p>
+<p>Untuk memvisualisasikan penyebaran kelompok, kita menggunakan <strong>Principal Component Analysis (PCA)</strong>:</p>
+<ul>
+<li>PCA merotasi sumbu koordinat data ke arah di mana data memiliki variansi maksimum.</li>
+<li>Arah variansi terbesar pertama disebut <strong>Principal Component 1 (PC1)</strong>, dan arah tegak lurus dengan variansi terbesar berikutnya adalah <strong>Principal Component 2 (PC2)</strong>.</li>
+<li>Dengan memproyeksikan data 37 dimensi ke ruang 2 dimensi (PC1 dan PC2), kita dapat memvisualisasikan struktur klaster pelanggan dengan kehilangan informasi sesedikit mungkin.</li>
+</ul>
+<div id="pca-dimensionality-reduction" class="cell" data-execution_count="11">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Menjalankan PCA untuk reduksi dimensi menjadi 2 komponen</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>pca <span class="op">=</span> PCA(n_components<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>pca_result <span class="op">=</span> pca.fit_transform(df_scaled)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>df_pca <span class="op">=</span> pd.DataFrame(pca_result, columns<span class="op">=</span>[<span class="st">'PC1'</span>, <span class="st">'PC2'</span>])</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>df_pca[<span class="st">'Cluster'</span>] <span class="op">=</span> cluster_labels</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Menampilkan persentase variansi yang dijelaskan oleh PCA</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>variance_explained <span class="op">=</span> pca.explained_variance_ratio_</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Variansi yang dijelaskan oleh PC1: </span><span class="sc">{</span>variance_explained[<span class="dv">0</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Variansi yang dijelaskan oleh PC2: </span><span class="sc">{</span>variance_explained[<span class="dv">1</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total variansi yang dipertahankan dalam 2D: </span><span class="sc">{</span><span class="bu">sum</span>(variance_explained)<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Variansi yang dijelaskan oleh PC1: 17.73%
+Variansi yang dijelaskan oleh PC2: 6.03%
+Total variansi yang dipertahankan dalam 2D: 23.76%</code></pre>
+</div>
+</div>
+<p>Dua komponen utama pertama mempertahankan sekitar <strong>23.76%</strong> dari total variabilitas data asli, yang cukup representatif untuk visualisasi sebaran pengelompokan 2D.</p>
+<div id="cell-fig-pca-clusters-visualization" class="cell" data-execution_count="12">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot sebaran klaster pada bidang PCA 2D</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'#1f77b4'</span>, <span class="st">'#ff7f0e'</span>, <span class="st">'#2ca02c'</span>, <span class="st">'#d62728'</span>] <span class="co"># Palet premium</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">'PC1'</span>, y<span class="op">=</span><span class="st">'PC2'</span>,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    hue<span class="op">=</span><span class="st">'Cluster'</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    palette<span class="op">=</span>colors[:optimal_k],</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df_pca,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="st">"full"</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.7</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    s<span class="op">=</span><span class="dv">60</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Visualisasi Klaster Pelanggan dalam Ruang 2D PCA'</span>, fontsize<span class="op">=</span><span class="dv">14</span>, fontweight<span class="op">=</span><span class="st">'bold'</span>, pad<span class="op">=</span><span class="dv">15</span>)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="ss">f'Principal Component 1 (</span><span class="sc">{</span>variance_explained[<span class="dv">0</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">% Variance)'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="ss">f'Principal Component 2 (</span><span class="sc">{</span>variance_explained[<span class="dv">1</span>]<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">% Variance)'</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>plt.legend(title<span class="op">=</span><span class="st">'Klaster'</span>, loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-pca-clusters-visualization" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pca-clusters-visualization-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="antigravity-run_files/figure-html/fig-pca-clusters-visualization-output-1.png" width="945" height="753" class="figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pca-clusters-visualization-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Gambar&nbsp;2: Visualisasi Klaster Pelanggan dalam Ruang 2D PCA
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Visualisasi di atas menunjukkan pemisahan kelompok pelanggan yang cukup jelas di sepanjang sumbu PC1 dan PC2, mengonfirmasi bahwa algoritme K-Means berhasil mengidentifikasi pola struktural kelompok pelanggan yang berbeda.</p>
+<hr>
+</section>
+</section>
+</section>
+<section id="profiling-klaster-analisis-hasil" class="level1">
+<h1>5. Profiling Klaster (Analisis Hasil)</h1>
+<section id="step-10-profiling-karakteristik-rata-rata-fitur-per-klaster" class="level2">
+<h2 class="anchored" data-anchor-id="step-10-profiling-karakteristik-rata-rata-fitur-per-klaster">Step 10: Profiling Karakteristik Rata-rata Fitur per Klaster</h2>
+<section id="teori-8" class="level3">
+<h3 class="anchored" data-anchor-id="teori-8">Teori</h3>
+<p>Untuk memahami siapa saja orang-orang di dalam setiap klaster, kita menghitung rata-rata (<em>mean</em>) dari fitur-fitur penting yang mendefinisikan perilaku belanja, kondisi demografis, dan interaksi promosi mereka.</p>
+<div class="cell" data-execution_count="13">
+<details open="" class="code-fold">
+<summary>Kode</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mengisi nilai kosong di dataframe eksplorasi awal agar profiling konsisten</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>df_processed[<span class="st">'Income'</span>] <span class="op">=</span> df_processed[<span class="st">'Income'</span>].fillna(df_processed[<span class="st">'Income'</span>].median())</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Fitur-fitur utama untuk profil</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>profile_features <span class="op">=</span> [</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Income'</span>, <span class="st">'Age'</span>, <span class="st">'Kidhome'</span>, <span class="st">'Teenhome'</span>, <span class="st">'Recency'</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'MntWines'</span>, <span class="st">'MntFruits'</span>, <span class="st">'MntMeatProducts'</span>, <span class="st">'MntFishProducts'</span>, <span class="st">'MntSweetProducts'</span>, <span class="st">'MntGoldProds'</span>,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'NumDealsPurchases'</span>, <span class="st">'NumWebPurchases'</span>, <span class="st">'NumCatalogPurchases'</span>, <span class="st">'NumStorePurchases'</span>, <span class="st">'NumWebVisitsMonth'</span>,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Complain'</span>, <span class="st">'Response'</span>, <span class="st">'Days_Registered'</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Menghitung rata-rata fitur per klaster</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>cluster_profile <span class="op">=</span> df_processed.groupby(<span class="st">'Cluster'</span>)[profile_features].mean()</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>cluster_sizes <span class="op">=</span> df_processed[<span class="st">'Cluster'</span>].value_counts().sort_index().rename(<span class="st">'Cluster_Size'</span>)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>profile_table <span class="op">=</span> pd.concat([cluster_sizes, cluster_profile], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Format tampilan angka agar rapi</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.float_format'</span>, <span class="kw">lambda</span> x: <span class="st">'</span><span class="sc">%.2f</span><span class="st">'</span> <span class="op">%</span> x)</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>profile_table.T</span></code></pre></div><button title="Salin ke Papan Klip" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-cluster-profile" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="13">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-cluster-profile-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabel&nbsp;3: Tabel Profil Karakteristik Pelanggan untuk Setiap Klaster
+</figcaption>
+<div aria-describedby="tbl-cluster-profile-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+
+
+<table class="dataframe cell caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Cluster</th>
+<th data-quarto-table-cell-role="th">0</th>
+<th data-quarto-table-cell-role="th">1</th>
+<th data-quarto-table-cell-role="th">2</th>
+<th data-quarto-table-cell-role="th">3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Cluster_Size</th>
+<td>1009.00</td>
+<td>171.00</td>
+<td>459.00</td>
+<td>601.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Income</th>
+<td>34713.60</td>
+<td>81569.49</td>
+<td>73853.65</td>
+<td>56805.05</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Age</th>
+<td>43.05</td>
+<td>45.64</td>
+<td>47.04</td>
+<td>50.99</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Kidhome</th>
+<td>0.80</td>
+<td>0.05</td>
+<td>0.05</td>
+<td>0.25</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Teenhome</th>
+<td>0.43</td>
+<td>0.13</td>
+<td>0.24</td>
+<td>0.95</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Recency</th>
+<td>49.57</td>
+<td>49.83</td>
+<td>49.37</td>
+<td>47.94</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MntWines</th>
+<td>38.15</td>
+<td>874.70</td>
+<td>488.42</td>
+<td>446.86</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">MntFruits</th>
+<td>5.01</td>
+<td>56.43</td>
+<td>70.86</td>
+<td>19.44</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MntMeatProducts</th>
+<td>22.80</td>
+<td>469.13</td>
+<td>426.71</td>
+<td>124.60</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">MntFishProducts</th>
+<td>7.30</td>
+<td>77.05</td>
+<td>104.93</td>
+<td>25.54</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">MntSweetProducts</th>
+<td>5.13</td>
+<td>65.48</td>
+<td>71.60</td>
+<td>18.94</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">MntGoldProds</th>
+<td>15.37</td>
+<td>77.34</td>
+<td>77.22</td>
+<td>57.28</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NumDealsPurchases</th>
+<td>2.00</td>
+<td>1.05</td>
+<td>1.52</td>
+<td>3.84</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">NumWebPurchases</th>
+<td>2.06</td>
+<td>5.44</td>
+<td>5.25</td>
+<td>6.20</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NumCatalogPurchases</th>
+<td>0.53</td>
+<td>6.05</td>
+<td>5.73</td>
+<td>2.93</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">NumStorePurchases</th>
+<td>3.16</td>
+<td>8.26</td>
+<td>8.36</td>
+<td>7.55</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">NumWebVisitsMonth</th>
+<td>6.46</td>
+<td>3.00</td>
+<td>2.95</td>
+<td>5.86</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Complain</th>
+<td>0.01</td>
+<td>0.01</td>
+<td>0.01</td>
+<td>0.01</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Response</th>
+<td>0.09</td>
+<td>0.58</td>
+<td>0.17</td>
+<td>0.11</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Days_Registered</th>
+<td>319.66</td>
+<td>356.05</td>
+<td>356.71</td>
+<td>407.44</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<hr>
+</section>
+</section>
+</section>
+<section id="kesimpulan-rekomendasi-bisnis" class="level1">
+<h1>6. Kesimpulan &amp; Rekomendasi Bisnis</h1>
+<p>Berdasarkan tabel rata-rata profil di atas, kita dapat merumuskan karakteristik unik dari keempat kelompok pelanggan beserta strategi pemasaran yang paling efektif bagi masing-masing kelompok:</p>
+<section id="klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat" class="level3">
+<h3 class="anchored" data-anchor-id="klaster-0-keluarga-muda-dengan-pendapatan-rendah-hemat">Klaster 0: “Keluarga Muda dengan Pendapatan Rendah &amp; Hemat”</h3>
+<ul>
+<li><strong>Karakteristik Demografi</strong>: Usia termuda (rata-rata ~43 tahun), memiliki jumlah anak kecil terbanyak (<code>Kidhome</code> rata-rata 0.80).</li>
+<li><strong>Karakteristik Finansial &amp; Belanja</strong>: Pendapatan terendah (~34.7k). Pengeluaran sangat minim di semua kategori produk (misalnya rata-rata belanja anggur hanya ~38 unit dan daging ~22 unit). Sering mengunjungi website perusahaan (<code>NumWebVisitsMonth</code> tertinggi, yaitu 6.45 kali/bulan) namun jarang melakukan pembelian langsung.</li>
+<li><strong>Strategi Pemasaran</strong>:
+<ul>
+<li>Fokuskan promosi pada produk kebutuhan anak dan diskon paket hemat keluarga.</li>
+<li>Kirimkan kupon diskon melalui channel digital/web karena mereka aktif mengunjungi situs web tetapi sensitif terhadap harga.</li>
+</ul></li>
+</ul>
+</section>
+<section id="klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif" class="level3">
+<h3 class="anchored" data-anchor-id="klaster-1-pelanggan-vip-yang-sangat-responsif-konsumtif">Klaster 1: “Pelanggan VIP yang Sangat Responsif &amp; Konsumtif”</h3>
+<ul>
+<li><strong>Karakteristik Demografi</strong>: Usia menengah (~45.6 tahun), hampir tidak memiliki anak di rumah (<code>Kidhome</code> ~0.05).</li>
+<li><strong>Karakteristik Finansial &amp; Belanja</strong>: Pendapatan tertinggi (~81.5k). Pengeluaran belanja luar biasa tinggi, terutama untuk Anggur (<code>MntWines</code> rata-rata ~874) dan Daging (<code>MntMeatProducts</code> rata-rata ~469). Mereka sangat menyukai pembelian langsung lewat katalog (<code>NumCatalogPurchases</code> tertinggi, yaitu 6.04) dan toko fisik.</li>
+<li><strong>Respon Promosi</strong>: Tingkat respon terhadap promosi terakhir (<code>Response</code>) luar biasa tinggi, mencapai <strong>57.89%</strong>!</li>
+<li><strong>Strategi Pemasaran</strong>:
+<ul>
+<li>Ini adalah kelompok pelanggan paling berharga (VIP). Layani mereka dengan program loyalitas eksklusif (loyalty program) dan penawaran keanggotaan premium.</li>
+<li>Berikan rekomendasi produk premium (misal: anggur langka berkualitas tinggi atau daging potong impor) melalui katalog fisik eksklusif atau komunikasi personal langsung.</li>
+</ul></li>
+</ul>
+</section>
+<section id="klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar" class="level3">
+<h3 class="anchored" data-anchor-id="klaster-2-pelanggan-kaya-yang-tenang-menyukai-produk-segar">Klaster 2: “Pelanggan Kaya yang Tenang &amp; Menyukai Produk Segar”</h3>
+<ul>
+<li><strong>Karakteristik Demografi</strong>: Usia rata-rata ~47 tahun, hampir tidak memiliki anak di rumah (<code>Kidhome</code> ~0.05).</li>
+<li><strong>Karakteristik Finansial &amp; Belanja</strong>: Pendapatan tinggi (~73.8k). Pengeluaran belanja tinggi di semua kategori produk, khususnya memiliki konsumsi buah (<code>MntFruits</code> ~70), ikan (<code>MntFishProducts</code> ~104), dan permen/manisan (<code>MntSweetProducts</code> ~71) tertinggi dibanding kelompok lain.</li>
+<li><strong>Respon Pemasaran</strong>: Cukup loyal dengan respon promosi moderat (~16.5%). Jarang melakukan komplain.</li>
+<li><strong>Strategi Pemasaran</strong>:
+<ul>
+<li>Tawarkan promosi produk segar sehat (seafood, buah organik, cokelat/permen premium).</li>
+<li>Maksimalkan penjualan melalui gerai fisik (<code>NumStorePurchases</code> tertinggi, yaitu 8.35 kali) karena mereka menyukai pengalaman berbelanja langsung di toko tanpa banyak terganggu oleh tawaran diskon online.</li>
+</ul></li>
+</ul>
+</section>
+<section id="klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja" class="level3">
+<h3 class="anchored" data-anchor-id="klaster-3-pelanggan-setia-kelas-menengah-keluarga-dengan-remaja">Klaster 3: “Pelanggan Setia Kelas Menengah (Keluarga dengan Remaja)”</h3>
+<ul>
+<li><strong>Karakteristik Demografi</strong>: Usia tertua (rata-rata ~51 tahun), memiliki anak remaja terbanyak (<code>Teenhome</code> tertinggi, yaitu 0.94). Masa keanggotaan terlama (<code>Days_Registered</code> tertinggi ~407 hari).</li>
+<li><strong>Karakteristik Finansial &amp; Belanja</strong>: Pendapatan kelas menengah (~56.8k). Pengeluaran moderat, dengan minat utama pada Anggur (<code>MntWines</code> ~446). Sangat aktif berburu diskon (<code>NumDealsPurchases</code> tertinggi, yaitu 3.84 kali) dan sering membeli melalui website (<code>NumWebPurchases</code> tertinggi, yaitu 6.20 kali).</li>
+<li><strong>Strategi Pemasaran</strong>:
+<ul>
+<li>Tawarkan promosi berbasis potongan harga (<em>deals</em>) untuk mempertahankan loyalitas mereka.</li>
+<li>Tawarkan paket bundling produk untuk keluarga menengah melalui platform e-commerce (web) karena mereka sangat terbiasa belanja online.</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="informasi-diagnostik-kredit" class="level1">
+<h1>7. Informasi Diagnostik &amp; Kredit</h1>
+<p>Dokumen laporan analisis ini dibuat dan ditulis secara otomatis menggunakan pendekatan <em>literate programming</em> oleh <strong>Google Antigravity</strong>, asisten pengodean cerdas berbasis AI yang dikembangkan oleh tim Google DeepMind.</p>
+<p>Berikut adalah informasi diagnostik terkait lingkungan eksekusi pembuatan dokumen ini:</p>
+<section id="diagnostik-antigravity" class="level2">
+<h2 class="anchored" data-anchor-id="diagnostik-antigravity">Diagnostik Antigravity</h2>
+<ul>
+<li><strong>Nama Agen</strong>: Antigravity</li>
+<li><strong>Pengembang</strong>: Google DeepMind Team</li>
+<li><strong>Conversation ID</strong>: <code>72af37b6-ff6b-45af-bca3-d1abfd82d133</code></li>
+<li><strong>Workspace Corpus Name</strong>: <code>return215/machine-learning-tugas-ut</code></li>
+<li><strong>Sistem Operasi</strong>: Linux (distrobox host)</li>
+</ul>
+</section>
+<section id="diagnostik-python-environment" class="level2">
+<h2 class="anchored" data-anchor-id="diagnostik-python-environment">Diagnostik Python &amp; Environment</h2>
+<ul>
+<li><strong>Python Executable</strong>: Python 3.14.4</li>
+<li><strong>Conda Environment</strong>: <code>machine-learning-tugas</code> (dijalankan di dalam distrobox container <code>ubuntu-bigdata</code>)</li>
+<li><strong>Quarto Executable</strong>: <code>/usr/local/bin/quarto</code></li>
+<li><strong>Versi Pustaka Analisis Data Utama</strong>:
+<ul>
+<li><code>pandas</code>: <code>3.0.2</code></li>
+<li><code>scikit-learn</code>: <code>1.8.0</code></li>
+<li><code>matplotlib</code>: <code>3.10.8</code></li>
+<li><code>seaborn</code>: <code>0.13.2</code></li>
+</ul></li>
+</ul>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Disalin!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Disalin!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
